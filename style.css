@@ -1142,3 +1142,115 @@ button {
     grid-template-columns: 1fr;
   }
 }
+/* ===== EFECTO DE REVISTA FÍSICA ===== */
+
+.magazine-stage {
+  padding: 26px;
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.04),
+      rgba(0,0,0,.10) 50%,
+      rgba(255,255,255,.04)
+    );
+  box-shadow:
+    0 35px 70px rgba(0,0,0,.45),
+    0 10px 25px rgba(0,0,0,.25);
+}
+
+/* Sensación de páginas alrededor de la revista */
+.book-shell {
+  position: relative;
+  background: #f7f2ea;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,.15),
+    0 8px 0 rgba(0,0,0,.08),
+    0 18px 35px rgba(0,0,0,.35);
+}
+
+/* Pequeño relieve en los bordes */
+.book-shell::before,
+.book-shell::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.book-shell::before {
+  left: -4px;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,.28),
+    rgba(255,255,255,.08)
+  );
+}
+
+.book-shell::after {
+  right: -4px;
+  background: linear-gradient(
+    to left,
+    rgba(0,0,0,.28),
+    rgba(255,255,255,.08)
+  );
+}
+
+/* La revista queda separada visualmente del fondo */
+.spread {
+  position: relative;
+  box-shadow:
+    0 18px 35px rgba(0,0,0,.30),
+    0 3px 8px rgba(0,0,0,.18);
+}
+
+/* Simula el pequeño pliegue central de una revista abierta */
+.reference-spread::after,
+.cover-spread::after,
+.back-spread::after,
+.general-map-spread::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,.10),
+    rgba(255,255,255,.16),
+    rgba(0,0,0,.08)
+  );
+  opacity: .65;
+}
+
+/* Profundidad adicional en pantallas grandes */
+@media (min-width: 851px) {
+  .magazine-stage {
+    margin-top: 35px;
+    margin-bottom: 20px;
+  }
+
+  .book-shell {
+    transform: perspective(1800px) rotateX(.35deg);
+    transform-origin: center bottom;
+  }
+}
+
+/* En móvil mantenemos el margen sin deformar la revista */
+@media (max-width: 850px) {
+  .magazine-stage {
+    padding: 12px;
+    margin-left: 8px;
+    margin-right: 8px;
+  }
+
+  .book-shell {
+    transform: none;
+  }
+}
