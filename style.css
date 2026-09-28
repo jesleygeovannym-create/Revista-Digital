@@ -1145,69 +1145,74 @@ button {
 /* ===== EFECTO DE REVISTA FÍSICA ===== */
 
 .magazine-stage {
-  padding: 26px;
+  padding: 24px;
   border-radius: 4px;
   background:
     linear-gradient(
       90deg,
-      rgba(255,255,255,.04),
-      rgba(0,0,0,.10) 50%,
-      rgba(255,255,255,.04)
+      #071426 0%,
+      #0b1a2d 18%,
+      #071426 50%,
+      #0b1a2d 82%,
+      #071426 100%
     );
   box-shadow:
-    0 35px 70px rgba(0,0,0,.45),
-    0 10px 25px rgba(0,0,0,.25);
+    0 30px 60px rgba(0,0,0,.45),
+    0 8px 20px rgba(0,0,0,.30);
 }
 
-/* Sensación de páginas alrededor de la revista */
 .book-shell {
   position: relative;
   background: #f7f2ea;
   box-shadow:
-    0 2px 0 rgba(255,255,255,.15),
-    0 8px 0 rgba(0,0,0,.08),
-    0 18px 35px rgba(0,0,0,.35);
+    0 2px 0 rgba(255,255,255,.12),
+    0 7px 0 rgba(0,0,0,.10),
+    0 18px 32px rgba(0,0,0,.38);
 }
 
-/* Pequeño relieve en los bordes */
+/* Borde físico de la revista */
 .book-shell::before,
 .book-shell::after {
   content: "";
   position: absolute;
-  top: 8px;
-  bottom: 8px;
-  width: 4px;
+  top: 7px;
+  bottom: 7px;
+  width: 5px;
   pointer-events: none;
   z-index: 5;
 }
 
 .book-shell::before {
-  left: -4px;
+  left: -5px;
   background: linear-gradient(
     to right,
-    rgba(0,0,0,.28),
-    rgba(255,255,255,.08)
+    #071426,
+    #d8b878,
+    #071426
   );
+  opacity: .75;
 }
 
 .book-shell::after {
-  right: -4px;
+  right: -5px;
   background: linear-gradient(
     to left,
-    rgba(0,0,0,.28),
-    rgba(255,255,255,.08)
+    #071426,
+    #d8b878,
+    #071426
   );
+  opacity: .75;
 }
 
-/* La revista queda separada visualmente del fondo */
+/* Sombra de las páginas */
 .spread {
   position: relative;
   box-shadow:
-    0 18px 35px rgba(0,0,0,.30),
-    0 3px 8px rgba(0,0,0,.18);
+    0 16px 32px rgba(0,0,0,.28),
+    0 3px 7px rgba(0,0,0,.18);
 }
 
-/* Simula el pequeño pliegue central de una revista abierta */
+/* Línea central de la revista */
 .reference-spread::after,
 .cover-spread::after,
 .back-spread::after,
@@ -1220,37 +1225,29 @@ button {
   width: 2px;
   transform: translateX(-50%);
   pointer-events: none;
+
   background: linear-gradient(
     to right,
-    rgba(0,0,0,.10),
-    rgba(255,255,255,.16),
-    rgba(0,0,0,.08)
+    rgba(7,20,38,.18),
+    rgba(216,184,120,.25),
+    rgba(255,255,255,.18),
+    rgba(7,20,38,.12)
   );
+
   opacity: .65;
 }
 
-/* Profundidad adicional en pantallas grandes */
 @media (min-width: 851px) {
   .magazine-stage {
     margin-top: 35px;
     margin-bottom: 20px;
   }
-
-  .book-shell {
-    transform: perspective(1800px) rotateX(.35deg);
-    transform-origin: center bottom;
-  }
 }
 
-/* En móvil mantenemos el margen sin deformar la revista */
 @media (max-width: 850px) {
   .magazine-stage {
     padding: 12px;
     margin-left: 8px;
     margin-right: 8px;
-  }
-
-  .book-shell {
-    transform: none;
   }
 }
