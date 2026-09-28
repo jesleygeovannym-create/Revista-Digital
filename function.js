@@ -175,7 +175,7 @@ const pages = [
     name: "Iberostar Paraíso Maya",
     location: "Iberostar Selection Paraíso Maya Suites, Carretera Chetumal-Puerto Juárez km 309, Playa Paraíso, Quintana Roo, México",
     image: "src/paraisoMaya.jpg",
-    intro: "berostar Selection Paraíso Maya combina la grandeza de la cultura maya con una experiencia todo incluido frente al Caribe. Sus piscinas, parque acuático, río lento, gastronomía internacional y programas familiares convierten al resort en uno de los destinos más completos de Riviera Maya..",
+    intro: "Iberostar Selection Paraíso Maya combina la grandeza de la cultura maya con una experiencia todo incluido frente al Caribe. Sus piscinas, parque acuático, río lento, gastronomía internacional y programas familiares convierten al resort en uno de los destinos más completos de Riviera Maya..",
     stats: [
       ["308", "Habitaciones"],
       ["8", "Restaurantes"],
@@ -2767,62 +2767,30 @@ function renderPage() {
       renderVideos();
   }
 
-  else {
-    bookShell.innerHTML = `
-      <div
-        class="spread back-spread"
-        style="background-image:linear-gradient(90deg,rgba(4,24,39,.65),rgba(10,3,16,.94)),url('${page.image}')"
-      >
+else {
+  bookShell.innerHTML = `
+    <div class="spread back-spread" style="background-image:linear-gradient(90deg,rgba(4,24,39,.65),rgba(10,3,16,.94)),url('${page.image}')">
 
-        <div class="back-quote">
+      <section class="back-quote">
+        <span>${page.kicker}</span>
+        <h1>“${page.quote}”</h1>
+        <span>KM. 309 · PLAYA DEL CARMEN, Q.ROO MÉXICO</span>
+      </section>
 
-          <h1>
-            “${page.quote}”
-          </h1>
+      <section class="back-contact">
+        <img class="cover-logo" src="src/logo png-01.png" alt="Logo">
+        <h1>PLAYA PARAISO</h1>
+        <small>IBEROSTAR</small>
 
-          <span>
-            KM. 309 · PLAYA DEL CARMEN, Q.ROO MÉXICO
-          </span>
+        ${page.contact.map((line) => `<p>${line}</p>`).join("")}
 
-        </div>
+        <button class="back-reserve" type="button">
+          RESERVAR AHORA
+        </button>
+      </section>
 
-        <div class="back-contact">
-
-          <img
-            class="cover-logo"
-            src="src/logo png-01.png"
-            alt="Logo"
-          />
-
-          <h1>
-            PLAYA PARAISO
-          </h1>
-
-          <small>
-            IBEROSTAR
-          </small>
-
-          ${
-            page.contact
-              .map(
-                (line) =>
-                  `<p>${line}</p>`
-              )
-              .join("")
-          }
-
-          <button
-            class="back-reserve"
-            type="button"
-          >
-            RESERVAR AHORA
-          </button>
-
-        </div>
-
-      </div>
-    `;
-  }
+    </div>`;
+}
 
   renderDots();
 

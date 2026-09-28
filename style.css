@@ -1216,3 +1216,94 @@ button {
     margin-right: 8px;
   }
 }
+/* ===== CONTRAPORTADA RESPONSIVA ===== */
+
+@media (max-width: 620px) {
+  .back-spread {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 0;
+    height: auto;
+  }
+
+  .back-quote,
+  .back-contact {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 28px 20px;
+    box-sizing: border-box;
+  }
+
+  .back-quote {
+    min-height: 280px;
+  }
+
+  .back-quote h1 {
+    margin: 12px 0;
+    font-size: clamp(26px, 8vw, 34px);
+    line-height: 1.2;
+  }
+
+  .back-contact {
+    min-height: 330px;
+    justify-content: center;
+  }
+
+  .back-contact .cover-logo {
+    width: min(150px, 45vw);
+    height: auto;
+    margin: 0 auto 10px;
+  }
+
+  .back-contact h1 {
+    margin: 8px 0 3px;
+    font-size: clamp(22px, 7vw, 28px);
+  }
+
+  .back-contact p {
+    margin: 3px 0;
+    font-size: clamp(9px, 2.8vw, 11px);
+  }
+
+  .back-reserve {
+    width: min(220px, 75vw);
+    height: 28px;
+    margin: 14px auto 0;
+  }
+}
+@media (max-width: 620px) {
+  .back-contact {
+    min-height: 325px;
+    height: 325px;
+    padding: 20px;
+    overflow: visible;
+  }
+
+  .back-contact .cover-logo {
+    width: 130px;
+    margin: 0 auto 8px;
+  }
+
+  .back-contact h1 {
+    margin: 6px 0 2px;
+    font-size: 24px;
+  }
+
+  .back-contact small {
+    font-size: 9px;
+  }
+
+  .back-contact p {
+    margin: 2px 0;
+    font-size: 10px;
+  }
+
+  .back-reserve {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    height: 28px;
+    margin: 12px auto 0;
+  }
+}
