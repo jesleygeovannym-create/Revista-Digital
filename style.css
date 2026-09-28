@@ -1142,77 +1142,51 @@ button {
     grid-template-columns: 1fr;
   }
 }
-/* ===== EFECTO DE REVISTA FÍSICA ===== */
+/* ===== MARGEN DE REVISTA - RESPETA EL DISEÑO ORIGINAL ===== */
 
 .magazine-stage {
   padding: 24px;
-  border-radius: 4px;
-  background:
-    linear-gradient(
-      90deg,
-      #071426 0%,
-      #0b1a2d 18%,
-      #071426 50%,
-      #0b1a2d 82%,
-      #071426 100%
-    );
+  background: #160a06;
   box-shadow:
-    0 30px 60px rgba(0,0,0,.45),
-    0 8px 20px rgba(0,0,0,.30);
+    0 28px 55px rgba(0, 0, 0, .45),
+    inset 0 0 0 1px rgba(216, 184, 120, .18);
 }
 
+/* La revista mantiene sus colores originales */
 .book-shell {
-  position: relative;
-  background: #f7f2ea;
+  background: transparent;
   box-shadow:
-    0 2px 0 rgba(255,255,255,.12),
-    0 7px 0 rgba(0,0,0,.10),
-    0 18px 32px rgba(0,0,0,.38);
+    0 12px 28px rgba(0, 0, 0, .32);
 }
 
-/* Borde físico de la revista */
+/* Pequeño acabado dorado en los laterales */
 .book-shell::before,
 .book-shell::after {
   content: "";
   position: absolute;
-  top: 7px;
-  bottom: 7px;
-  width: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
   pointer-events: none;
   z-index: 5;
+  background: #d8b878;
+  opacity: .35;
 }
 
 .book-shell::before {
-  left: -5px;
-  background: linear-gradient(
-    to right,
-    #071426,
-    #d8b878,
-    #071426
-  );
-  opacity: .75;
+  left: -2px;
 }
 
 .book-shell::after {
-  right: -5px;
-  background: linear-gradient(
-    to left,
-    #071426,
-    #d8b878,
-    #071426
-  );
-  opacity: .75;
+  right: -2px;
 }
 
-/* Sombra de las páginas */
+/* Mantener intactos los colores de cada página */
 .spread {
   position: relative;
-  box-shadow:
-    0 16px 32px rgba(0,0,0,.28),
-    0 3px 7px rgba(0,0,0,.18);
 }
 
-/* Línea central de la revista */
+/* Unión central muy sutil */
 .reference-spread::after,
 .cover-spread::after,
 .back-spread::after,
@@ -1222,19 +1196,10 @@ button {
   top: 0;
   bottom: 0;
   left: 50%;
-  width: 2px;
+  width: 1px;
   transform: translateX(-50%);
   pointer-events: none;
-
-  background: linear-gradient(
-    to right,
-    rgba(7,20,38,.18),
-    rgba(216,184,120,.25),
-    rgba(255,255,255,.18),
-    rgba(7,20,38,.12)
-  );
-
-  opacity: .65;
+  background: rgba(0, 0, 0, .12);
 }
 
 @media (min-width: 851px) {
