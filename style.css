@@ -1,13 +1,10 @@
-﻿: root { 
+﻿:root { 
   --brown: #160a06; 
-   
   --cream: #f7f2ea; 
-   
   --navy: #071426; 
-   
   --gold: #d8b878 
 } 
- 
+                                                    
 * { 
   box-sizing: border-box 
 } 
@@ -157,19 +154,19 @@ button {
 .reference-stats div { 
   padding: 10px 4px; 
   text-align: center; 
-  background: #f0e5cf; 
-  border-bottom: 2px solid #d5b36f 
+  background: var(--gold); 
+  border-bottom: 2px solid #b99a5c 
 } 
  
 .reference-stats strong { 
   display: block; 
-  color: #253047; 
+  color: #251d17; 
   font-size: 24px 
 } 
  
 .reference-stats small { 
   font: 9px Arial; 
-  color: #777 
+  color: #3f3426 
 } 
  
 .reference-copy ul { 
@@ -179,8 +176,8 @@ button {
   color: #666 
 } 
  
-.reference-copy li: before { 
-  content: 'âœ¦'; 
+.reference-copy li:before { 
+  content: 'o'; 
   color: #d5b36f; 
   margin-right: 8px 
 } 
@@ -444,10 +441,10 @@ button {
 } 
  
 .cover-logo { 
-    width: 230px; 
-    height: auto; 
-    display: block; 
-    margin: 50px auto 18px; 
+  width: 230px; 
+  height: auto; 
+  display: block; 
+  margin: 50px auto 18px; 
 } 
  
 .cover-copy h1 { 
@@ -574,6 +571,20 @@ button {
   background: var(--navy); 
   border-radius: 8px 
 } 
+
+.map-location-button {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--gold);
+  color: #241b14;
+  font: bold 11px Arial;
+  box-shadow: 0 4px 12px #0005;
+}
  
 .map-route-list b { 
   color: #dfc483; 
@@ -649,126 +660,127 @@ button {
  
 @media(max-width: 150px) { 
   .magazine-stage { 
-  width: 92vw 
-} 
+    width: 92vw 
+  } 
  
-.nav-button { 
-  display: none 
-} 
+  .nav-button { 
+    display: none 
+  } 
  
-.book-shell,.spread { 
-  min-height: 690px 
-} 
+  .book-shell,.spread { 
+    min-height: 690px 
+  } 
  
-.cover-copy h1 { 
-  font-size: 38px 
-} 
+  .cover-copy h1 { 
+    font-size: 38px 
+  } 
 } 
  
 @media(max-width: 620px) { 
   body { 
-  justify-content: flex-start; 
-  padding-top: 24px 
-} 
+    justify-content: flex-start; 
+    padding-top: 24px 
+  } 
  
-.reference-spread { 
-  grid-template-columns: 1fr 
-} 
+  .reference-spread { 
+    grid-template-columns: 1fr 
+  } 
  
-.reference-right { 
-  min-height: 620px 
-} 
+  .reference-right { 
+    min-height: 620px 
+  } 
  
-.food-list { 
-  grid-template-columns: repeat(2,1fr) 
-} 
+  .food-list { 
+    grid-template-columns: repeat(2,1fr) 
+  } 
  
-.general-map-title { 
-  left: 10%; 
-  right: 10% 
-} 
+  .general-map-title { 
+    left: 10%; 
+    right: 10% 
+  } 
  
-.back-spread{ 
+  .back-spread { 
     display:flex; 
     min-height:740px; 
     background-size:cover; 
     background-position:center; 
-} 
+  } 
  
-.back-quote, 
-.back-contact{ 
+  .back-quote, 
+  .back-contact { 
     width:50%; 
     padding:55px; 
     display:flex; 
     flex-direction:column; 
     justify-content:center; 
-} 
+  } 
  
-.back-quote{ 
+  .back-quote { 
     color:#e2c78a; 
     text-align:center; 
-} 
+  } 
  
-.back-quote h1{ 
+  .back-quote h1 { 
     font-style:italic; 
     font-size:48px; 
     line-height:1.3; 
-} 
+  } 
  
-.back-contact{ 
+  .back-contact { 
     background:rgba(10,3,16,.82); 
     align-items:center; 
     text-align:center; 
     color:#fff; 
-} 
+  } 
  
-.back-contact h1{ 
+  .back-contact h1 { 
     margin:20px 0 10px; 
-} 
+  } 
  
-.back-reserve{ 
+  .back-reserve { 
     margin-top:25px; 
-} 
-@media(max-width:850px){ 
+  } 
  
-    .back-spread{ 
-        flex-direction:column; 
-        min-height:auto; 
+  @media(max-width:850px) { 
+ 
+    .back-spread { 
+      flex-direction:column; 
+      min-height:auto; 
     } 
  
     .back-quote, 
-    .back-contact{ 
-        width:100%; 
-        padding:30px 20px; 
-        box-sizing:border-box; 
+    .back-contact { 
+      width:100%; 
+      padding:30px 20px; 
+      box-sizing:border-box; 
     } 
  
-    .back-quote{ 
-        min-height:220px; 
+    .back-quote { 
+      min-height:220px; 
     } 
  
-    .back-quote h1{ 
-        font-size:30px; 
+    .back-quote h1 { 
+      font-size:30px; 
     } 
  
-    .back-contact{ 
-        gap:10px; 
+    .back-contact { 
+      gap:10px; 
     } 
  
-    .back-contact h1{ 
-        font-size:32px; 
+    .back-contact h1 { 
+      font-size:32px; 
     } 
  
-    .cover-logo{ 
-        width:180px; 
-        height:auto; 
+    .cover-logo { 
+      width:180px; 
+      height:auto; 
     } 
  
-    .back-reserve{ 
-        width:100%; 
-        max-width:260px; 
+    .back-reserve { 
+      width:100%; 
+      max-width:260px; 
     } 
-} 
+  } 
 } 
 
 
@@ -1142,6 +1154,7 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
 /* ===== MARGEN DE REVISTA - RESPETA EL DISEÑO ORIGINAL ===== */
 
 .magazine-stage {
@@ -1152,14 +1165,12 @@ button {
     inset 0 0 0 1px rgba(216, 184, 120, .18);
 }
 
-/* La revista mantiene sus colores originales */
 .book-shell {
   background: transparent;
   box-shadow:
     0 12px 28px rgba(0, 0, 0, .32);
 }
 
-/* Pequeño acabado dorado en los laterales */
 .book-shell::before,
 .book-shell::after {
   content: "";
@@ -1181,12 +1192,10 @@ button {
   right: -2px;
 }
 
-/* Mantener intactos los colores de cada página */
 .spread {
   position: relative;
 }
 
-/* Unión central muy sutil */
 .reference-spread::after,
 .cover-spread::after,
 .back-spread::after,
@@ -1218,8 +1227,6 @@ button {
 }
 
 @media (max-width: 620px) {
-
-  /* ===== CONTRAPORTADA RESPONSIVE ===== */
 
   .book-shell,
   .spread,

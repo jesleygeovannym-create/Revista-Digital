@@ -6,12 +6,20 @@ const generalMapCenter = { latitude: 20.7612389, longitude: -86.9640931 };
 const generalMapZoom = 15;
 
 const hotelCoordinates = {
-  "Iberostar Paraíso del Mar": [20.7621, -86.9634],
-  "Iberostar Paraíso Maya": [20.7648, -86.9638],
-  "Iberostar Paraíso Lindo": [20.7597, -86.9602],
+  "Iberostar Paraíso del Mar": [20.7612389, -86.9640931],
+  "Iberostar Paraíso Maya": [20.7578835, -86.9648766],
+  "Iberostar Paraíso Lindo": [20.7596096, -86.9639649],
   "Iberostar Paraíso Beach": [20.7584, -86.9585],
-  "Iberostar Paraíso JOIA": [20.7640, -86.9660]
+  "Iberostar Paraíso JOIA": [20.7563073, -86.9629786]
 };
+
+// Límite del complejo: ningún mapa (general o de hotel) puede
+// alejarse ni desplazarse más allá de este rectángulo. Así solo
+// se ve Iberostar Playa Paraíso, nunca lo que hay alrededor.
+const complexBounds = [
+  [20.7550, -86.9700], // suroeste
+  [20.7690, -86.9550]  // noreste
+];
 
 
 /* =========================================================
@@ -614,14 +622,6 @@ function openDirections(destination) {
    ========================================================= */
 
 function hotelMap(page) {
-  const mapUrl =
-    `https://www.google.com/maps?q=${encodeURIComponent(page.location)}&z=18&t=k&output=embed`;
-
-  const exactSearch =
-    page.name === "Iberostar Paraíso Maya"
-      ? "Iberostar Selection Paraíso Maya Suites, Playa Paraíso, Quintana Roo, México"
-      : page.location;
-
   return `
     <div
       class="interactive-map"
@@ -635,21 +635,12 @@ function hotelMap(page) {
 
         <div class="map-actions">
           <button class="locate-me" type="button">
-            Ubicarme
+            📍 Ubicarme
           </button>
 
           <button class="route-to" type="button">
             Cómo llegar
           </button>
-
-          <a
-            class="open-map"
-            href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(page.location)}&zoom=18"
-            target="_blank"
-            rel="noopener"
-          >
-            Abrir ubicación ↗
-          </a>
         </div>
       </div>
 
@@ -657,21 +648,7 @@ function hotelMap(page) {
         class="hotel-google-frame"
         id="hotelMapFrame"
       >
-        <iframe
-          class="google-map"
-          title="Mapa satelital de ${page.name}"
-          src="${mapUrl}"
-          loading="lazy"
-          allowfullscreen
-          referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
-
-        <div
-          class="hotel-user-marker"
-          id="hotelUserMarker"
-        >
-          <span>Tu ubicación</span>
-        </div>
+        <div id="hotelMap" class="google-map"></div>
       </div>
     </div>
   `;
@@ -2635,94 +2612,41 @@ function renderPage() {
     `;
   }
 
-  else if (
-    page.type === "map"
-  ) {
-    const completeMapUrl =
-      "https://www.google.com/maps?q=20.7612389,-86.9640931&z=15&t=k&output=embed";
-
+  else if (page.type === "map") {
     bookShell.innerHTML = `
       <div class="spread general-map-spread">
-
-        <div
-          class="general-map-frame"
-          id="generalMapFrame"
-        >
-
-          <iframe
-            class="google-map general-google-map"
-            title="Mapa general satelital de todos los hoteles"
-            src="${completeMapUrl}"
-            loading="lazy"
-            allowfullscreen
-            referrerpolicy="no-referrer-when-downgrade"
-          ></iframe>
-
-          <div
-            class="general-user-marker"
-            id="generalUserMarker"
-          >
-            <span>
-              Tu ubicación
-            </span>
-          </div>
-
+        <div class="general-map-frame" id="generalMapFrame">
+          <div id="generalMap" class="google-map general-google-map"></div>
+          <button type="button" class="locate-me map-location-button">
+            📍 Mi ubicación
+          </button>
         </div>
 
         <div class="map-route-list">
-
-          <b>
-            ★ NAVEGAR A HOTEL
-          </b>
-
-          ${
-            pages
-              .filter(
-                (item) =>
-                  item.type === "hotel"
-              )
-              .map(
-                (item, i) => `
-                  <button
-                    type="button"
-                    data-hotel="${i + 1}"
-                  >
-                    ● ${item.name.replace(
-                      "Iberostar ",
-                      ""
-                    )}
-
-                    <span>
-                      →
-                    </span>
-                  </button>
-
-                  <button
-                    class="mini-route"
-                    type="button"
-                    data-route="${item.location}"
-                  >
-                    Cómo llegar
-                  </button>
-                `
-              )
-              .join("")
-          }
-
+          <b>★ NAVEGAR A HOTEL</b>
+          ${pages
+            .filter((item) => item.type === "hotel")
+            .map(
+              (item, i) => `
+                <button type="button" data-hotel="${i + 1}" data-route="${item.location}" class="hotel-route-button">
+                  ● ${item.name.replace("Iberostar ", "")}
+                  <span>→</span>
+                </button>
+                <button class="mini-route" type="button" data-route="${item.location}">
+                  Cómo llegar
+                </button>
+              `
+            )
+            .join("")}
         </div>
 
-        <a
-          class="open-map general-map-link"
-          href="https://www.google.com/maps/search/?api=1&query=Iberostar%20Playa%20Para%C3%ADso%2C%20Playa%20Para%C3%ADso%2C%20Quintana%20Roo"
-          target="_blank"
-          rel="noopener"
-        >
+        <a class="open-map general-map-link" href="https://www.openstreetmap.org/?mlat=20.7612389&mlon=-86.9640931#map=16/20.7612389/-86.9640931" target="_blank" rel="noopener">
           Abrir mapa completo ↗
         </a>
-
       </div>
     `;
   }
+
 
   else if (
     page.type === "mapamundi"
@@ -3101,7 +3025,9 @@ function initializeGeneralMap() {
           mapElement,
           {
             zoomControl: true,
-            attributionControl: true
+            attributionControl: true,
+            maxBounds: complexBounds,
+            maxBoundsViscosity: 1.0
           }
         ).setView(
           complexCenter,
@@ -3110,6 +3036,12 @@ function initializeGeneralMap() {
 
       activeMap =
         generalMap;
+
+      // Zoom mínimo = justo lo que ocupa el complejo. No se puede
+      // alejar más y ver los alrededores.
+      generalMap.setMinZoom(
+        generalMap.getBoundsZoom(complexBounds)
+      );
 
       const satelliteLayer =
         L.tileLayer(
@@ -3200,8 +3132,8 @@ function initializeGeneralMap() {
         ],
         [
           "Spa y bienestar",
-          20.7630,
-          -86.9610
+          20.7601287,
+          -86.9661145
         ]
       ];
 
@@ -3278,12 +3210,20 @@ function initializeHotelMap() {
           mapElement,
           {
             zoomControl: true,
-            attributionControl: true
+            attributionControl: true,
+            maxBounds: complexBounds,
+            maxBoundsViscosity: 1.0
           }
         ).setView(
           destinationCoordinates,
           17
         );
+
+      // No dejar alejar el zoom más allá de lo que ocupa el complejo,
+      // así nunca se ve lo que hay fuera de Iberostar Playa Paraíso.
+      activeMap.setMinZoom(
+        activeMap.getBoundsZoom(complexBounds)
+      );
 
       const satelliteLayer =
         L.tileLayer(
