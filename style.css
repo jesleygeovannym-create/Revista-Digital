@@ -575,7 +575,7 @@ button {
 .map-location-button {
   position: absolute;
   top: 18px;
-  right: 460px;
+  right: 18px;
   z-index: 1000;
   padding: 9px 14px;
   border: 0;
