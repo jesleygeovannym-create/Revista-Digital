@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Revista Iberostar</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+   <link
+  href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  defer
+></script>
+    
+    <style>
+      body, button { font-family: "EB Garamond", Georgia, serif; }
+      .book-shell { perspective: 1800px; }
+      .book-shell.page-turn { animation: pageTurn .7s cubic-bezier(.2,.75,.25,1); }
+
+      @keyframes pageTurn {
+        0% {
+          opacity: .35;
+          transform: rotateY(-12deg) translateX(32px);
+          transform-origin: left center;
+        }
+
+        55% {
+          opacity: .75;
+          transform: rotateY(4deg) translateX(-8px);
+        }
+
+        100% {
+          opacity: 1;
+          transform: rotateY(0) translateX(0);
+        }
+      }
+
+      .google-map {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: 350px;
+        border: 0;
+      }
+
+      #hotelMap {
+        min-height: 350px;
+        width: 100%;
+        height: 100%;
+        background: #dfe8d7;
+      }
+
+      .google-fallback {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: 350px;
+        border: 0;
+      }
+
+      .map-labels {
+        position: absolute;
+        z-index: 450;
+        top: 62px;
+        left: 10px;
+        display: grid;
+        gap: 5px;
+        max-width: 190px;
+        padding: 10px 12px;
+        border: 1px solid rgba(216,184,120,.65);
+        border-radius: 8px;
+        background: rgba(7,20,38,.9);
+        color: #fff;
+        font: 10px Arial, sans-serif;
+        pointer-events: none;
+      }
+
+      .map-labels strong {
+        color: #f1d18d;
+        font: 16px "EB Garamond", Georgia, serif;
+      }
+
+      .map-labels span {
+        color: rgba(255,255,255,.9);
+      }
+
+      .route-preview {
+        min-height: 100%;
+        padding: 18px;
+        background: linear-gradient(145deg, #edf2e6, #c5d9b5);
+        color: #253047;
+        font: 12px Arial, sans-serif;
+      }
+
+      .route-preview-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+
+      .route-preview-header span {
+        color: #6a572e;
+      }
+
+      .route-preview-map {
+        position: relative;
+        min-height: 230px;
+        overflow: hidden;
+        background:
+          linear-gradient(155deg, transparent 0 48%, rgba(255,255,255,.7) 49% 53%, transparent 54%),
+          repeating-linear-gradient(25deg, rgba(92,145,91,.22) 0 2px, transparent 2px 32px),
+          #dcebd2;
+        border: 1px solid #b4caa7;
+      }
+
+      .route-path {
+        position: absolute;
+        top: 50%;
+        right: 14%;
+        left: 14%;
+        display: flex;
+        align-items: center;
+        transform: rotate(-12deg);
+      }
+
+      .route-path b {
+        flex: 1;
+        height: 7px;
+        border-radius: 8px;
+        background: #d9b978;
+        box-shadow: 0 0 0 2px #fff, 0 3px 8px rgba(40,60,30,.3);
+      }
+
+      .route-path i {
+        z-index: 1;
+        width: 18px;
+        height: 18px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px #555;
+      }
+
+      .route-start {
+        background: #42c9a5;
+      }
+
+      .route-end {
+        background: #e56b5b;
+      }
+
+      .route-label {
+        position: absolute;
+        padding: 6px 8px;
+        border-radius: 5px;
+        background: rgba(7,20,38,.9);
+        color: #fff;
+        font-size: 10px;
+      }
+
+      .route-start-label {
+        top: 28%;
+        left: 8%;
+      }
+
+      .route-end-label {
+        right: 8%;
+        bottom: 28%;
+        max-width: 45%;
+      }
+
+      .route-preview > small {
+        display: block;
+        margin-top: 12px;
+        color: #5d625c;
+        line-height: 1.4;
+      }
+
+      .open-map {
+        margin-right: 10px;
+        color: #755b29;
+        font: 10px Arial, sans-serif;
+        text-decoration: none;
+      }
+
+      .back-map {
+        position: relative;
+        width: 50%;
+        min-height: 740px;
+        overflow: hidden;
+        background: #e9e2d4;
+      }
+
+      .back-map .google-map {
+        min-height: 740px;
+      }
+
+      .back-map-title {
+        position: absolute;
+        z-index: 1;
+        top: 18px;
+        left: 18px;
+        padding: 12px 16px;
+        background: rgba(7,20,38,.92);
+        color: #e6ca8c;
+      }
+
+      .back-map-title small {
+        font: 8px Arial, sans-serif;
+        letter-spacing: .18em;
+      }
+
+      .back-map-title h2 {
+        margin: 4px 0 0;
+        font-size: 16px;
+        font-weight: 500;
+      }
+
+      .back-map-link {
+        position: absolute;
+        z-index: 1;
+        left: 18px;
+        bottom: 18px;
+        padding: 9px 12px;
+        background: #f3d49a;
+        color: #241b14;
+      }
+
+      .general-map-spread {
+        position: relative;
+        min-height: 740px;
+        background: #e9e2d4;
+      }
+
+      .general-google-map {
+        min-height: 740px;
+      }
+
+      .general-map-spread .general-map-title {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+
+      .general-map-spread .map-route-list {
+        z-index: 1000 !important;
+      }
+
+      .general-map-link {
+        position: absolute;
+        z-index: 2;
+        right: 18px;
+        bottom: 18px;
+        padding: 9px 12px;
+        background: #f3d49a;
+        color: #241b14;
+      }
+
+      .general-map-frame {
+        position: relative;
+        width: 100%;
+        min-height: 740px;
+        overflow: hidden;
+      }
+
+      .general-user-marker {
+        position: absolute;
+        z-index: 10;
+        display: none;
+        transform: translate(-50%, -100%);
+        pointer-events: none;
+      }
+
+      .general-user-marker.visible {
+        display: block;
+      }
+
+      .general-user-marker::before {
+        content: "";
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 0;
+        background: #24b8a0;
+        box-shadow: 0 2px 8px #0008;
+        transform: rotate(-45deg);
+      }
+
+      .general-user-marker span {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        padding: 5px 8px;
+        border-radius: 4px;
+        background: #071426;
+        color: #fff;
+        font: 10px Arial, sans-serif;
+      }
+
+      .hotel-google-frame {
+        position: relative;
+        width: 100%;
+        min-height: 350px;
+        overflow: hidden;
+      }
+
+      .hotel-google-frame .google-map {
+        min-height: 350px;
+      }
+
+      .reference-right .interactive-map {
+        height: 100%;
+        min-height: 0;
+      }
+
+      .reference-right .hotel-google-frame {
+        height: calc(100% - 42px);
+        min-height: 0;
+      }
+
+      .reference-right .hotel-google-frame .google-map {
+        height: 100%;
+        min-height: 0;
+      }
+
+      .hotel-user-marker {
+        position: absolute;
+        z-index: 10;
+        display: none;
+        transform: translate(-50%, -100%);
+        pointer-events: none;
+      }
+
+      .hotel-user-marker.visible {
+        display: block;
+      }
+
+      .hotel-user-marker::before {
+        content: "";
+        display: block;
+        width: 19px;
+        height: 19px;
+        border: 3px solid #fff;
+        border-radius: 50% 50% 50% 0;
+        background: #24b8a0;
+        box-shadow: 0 2px 8px #0008;
+        transform: rotate(-45deg);
+      }
+
+      .hotel-user-marker span {
+        position: absolute;
+        bottom: 27px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        padding: 5px 8px;
+        border-radius: 4px;
+        background: #071426;
+        color: #fff;
+        font: 10px Arial, sans-serif;
+      }
+
+      .general-map-canvas {
+        position: absolute;
+        inset: 0;
+        min-height: 740px;
+        background: #dcebd2;
+      }
+
+      .complex-label,
+      .place-label {
+        padding: 4px 7px;
+        border: 1px solid rgba(216,184,120,.75);
+        border-radius: 4px;
+        background: rgba(7,20,38,.9);
+        color: #fff;
+        font: 11px Arial, sans-serif;
+        box-shadow: 0 2px 8px rgba(0,0,0,.35);
+      }
+
+      .complex-label {
+        color: #f2d494;
+        font-weight: 700;
+      }
+
+      .place-label {
+        color: #fff;
+        font-size: 10px;
+      }
+
+      .location-status {
+        max-width: min(90vw, 1080px);
+        margin: 8px auto 0;
+        color: rgba(226, 201, 145, .78);
+        font: 11px Arial, sans-serif;
+        text-align: center;
+      }
+
+      .map-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .map-actions button,
+      .mini-route {
+        padding: 5px 7px;
+        border: 1px solid #cbb47d;
+        background: #fff8e9;
+        color: #594827;
+        font: 9px Arial, sans-serif;
+      }
+
+      .route-panel {
+        position: absolute;
+        z-index: 5;
+        left: 50%;
+        bottom: 18px;
+        display: none;
+        width: min(360px, calc(100% - 36px));
+        transform: translateX(-50%);
+        padding: 16px 18px;
+        background: rgba(7, 20, 38, .97);
+        color: #f3d79b;
+        box-shadow: 0 10px 30px #0008;
+      }
+
+      .route-panel.visible {
+        display: grid;
+        gap: 8px;
+      }
+
+      .route-panel strong {
+        font-size: 16px;
+      }
+
+      .route-panel span {
+        color: #fff;
+        font: 11px Arial, sans-serif;
+      }
+
+      .route-panel a {
+        color: #f3d79b;
+        font: 11px Arial, sans-serif;
+      }
+
+      .route-panel iframe {
+        width: 100%;
+        height: 220px;
+        border: 0;
+      }
+
+      .internal-route {
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid rgba(216, 184, 120, .45);
+        background: linear-gradient(135deg, #12263d, #071426);
+        color: #fff;
+        font: 11px Arial, sans-serif;
+      }
+
+      .internal-route span {
+        color: #f3d79b;
+      }
+
+      .internal-route small {
+        color: rgba(255,255,255,.72);
+        line-height: 1.4;
+      }
+
+      .route-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #fff;
+      }
+
+      .route-line i {
+        width: 10px;
+        height: 10px;
+        border: 2px solid #d9b978;
+        border-radius: 50%;
+      }
+
+      .route-line i:first-child {
+        background: #42c9a5;
+      }
+
+      .route-line i:last-child {
+        background: #eb6c5c;
+      }
+
+      .route-line b {
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, #42c9a5, #d9b978, #eb6c5c);
+        color: transparent;
+      }
+
+      .close-route {
+        position: absolute;
+        top: 5px;
+        right: 7px;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font-size: 20px;
+      }
+
+      .route-panel small {
+        color: rgba(255,255,255,.72);
+        line-height: 1.4;
+      }
+
+      .location-status {
+        max-width: min(90vw, 1080px);
+        margin: 8px auto 0;
+        color: rgba(226, 201, 145, .78);
+        font: 11px Arial, sans-serif;
+        text-align: center;
+      }
+
+      .map-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .map-actions button {
+        padding: 5px 7px;
+        border: 1px solid #cbb47d;
+        background: #fff8e9;
+        color: #594827;
+        font: 9px Arial, sans-serif;
+      }
+
+      @media (max-width: 850px) {
+        body {
+          justify-content: flex-start;
+          padding: 18px 0 88px;
+        }
+
+        .magazine-stage {
+          width: 94vw;
+          margin-top: 8px;
+        }
+
+        .nav-button {
+          display: none;
+        }
+
+        .book-shell,
+        .spread {
+          min-height: 0;
+        }
+
+        .cover-spread,
+        .back-spread,
+        .general-map-spread {
+          min-height: 680px;
+        }
+
+        .cover-copy h1 {
+          font-size: clamp(34px, 8vw, 52px);
+        }
+
+        .reference-photo {
+          height: 230px;
+        }
+
+        .reference-right {
+          grid-template-rows: 48px minmax(350px, 1fr) 150px;
+        }
+
+        .map-canvas {
+          min-height: 350px;
+        }
+
+        .google-map {
+          min-height: 350px;
+        }
+
+        #hotelMap,
+        .google-fallback {
+          min-height: 350px;
+        }
+
+        .map-toolbar {
+          height: auto;
+          min-height: 42px;
+          padding: 4px;
+        }
+
+        .map-actions {
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .map-labels {
+          top: 72px;
+          max-width: 165px;
+          padding: 8px;
+          font-size: 9px;
+        }
+
+        .map-toolbar {
+          height: auto;
+          min-height: 42px;
+          padding: 4px;
+        }
+
+        .map-actions {
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+      }
+
+      @media (max-width: 620px) { 
+        .magazine-stage {
+          width: calc(100vw - 20px);
+          margin-top: 0;
+        }
+
+        .reference-spread {
+          display: block;
+        }
+
+        .reference-photo {
+          height: 235px;
+        }
+
+        .reference-copy {
+          min-height: 310px;
+          padding: 16px 18px;
+        }
+
+        .reference-copy p {
+          font-size: 11px;
+        }
+
+        .reference-stats {
+          gap: 5px;
+        }
+
+        .reference-stats strong {
+          font-size: 20px;
+        }
+
+        .reference-stats small {
+          font-size: 8px;
+        }
+
+        .reference-copy ul {
+          font-size: 10px;
+          line-height: 1.85;
+        }
+
+        .reference-right {
+          display: block;
+          min-height: 0;
+        }
+
+        .reference-right > header {
+          height: 48px;
+        }
+
+        .interactive-map {
+          height: auto;
+          min-height: 0;
+          overflow: visible;
+        }
+
+        .map-canvas {
+          min-height: 390px;
+        }
+
+        .google-map {
+          min-height: 390px;
+        }
+
+        #hotelMap,
+        .google-fallback {
+          min-height: 390px;
+          height: 390px;
+        }
+
+        .map-toolbar {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .map-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .map-labels {
+          top: 88px;
+          left: 6px;
+          max-width: 145px;
+        }
+
+        .location-status {
+          margin: 8px 20px 0;
+          font-size: 10px;
+          line-height: 1.4;
+        }
+
+        .map-toolbar {
+          flex-wrap: wrap;
+          gap: 4px;
+        }
+
+        .map-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .back-map {
+          width: 100%;
+          min-height: 50%;
+          height: 50%;
+        }
+
+        .back-map .google-map {
+          min-height: 100%;
+        }
+
+        .food-panel {
+          min-height: 165px;
+        }
+
+        .food-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .general-map-spread {
+          min-height: 650px;
+        }
+
+        .general-google-map {
+          min-height: 650px;
+        }
+
+        .general-map-frame {
+          min-height: 650px;
+        }
+
+        .reference-right .interactive-map {
+          height: auto;
+        }
+
+        .hotel-google-frame,
+        .hotel-google-frame .google-map {
+          min-height: 440px;
+          height: 440px;
+        }
+
+        .general-map-canvas {
+          min-height: 650px;
+        }
+
+        .general-map-title {
+          left: 8%;
+          right: 8%;
+          top: 12px;
+        }
+
+        .general-map-title h1 {
+          font-size: 15px;
+        }
+
+        .general-map-art {
+          inset: 105px 0 0;
+        }
+
+        .map-route-list {
+        left: 10px;
+        bottom: 30px;
+        padding: 9px;
+        z-index: 1000 !important;
+        }
+
+      .map-route-list button {
+        width: 145px;
+        padding: 6px;
+        font-size: 10px;
+      }
+
+        .map-location-button {
+          top: 10px;
+          right: 10px;
+          padding: 7px 11px;
+          font-size: 10px;
+        }
+
+        .back-spread {
+          display: block;
+          min-height: 650px;
+        }
+
+        .back-quote,
+        .back-contact {
+          width: 100%;
+          height: 50%;
+          padding: 100px;
+        }
+
+        .back-quote h1 {
+          font-size: 25px;
+        }
+
+        .back-contact h1 {
+          font-size: 24px;
+        }
+
+        .cta-button {
+          right: 12px;
+          bottom: 12px;
+          padding: 10px 14px;
+          font-size: 11px;
+        }
+
+        .pager {
+          max-width: calc(100vw - 32px);
+          flex-wrap: wrap;
+          margin-top: 12px;
+        }
+      }
+
+      .cover-spread {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 740px;
+        background: #090b16;
+      }
+
+      .cover-left {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        overflow: hidden;
+        background: radial-gradient(circle at 50% 15%, #1b1028 0, #100a16 42%, #080b14 100%);
+        color: #dcbf82;
+        text-align: center;
+      }
+
+      .cover-left::before {
+        content: "";
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        top: -90px;
+        left: -70px;
+        border: 1px solid rgba(224,194,132,.18);
+        border-radius: 50%;
+      }
+
+      .cover-left small {
+        font-size: 9px;
+        letter-spacing: .28em;
+      }
+
+      .cover-left .cover-star {
+        margin: 0 0 22px;
+        font-size: 43px;
+      }
+
+      .cover-left h1 {
+        margin: 50px 0;
+        color: #f4eee3;
+        font-size: clamp(44px, 5vw, 66px);
+        font-weight: 400;
+        line-height: .94;
+      }
+
+      .cover-left h1 span {
+        display: block;
+      }
+
+      .cover-left h1 span:last-child {
+        color: #d9b875;
+      }
+
+      .cover-left p {
+        font-size: 9px;
+        letter-spacing: .24em;
+      }
+
+      .cover-left footer {
+        position: absolute;
+        bottom: 22px;
+        color: rgba(220,191,130,.58);
+        font-size: 8px;
+        letter-spacing: .2em;
+      }
+
+      .cover-right {
+        position: relative;
+        min-height: 740px;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .cover-right>div {
+        position: absolute;
+        right: 32px;
+        bottom: 28px;
+        left: 28px;
+        padding-left: 14px;
+        border-left: 2px solid #d9b875;
+        color: #f2e7cf;
+      }
+
+      .cover-right small {
+        color: #e0c486;
+        font-size: 9px;
+        letter-spacing: .24em;
+      }
+
+      .cover-right p {
+        margin: 8px 0 0;
+        font-size: 11px;
+      }
+
+      @media (max-width: 850px) {
+        .cover-spread,
+        .cover-right {
+          min-height: 680px;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .cover-spread {
+          grid-template-columns: 1fr;
+          min-height: 650px;
+        }
+
+        .cover-left {
+          min-height: 325px;
+          padding: 28px 20px;
+        }
+
+        .cover-left .cover-star {
+          margin-bottom: 10px;
+          font-size: 30px;
+        }
+
+        .cover-left h1 {
+          margin: 12px 0;
+          font-size: 40px;
+        }
+
+        .cover-left footer {
+          bottom: 12px;
+          font-size: 7px;
+        }
+
+        .cover-right {
+          min-height: 325px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="magazine-stage">
+      <button class="nav-button nav-left" type="button" aria-label="Página anterior">‹</button>
+
+      <div class="book-shell" id="bookShell" aria-live="polite"></div>
+
+      <button class="nav-button nav-right" type="button" aria-label="Página siguiente">›</button>
+    </main>
+
+    <nav class="pager" id="pager" aria-label="Navegación de páginas"></nav>
+
+    <p class="location-status" id="locationStatus" role="status">
+      La ubicación se solicitará al abrir la revista.
+    </p>
+    <script src="function.js"></script>
+  </body>
+</html>
