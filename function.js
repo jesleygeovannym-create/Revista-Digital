@@ -17,8 +17,13 @@ const hotelCoordinates = {
 // alejarse ni desplazarse más allá de este rectángulo. Así solo
 // se ve Iberostar Playa Paraíso, nunca lo que hay alrededor.
 const complexBounds = [
+<<<<<<< HEAD
   [20.7553, -86.9663], // suroeste
   [20.7630, -86.9578]  // noreste
+=======
+  [20.7550, -86.9700], // suroeste
+  [20.7690, -86.9550]  // noreste
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
 ];
 
 
@@ -498,17 +503,26 @@ function openDirections(destination) {
       `${destinationCoordinates[1]},${destinationCoordinates[0]}`;
 
     const routeRequest =
+<<<<<<< HEAD
       `https://router.project-osrm.org/route/v1/foot/${start};${end}?overview=full&geometries=geojson`;
+=======
+      `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
 
     fetch(routeRequest)
       .then((response) => response.json())
       .then((route) => {
+<<<<<<< HEAD
         const osrmCoordinates =
+=======
+        const routeCoordinates =
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
           route.routes?.[0]?.geometry?.coordinates?.map(
             ([longitude, latitude]) =>
               [latitude, longitude]
           );
 
+<<<<<<< HEAD
         // OSRM a veces "engancha" la ruta al camino peatonal más
         // cercano y no llega exactamente hasta la puerta del hotel.
         // Forzamos que la línea siempre empiece en tu ubicación real
@@ -525,6 +539,8 @@ function openDirections(destination) {
               ]
             : null;
 
+=======
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
         routeLine?.remove();
 
         routeLine =
@@ -3059,6 +3075,18 @@ function initializeGeneralMap() {
         generalMap.getBoundsZoom(complexBounds)
       );
 
+<<<<<<< HEAD
+=======
+      const satelliteLayer =
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            maxZoom: 20,
+            attribution: "Tiles © Esri"
+          }
+        );
+
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3069,7 +3097,26 @@ function initializeGeneralMap() {
           }
         );
 
+<<<<<<< HEAD
       streetLayer.addTo(
+=======
+      satelliteLayer.addTo(
+        generalMap
+      );
+
+      L.control.layers(
+        {
+          "Satélite":
+            satelliteLayer,
+          "Mapa":
+            streetLayer
+        },
+        null,
+        {
+          collapsed: false
+        }
+      ).addTo(
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
         generalMap
       );
 
@@ -3217,6 +3264,19 @@ function initializeHotelMap() {
         activeMap.getBoundsZoom(complexBounds)
       );
 
+<<<<<<< HEAD
+=======
+      const satelliteLayer =
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            maxZoom: 20,
+            attribution:
+              "Tiles © Esri"
+          }
+        );
+
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3227,7 +3287,26 @@ function initializeHotelMap() {
           }
         );
 
+<<<<<<< HEAD
       streetLayer.addTo(
+=======
+      satelliteLayer.addTo(
+        activeMap
+      );
+
+      L.control.layers(
+        {
+          "Satélite":
+            satelliteLayer,
+          "Mapa":
+            streetLayer
+        },
+        null,
+        {
+          collapsed: false
+        }
+      ).addTo(
+>>>>>>> a7c9271a4430ae15005664a9bfb0814ce175bb80
         activeMap
       );
 
