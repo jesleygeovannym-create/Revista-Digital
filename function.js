@@ -17,8 +17,8 @@ const hotelCoordinates = {
 // alejarse ni desplazarse más allá de este rectángulo. Así solo
 // se ve Iberostar Playa Paraíso, nunca lo que hay alrededor.
 const complexBounds = [
-  [20.7550, -86.9700], // suroeste
-  [20.7690, -86.9550]  // noreste
+  [20.7553, -86.9663], // suroeste
+  [20.7630, -86.9578]  // noreste
 ];
 
 
@@ -201,7 +201,7 @@ const pages = [
     type: "hotel",
     kicker: "HOTEL 3 DE 5 · PARAÍSO LINDO",
     name: "Iberostar Paraíso Lindo",
-    location: "Iberosstar Paraíso Lindo, Playa Paraíso, Quintana Roo, México",
+    location: "Iberostar Paraíso Lindo, Playa Paraíso, Quintana Roo, México",
     image: "src/ParaisoLindo.jpg",
     intro: "Iberostar Selection Paraíso Lindo combina naturaleza, diversión y descanso en un entorno privilegiado frente al Caribe mexicano. Sus piscinas, parque acuático, río lento y experiencias gastronómicas lo convierten en el lugar ideal para familias y viajeros que buscan disfrutar de la esencia de Riviera Maya con el sello de hospitalidad Iberostar.",
     stats: [
@@ -498,16 +498,32 @@ function openDirections(destination) {
       `${destinationCoordinates[1]},${destinationCoordinates[0]}`;
 
     const routeRequest =
-      `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+      `https://router.project-osrm.org/route/v1/foot/${start};${end}?overview=full&geometries=geojson`;
 
     fetch(routeRequest)
       .then((response) => response.json())
       .then((route) => {
-        const routeCoordinates =
+        const osrmCoordinates =
           route.routes?.[0]?.geometry?.coordinates?.map(
             ([longitude, latitude]) =>
               [latitude, longitude]
           );
+
+        // OSRM a veces "engancha" la ruta al camino peatonal más
+        // cercano y no llega exactamente hasta la puerta del hotel.
+        // Forzamos que la línea siempre empiece en tu ubicación real
+        // y termine exactamente en la coordenada del hotel.
+        const routeCoordinates =
+          osrmCoordinates && osrmCoordinates.length
+            ? [
+                [
+                  currentPosition.latitude,
+                  currentPosition.longitude
+                ],
+                ...osrmCoordinates,
+                destinationCoordinates
+              ]
+            : null;
 
         routeLine?.remove();
 
@@ -3043,15 +3059,6 @@ function initializeGeneralMap() {
         generalMap.getBoundsZoom(complexBounds)
       );
 
-      const satelliteLayer =
-        L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          {
-            maxZoom: 20,
-            attribution: "Tiles © Esri"
-          }
-        );
-
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3062,22 +3069,7 @@ function initializeGeneralMap() {
           }
         );
 
-      satelliteLayer.addTo(
-        generalMap
-      );
-
-      L.control.layers(
-        {
-          "Satélite":
-            satelliteLayer,
-          "Mapa":
-            streetLayer
-        },
-        null,
-        {
-          collapsed: false
-        }
-      ).addTo(
+      streetLayer.addTo(
         generalMap
       );
 
@@ -3225,16 +3217,6 @@ function initializeHotelMap() {
         activeMap.getBoundsZoom(complexBounds)
       );
 
-      const satelliteLayer =
-        L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          {
-            maxZoom: 20,
-            attribution:
-              "Tiles © Esri"
-          }
-        );
-
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3245,22 +3227,7 @@ function initializeHotelMap() {
           }
         );
 
-      satelliteLayer.addTo(
-        activeMap
-      );
-
-      L.control.layers(
-        {
-          "Satélite":
-            satelliteLayer,
-          "Mapa":
-            streetLayer
-        },
-        null,
-        {
-          collapsed: false
-        }
-      ).addTo(
+      streetLayer.addTo(
         activeMap
       );
 
