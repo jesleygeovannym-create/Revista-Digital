@@ -1,4 +1,31 @@
 // Pega aquí tu clave de Google Maps entre las comillas.
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL =
+  "https://pmnnweuoqghcyeffjzva.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_fVJ6ntm-e2s-0IdI0IPC9A_7H741TpI";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+  async function probarSupabase() {
+  const { data, error } = await supabaseClient
+    .from("media")
+    .select("*");
+
+  if (error) {
+    console.error("ERROR SUPABASE:", error);
+    return;
+  }
+
+  console.log("DATOS DE SUPABASE:", data);
+}
 const GOOGLE_MAPS_API_KEY = "";
 let googleMapsPromise;
 let leafletPromise;
@@ -17,8 +44,8 @@ const hotelCoordinates = {
 // alejarse ni desplazarse más allá de este rectángulo. Así solo
 // se ve Iberostar Playa Paraíso, nunca lo que hay alrededor.
 const complexBounds = [
-  [20.7550, -86.9700], // suroeste
-  [20.7690, -86.9550]  // noreste
+  [20.7553, -86.9663], // suroeste
+  [20.7630, -86.9578]  // noreste
 ];
 
 
@@ -498,16 +525,32 @@ function openDirections(destination) {
       `${destinationCoordinates[1]},${destinationCoordinates[0]}`;
 
     const routeRequest =
-      `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+      `https://router.project-osrm.org/route/v1/foot/${start};${end}?overview=full&geometries=geojson`;
 
     fetch(routeRequest)
       .then((response) => response.json())
       .then((route) => {
-        const routeCoordinates =
+        const osrmCoordinates =
           route.routes?.[0]?.geometry?.coordinates?.map(
             ([longitude, latitude]) =>
               [latitude, longitude]
           );
+
+        // OSRM a veces "engancha" la ruta al camino peatonal más
+        // cercano y no llega exactamente hasta la puerta del hotel.
+        // Forzamos que la línea siempre empiece en tu ubicación real
+        // y termine exactamente en la coordenada del hotel.
+        const routeCoordinates =
+          osrmCoordinates && osrmCoordinates.length
+            ? [
+                [
+                  currentPosition.latitude,
+                  currentPosition.longitude
+                ],
+                ...osrmCoordinates,
+                destinationCoordinates
+              ]
+            : null;
 
         routeLine?.remove();
 
@@ -1017,9 +1060,21 @@ async function renderWorkspaceCards() {
 
   if (!container) return;
 
-  const items =
-    await databaseGetAll("workspace");
+  const { data: items, error } =
+  await supabaseClient
+    .from("workspace")
+    .select("*")
+    .order("created_at", {
+      ascending: false
+    });
 
+if (error) {
+  console.error(
+    "ERROR AL CARGAR WORKSPACE:",
+    error
+  );
+  return;
+}
   if (!items.length) {
     container.innerHTML = `
       <div class="workspace-empty">
@@ -1125,16 +1180,42 @@ async function renderWorkspaceCards() {
 }
 
 async function editWorkspace(id) {
-  const items =
-    await databaseGetAll("workspace");
 
-  const item =
-    items.find(
-      (entry) =>
-        String(entry.id) === String(id)
+  console.log("EDITAR WORKSPACE:", id);
+
+  const { data, error } =
+    await supabaseClient
+      .from("workspace")
+      .select("*")
+      .eq("id", id);
+
+  if (error) {
+    console.error(
+      "ERROR AL BUSCAR WORKSPACE:",
+      error
     );
 
-  if (!item) return;
+    alert(
+      "No se pudo cargar la experiencia."
+    );
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    console.error(
+      "NO SE ENCONTRÓ EL WORKSPACE:",
+      id
+    );
+
+    alert(
+      "No se encontró esta experiencia."
+    );
+
+    return;
+  }
+
+  const item = data[0];
 
   document.getElementById(
     "workspaceEditId"
@@ -1142,15 +1223,15 @@ async function editWorkspace(id) {
 
   document.getElementById(
     "workspaceHotel"
-  ).value = item.hotel;
+  ).value = item.hotel || "";
 
   document.getElementById(
     "workspaceTitle"
-  ).value = item.title;
+  ).value = item.title || "";
 
   document.getElementById(
     "workspaceText"
-  ).value = item.text;
+  ).value = item.text || "";
 
   document.getElementById(
     "workspaceProduct"
@@ -1162,11 +1243,38 @@ async function editWorkspace(id) {
 
   document.getElementById(
     "workspaceSaveButton"
-  ).textContent = "GUARDAR CAMBIOS";
+  ).textContent =
+    "GUARDAR CAMBIOS";
 }
 
 async function deleteWorkspace(id) {
-  await databaseDelete("workspace", id);
+
+  console.log("ELIMINAR WORKSPACE:", id);
+
+  const { error } =
+    await supabaseClient
+      .from("workspace")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    console.error(
+      "ERROR AL ELIMINAR WORKSPACE:",
+      error
+    );
+
+    alert(
+      "No se pudo eliminar la experiencia."
+    );
+
+    return;
+  }
+
+  console.log(
+    "WORKSPACE ELIMINADO CORRECTAMENTE"
+  );
+
   await renderWorkspaceCards();
 }
 
@@ -1229,97 +1337,248 @@ function wireWorkspace() {
   });
 
   saveButton.addEventListener("click", async () => {
-    const editId =
-      document.getElementById(
-        "workspaceEditId"
-      ).value;
 
-    const hotel =
-      document.getElementById(
-        "workspaceHotel"
-      ).value;
+  const editId =
+    document.getElementById(
+      "workspaceEditId"
+    ).value;
 
-    const title =
-      document.getElementById(
-        "workspaceTitle"
-      ).value.trim();
+  const hotel =
+    document.getElementById(
+      "workspaceHotel"
+    ).value;
 
-    const text =
-      document.getElementById(
-        "workspaceText"
-      ).value.trim();
+  const title =
+    document.getElementById(
+      "workspaceTitle"
+    ).value.trim();
 
-    const product =
-      document.getElementById(
-        "workspaceProduct"
-      ).value.trim();
+  const text =
+    document.getElementById(
+      "workspaceText"
+    ).value.trim();
 
-    const imageFile =
-      document.getElementById(
-        "workspaceImage"
-      ).files[0];
+  const product =
+    document.getElementById(
+      "workspaceProduct"
+    ).value.trim();
 
-    if (!title || !text) {
+  const imageFile =
+    document.getElementById(
+      "workspaceImage"
+    ).files[0];
+
+  if (!title || !text) {
+    alert(
+      "Completa el título y el texto."
+    );
+
+    return;
+  }
+
+  let image = "";
+
+  if (imageFile) {
+    image =
+      await fileToDataURL(imageFile);
+  }
+
+if (editId) {
+
+  let imageUrl = null;
+
+  // Obtener la imagen actual
+  const { data: currentData, error: currentError } =
+    await supabaseClient
+      .from("workspace")
+      .select("image")
+      .eq("id", editId)
+      .single();
+
+  if (currentError) {
+
+    console.error(
+      "ERROR AL OBTENER IMAGEN ACTUAL:",
+      currentError
+    );
+
+    alert(
+      "No se pudo obtener la experiencia."
+    );
+
+    return;
+  }
+
+  imageUrl = currentData.image || null;
+
+  // Si seleccionaste una imagen nueva
+  if (imageFile) {
+
+    const fileExt =
+      imageFile.name.split(".").pop();
+
+    const fileName =
+      `${crypto.randomUUID()}.${fileExt}`;
+
+    const { error: uploadError } =
+      await supabaseClient
+        .storage
+        .from("workspace-images")
+        .upload(
+          fileName,
+          imageFile,
+          {
+            contentType: imageFile.type,
+            upsert: false
+          }
+        );
+
+    if (uploadError) {
+
+      console.error(
+        "ERROR AL SUBIR NUEVA IMAGEN:",
+        uploadError
+      );
+
       alert(
-        "Completa el título y el texto."
+        "No se pudo subir la nueva imagen."
       );
 
       return;
     }
 
-    let image = "";
+    const { data: publicUrlData } =
+      supabaseClient
+        .storage
+        .from("workspace-images")
+        .getPublicUrl(fileName);
 
-    if (imageFile) {
-      image =
-        await fileToDataURL(imageFile);
-    }
+    imageUrl =
+      publicUrlData.publicUrl;
+  }
 
-    if (editId) {
-      const items =
-        await databaseGetAll(
-          "workspace"
-        );
+  // Actualizar experiencia
+  const { error } =
+    await supabaseClient
+      .from("workspace")
+      .update({
+        hotel,
+        title,
+        text,
+        product,
+        image: imageUrl
+      })
+      .eq("id", editId);
+      
+console.log("RESULTADO UPDATE:", error);
 
-      const current =
-        items.find(
-          (item) =>
-            String(item.id) ===
-            String(editId)
-        );
+if (error) {
 
-      await databasePut(
-        "workspace",
-        {
-          ...current,
-          hotel,
-          title,
-          text,
-          product,
-          image:
-            image ||
-            current.image ||
-            ""
-        }
+  console.error(
+    "ERROR AL ACTUALIZAR WORKSPACE:",
+    JSON.stringify(error, null, 2)
+  );
+
+  alert(
+    "No se pudo actualizar la experiencia."
+  );
+
+  return;
+}
+
+} else {
+
+  let imageUrl = null;
+
+  if (imageFile) {
+
+  const fileExt = imageFile.name.split(".").pop();
+
+  const fileName =
+    `${crypto.randomUUID()}.${fileExt}`;
+
+  const { error: uploadError } =
+    await supabaseClient
+      .storage
+      .from("workspace-images")
+      .upload(fileName, imageFile, {
+        contentType: imageFile.type,
+        upsert: false
+      });
+
+  if (uploadError) {
+
+    console.error(
+      "ERROR AL SUBIR IMAGEN:",
+      uploadError
+    );
+
+    alert(
+      "No se pudo subir la imagen."
+    );
+
+    return;
+  }
+
+  const { data: publicUrlData } =
+    supabaseClient
+      .storage
+      .from("workspace-images")
+      .getPublicUrl(fileName);
+
+  imageUrl =
+    publicUrlData.publicUrl;
+}
+
+const { data, error } =
+  await supabaseClient
+    .from("workspace")
+    .insert([
+      {
+        hotel,
+        title,
+        text,
+        product,
+        image: imageUrl
+      }
+    ])
+    .select();
+
+console.log(
+  "RESULTADO INSERT:",
+  data
+);
+
+console.log(
+  "ERROR INSERT:",
+  error
+);
+
+console.log("RESULTADO INSERT:", data);
+console.log("ERROR INSERT:", error);
+
+    if (error) {
+      console.error(
+        "ERROR AL PUBLICAR WORKSPACE:",
+        error
       );
-    } else {
-      await databaseAdd(
-        "workspace",
-        {
-          hotel,
-          title,
-          text,
-          product,
-          image,
-          createdAt: Date.now()
-        }
+
+      alert(
+        "No se pudo publicar la experiencia."
       );
+
+      return;
     }
+  }
 
-    resetWorkspaceForm();
-    form.classList.remove("visible");
+  resetWorkspaceForm();
 
-    await renderWorkspaceCards();
-  });
+  form.classList.remove(
+    "visible"
+  );
+
+  await renderWorkspaceCards();
+});
 }
 
 
@@ -3043,15 +3302,6 @@ function initializeGeneralMap() {
         generalMap.getBoundsZoom(complexBounds)
       );
 
-      const satelliteLayer =
-        L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          {
-            maxZoom: 20,
-            attribution: "Tiles © Esri"
-          }
-        );
-
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3062,22 +3312,7 @@ function initializeGeneralMap() {
           }
         );
 
-      satelliteLayer.addTo(
-        generalMap
-      );
-
-      L.control.layers(
-        {
-          "Satélite":
-            satelliteLayer,
-          "Mapa":
-            streetLayer
-        },
-        null,
-        {
-          collapsed: false
-        }
-      ).addTo(
+      streetLayer.addTo(
         generalMap
       );
 
@@ -3225,16 +3460,6 @@ function initializeHotelMap() {
         activeMap.getBoundsZoom(complexBounds)
       );
 
-      const satelliteLayer =
-        L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          {
-            maxZoom: 20,
-            attribution:
-              "Tiles © Esri"
-          }
-        );
-
       const streetLayer =
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -3245,22 +3470,7 @@ function initializeHotelMap() {
           }
         );
 
-      satelliteLayer.addTo(
-        activeMap
-      );
-
-      L.control.layers(
-        {
-          "Satélite":
-            satelliteLayer,
-          "Mapa":
-            streetLayer
-        },
-        null,
-        {
-          collapsed: false
-        }
-      ).addTo(
+      streetLayer.addTo(
         activeMap
       );
 
