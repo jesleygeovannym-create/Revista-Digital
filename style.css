@@ -111,28 +111,88 @@ button {
   height: 258px; 
   background-size: cover; 
   background-position: center; 
-  position: relative 
+  position: relative;
+  overflow: hidden;
+  background: #17263a;
 } 
  
-.reference-photo>div { 
-  position: absolute; 
-  left: 22px; 
-  bottom: 18px; 
-  color: #f2d69a 
+.reference-photo-content {
+  position: absolute;
+  left: 22px;
+  bottom: 18px;
+  z-index: 2;
+  color: #f2d69a;
+}
+ 
+.reference-photo small,
+.reference-photo-content small { 
+  font-size: 9px;
+  letter-spacing: .16em;
 } 
  
-.reference-photo small { 
-  font-size: 9px; 
-  letter-spacing: .16em 
+.reference-photo h1,
+.reference-photo-content h1 { 
+  margin: 5px 0;
+  color: #fff;
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 400;
 } 
- 
-.reference-photo h1 { 
-  margin: 5px 0; 
-  color: #fff; 
-  font-size: 28px; 
-  font-style: italic; 
-  font-weight: 400 
-} 
+
+.hotel-carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity .55s ease, transform .55s ease;
+  background-size: cover;
+  background-position: center;
+}
+
+.hotel-carousel-slide.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hotel-carousel-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  background: rgba(7,20,38,.45);
+  color: #f7e7c0;
+  font-size: 26px;
+}
+
+.hotel-carousel-prev { left: 16px; }
+.hotel-carousel-next { right: 16px; }
+
+.hotel-carousel-indicators {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+}
+
+.hotel-carousel-indicator {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+.hotel-carousel-indicator.active {
+  background: #d8b878;
+}
  
 .reference-copy { 
   padding: 18px 22px; 
@@ -181,6 +241,191 @@ button {
   color: #d5b36f; 
   margin-right: 8px 
 } 
+ 
+.hotel-carousel {
+  position: relative;
+  height: 260px;
+  overflow: hidden;
+  background: #162233;
+}
+
+.hotel-carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(22px);
+  transition: opacity .55s ease, transform .55s ease;
+  background-size: cover;
+  background-position: center;
+}
+
+.hotel-carousel-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hotel-carousel-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255,255,255,.38);
+  border-radius: 50%;
+  background: rgba(7,20,38,.45);
+  color: #f7e7c0;
+  font-size: 26px;
+}
+
+.hotel-carousel-prev { left: 16px; }
+.hotel-carousel-next { right: 16px; }
+
+.hotel-carousel-indicators {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+
+.hotel-carousel-indicator {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+.hotel-carousel-indicator.active {
+  background: #d8b878;
+}
+
+.hotel-stats {
+  margin-top: 18px;
+}
+
+.hotel-stat-button {
+  display: block;
+  width: 100%;
+  padding: 12px 8px;
+  border: 1px solid rgba(216,184,120,.5);
+  background: linear-gradient(135deg, #fefae5, #f0e0b7);
+  color: #2a1d10;
+  text-align: center;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.hotel-stat-button:hover,
+.hotel-stat-button:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(25,17,10,.12);
+}
+
+.hotel-stat-button strong {
+  display: block;
+  color: #1d1209;
+  font-size: 24px;
+}
+
+.hotel-stat-button small {
+  display: block;
+  margin-top: 3px;
+  font: 9px Arial;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.hotel-panel {
+  display: none;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(216,184,120,.45);
+  background: linear-gradient(135deg, rgba(15,27,40,.98), rgba(5,12,17,.96));
+  box-shadow: 0 10px 20px rgba(0,0,0,.12);
+}
+
+.hotel-panel.visible {
+  display: block;
+  animation: hotelPanelIn .28s ease;
+}
+
+@keyframes hotelPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hotel-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(216,184,120,.35);
+  background: rgba(216,184,120,.08);
+}
+
+.hotel-panel-header span {
+  color: #f2d089;
+  font: 8px Arial;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.hotel-panel-header h3 {
+  margin: 0;
+  flex: 1;
+  color: #fff5df;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.hotel-panel-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(216,184,120,.35);
+  border-radius: 50%;
+  background: transparent;
+  color: #f2d089;
+  font-size: 22px;
+}
+
+.hotel-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px;
+}
+
+.hotel-panel-item {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(216,184,120,.25);
+  background: #0b1628;
+}
+
+.hotel-panel-item img {
+  display: block;
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.hotel-panel-empty {
+  grid-column: 1 / -1;
+  padding: 16px;
+  color: rgba(255,255,255,.7);
+  font: 12px Arial;
+}
  
 .reference-right { 
   display: grid; 
@@ -426,6 +671,7 @@ button {
   align-items: center; 
   justify-content: center; 
   min-height: 740px; 
+  background: #B9A385; 
   background-size: cover; 
   background-position: center; 
   color: #e9cf91 
@@ -614,7 +860,9 @@ button {
 } 
  
 .back-spread { 
-  justify-content: stretch 
+  justify-content: stretch;
+  height: 740px;
+  background: #B9A385;
 } 
  
 .back-quote,.back-contact { 
@@ -624,35 +872,43 @@ button {
   flex-direction: column; 
   justify-content: center; 
   padding: 100px 55px 290px; 
-  text-align: center 
+  text-align: center;
+  background-color: #B9A385;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 } 
  
 .back-quote { 
   align-items: center; 
-  color: #e2c989 
+  color: #e2c989;
 } 
  
 .back-quote h1 { 
-  color: #e2c989; 
+  color: #e2c989;
   font-size: 35px; 
   font-style: italic; 
-  font-weight: 400 
+  font-weight: 400;
 } 
  
 .back-contact { 
-  background: #100713; 
-  color: #e1c788 
+  background: #B9A385;
+  color: #e1c788;
 } 
  
 .back-contact h1 { 
   margin: 15px 0 3px; 
-  color: white; 
-  font-size: 28px 
+  color: white;
+  font-size: 28px;
 } 
+
+.back-contact small {
+  color: #000000;
+}
  
 .back-contact p { 
   font: 11px Arial; 
-  color: #bbb 
+  color: #FFFFFF 
 } 
  
 .back-reserve { 
@@ -729,10 +985,10 @@ button {
   } 
  
   .back-contact { 
-    background:rgba(10,3,16,.82); 
+    background:#B9A385; 
     align-items:center; 
     text-align:center; 
-    color:#fff; 
+    color:#e1c788; 
   } 
  
   .back-contact h1 { 

@@ -189,7 +189,7 @@ const pages = [
     kicker: "HOTEL 1 DE 5 · PARAÍSO DEL MAR",
     name: "Iberostar Paraíso del Mar",
     location: "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
-    image: "src/paraisoDelMar.jpg",
+    image: "src/ParaisoDelMar.jpg",
     intro: "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
     stats: [
       ["344", "Habitaciones"],
@@ -332,6 +332,170 @@ const pages = [
 ];
 
 
+const hotelMediaCatalog = {
+  "Iberostar Paraíso Beach": {
+    banner: [
+      "src/paraiso-beach/banner/paraisoBeach.jpg",
+      "src/paraiso-beach/banner/PBE_GAST_0049.jpg",
+      "src/paraiso-beach/banner/PBE_INSIDE_0009.jpg",
+      "src/paraiso-beach/banner/PBE_POOL_0003.jpg",
+      "src/paraiso-beach/banner/PBE_STPR_0005.jpg",
+      "src/paraiso-beach/banner/PBE_VIEWS_0012.jpg",
+      "src/paraiso-beach/banner/PBE_VIEWS_0016.jpg"
+    ],
+    habitaciones: [
+      "src/paraiso-beach/habitaciones/PBE_ROOM_0053.jpg",
+      "src/paraiso-beach/habitaciones/PBE_ROOM_0066.jpg",
+      "src/paraiso-beach/habitaciones/PBE_ROOM_0072.jpg",
+      "src/paraiso-beach/habitaciones/PBE_ROOM_0084.jpg",
+      "src/paraiso-beach/habitaciones/PBE_ROOM_0086.jpg"
+    ],
+    piscinas: [
+      "src/paraiso-beach/piscinas/PBE_POOL_0003.jpg",
+      "src/paraiso-beach/piscinas/PBE_POOL_0011.jpg",
+      "src/paraiso-beach/piscinas/PBE_POOL_0014.jpg",
+      "src/paraiso-beach/piscinas/PBE_STPR_0005.jpg",
+      "src/paraiso-beach/piscinas/PBE_VIEWS_0016.jpg"
+    ],
+    restaurante: [
+      "src/paraiso-beach/restaurante/PBE_GAST_0048.jpg",
+      "src/paraiso-beach/restaurante/PBE_GAST_0049.jpg",
+      "src/paraiso-beach/restaurante/PBE_GAST_0053.jpg",
+      "src/paraiso-beach/restaurante/PBE_GAST_0059.jpg",
+      "src/paraiso-beach/restaurante/PBE_GAST_0061.jpg"
+    ]
+  },
+  "Iberostar Paraíso del Mar": {
+    banner: [
+      "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
+      "src/paraiso-del-mar/banner/PMA_GAST_0011.jpg",
+      "src/paraiso-del-mar/banner/PMA_GAST_0026.jpg",
+      "src/paraiso-del-mar/banner/PMA_OUTSIDE_0004.jpg",
+      "src/paraiso-del-mar/banner/PMA_VIEWS_0010.jpg",
+      "src/paraiso-del-mar/banner/PMA_VIEWS_0016.jpg",
+      "src/paraiso-del-mar/banner/PMA_VIEWS_0025.jpg"
+    ],
+    habitaciones: [
+      "src/paraiso-del-mar/habitaciones/PMA_ROOM_0044.jpg",
+      "src/paraiso-del-mar/habitaciones/PMA_ROOM_0067.jpg",
+      "src/paraiso-del-mar/habitaciones/PMA_ROOM_0071.jpg",
+      "src/paraiso-del-mar/habitaciones/PMA_ROOM_0080.jpg",
+      "src/paraiso-del-mar/habitaciones/PMA_ROOM_0084.jpg"
+    ],
+    piscinas: [
+      "src/paraiso-del-mar/piscinas/PBE_POOL_0003.jpg",
+      "src/paraiso-del-mar/piscinas/PBE_POOL_0011.jpg",
+      "src/paraiso-del-mar/piscinas/PMA_GAST_0079.jpg",
+      "src/paraiso-del-mar/piscinas/PMA_VIEWS_0010.jpg",
+      "src/paraiso-del-mar/piscinas/PMA_VIEWS_0017.jpg"
+    ],
+    restaurante: [
+      "src/paraiso-del-mar/restaurante/PMA_GAST_0015.jpg",
+      "src/paraiso-del-mar/restaurante/PMA_GAST_0024.jpg",
+      "src/paraiso-del-mar/restaurante/PMA_GAST_0060.jpg",
+      "src/paraiso-del-mar/restaurante/PMA_GAST_0065.jpg",
+      "src/paraiso-del-mar/restaurante/PMA_GAST_0072.jpg"
+    ]
+  },
+  "Iberostar Paraíso JOIA": {
+    banner: [
+      "src/paraiso-JOIA/banner/JOIA.jpg",
+      "src/paraiso-JOIA/banner/JOIA2.jpg",
+      "src/paraiso-JOIA/banner/GHP_MICE_0005.jpg",
+      "src/paraiso-JOIA/banner/GHP_POOL_0050.jpg",
+      "src/paraiso-JOIA/banner/GHP_POOL_0052.jpg",
+      "src/paraiso-JOIA/banner/GHP_VIEWS_0023.jpg",
+      "src/paraiso-JOIA/banner/GHP_VIEWS_0024.jpg"
+    ],
+    habitaciones: [
+      "src/paraiso-JOIA/habitaciones/GHP_ROOM_0088.jpg",
+      "src/paraiso-JOIA/habitaciones/GHP_ROOM_0090.jpg",
+      "src/paraiso-JOIA/habitaciones/GHP_ROOM_0108.jpg",
+      "src/paraiso-JOIA/habitaciones/GHP_ROOM_0118.jpg",
+      "src/paraiso-JOIA/habitaciones/GHP_ROOM_0126.jpg"
+    ],
+    piscinas: [
+      "src/paraiso-JOIA/piscinas/GHP_POOL_0012.jpg",
+      "src/paraiso-JOIA/piscinas/GHP_POOL_0021.jpg",
+      "src/paraiso-JOIA/piscinas/GHP_POOL_0037.jpg",
+      "src/paraiso-JOIA/piscinas/GHP_POOL_0038.jpg",
+      "src/paraiso-JOIA/piscinas/GHP_POOL_0050.jpg"
+    ],
+    restaurante: [
+      "src/paraiso-JOIA/restaurante/GHP_GAST_0097.jpg",
+      "src/paraiso-JOIA/restaurante/GHP_GAST_0102.jpg",
+      "src/paraiso-JOIA/restaurante/GHP_GAST_0103.jpg",
+      "src/paraiso-JOIA/restaurante/GHP_GAST_0166.jpg",
+      "src/paraiso-JOIA/restaurante/GHP_GAST_0191.jpg"
+    ]
+  },
+  "Iberostar Paraíso Lindo": {
+    banner: [
+      "src/paraiso-lindo/banner/ParaisoLindo.jpg",
+      "src/paraiso-lindo/banner/PLI_GAST_0128.jpg",
+      "src/paraiso-lindo/banner/PLI_POOL_0014.jpg",
+      "src/paraiso-lindo/banner/PLI_VIEWS_0009.jpg",
+      "src/paraiso-lindo/banner/PLI_VIEWS_0011.jpg",
+      "src/paraiso-lindo/banner/PLI_VIEWS_0031.jpg",
+      "src/paraiso-lindo/banner/PLI_VIEWS_0037.jpg",
+      "src/paraiso-lindo/banner/PLI_VIEWS_0042.jpg"
+    ],
+    habitaciones: [
+      "src/paraiso-lindo/habitaciones/PLI_ROOM_0002.jpg",
+      "src/paraiso-lindo/habitaciones/PLI_ROOM_0031.jpg",
+      "src/paraiso-lindo/habitaciones/PLI_ROOM_0103.jpg",
+      "src/paraiso-lindo/habitaciones/PLI_ROOM_0137.jpg",
+      "src/paraiso-lindo/habitaciones/PLI_ROOM_0164.jpg"
+    ],
+    piscinas: [
+      "src/paraiso-lindo/piscina/PLI_POOL_0014.jpg",
+      "src/paraiso-lindo/piscina/PLI_POOL_0095.jpg",
+      "src/paraiso-lindo/piscina/PLI_VIEWS_0009.jpg",
+      "src/paraiso-lindo/piscina/PLI_VIEWS_0035.jpg",
+      "src/paraiso-lindo/piscina/PLI_VIEWS_0037.jpg"
+    ],
+    restaurante: [
+      "src/paraiso-lindo/Restaurante/PLI_GAST_0043.jpg",
+      "src/paraiso-lindo/Restaurante/PLI_GAST_0085.jpg",
+      "src/paraiso-lindo/Restaurante/PLI_GAST_0089.jpg",
+      "src/paraiso-lindo/Restaurante/PLI_GAST_0098.jpg",
+      "src/paraiso-lindo/Restaurante/PLI_GAST_0105.jpg"
+    ]
+  },
+  "Iberostar Paraíso Maya": {
+    banner: [
+      "src/paraiso-maya/banner/paraisoMaya.jpg",
+      "src/paraiso-maya/banner/PMY_OUTSIDE_0001.jpg",
+      "src/paraiso-maya/banner/PMY_OUTSIDE_0005.jpg",
+      "src/paraiso-maya/banner/PMY_POOL_0049.jpg",
+      "src/paraiso-maya/banner/PMY_VIEWS_0016.jpg",
+      "src/paraiso-maya/banner/PMY_VIEWS_0031.jpg",
+      "src/paraiso-maya/banner/PMY_VIEWS_0032.jpg"
+    ],
+    habitaciones: [
+      "src/paraiso-maya/habitaciones/PMY_ROOM_0151.jpg",
+      "src/paraiso-maya/habitaciones/PMY_ROOM_0162.jpg",
+      "src/paraiso-maya/habitaciones/PMY_ROOM_0167.jpg",
+      "src/paraiso-maya/habitaciones/PMY_ROOM_0173.jpg",
+      "src/paraiso-maya/habitaciones/PMY_ROOM_0175.jpg"
+    ],
+    piscinas: [
+      "src/paraiso-maya/piscinas/PMY_POOL_0009.jpg",
+      "src/paraiso-maya/piscinas/PMY_POOL_0034.jpg",
+      "src/paraiso-maya/piscinas/PMY_POOL_0059.jpg",
+      "src/paraiso-maya/piscinas/PMY_POOL_0118.jpg",
+      "src/paraiso-maya/piscinas/PMY_VIEWS_0042.jpg"
+    ],
+    restaurante: [
+      "src/paraiso-maya/restaurante/PMY_GAST_0231.jpg",
+      "src/paraiso-maya/restaurante/PMY_GAST_0235.jpg",
+      "src/paraiso-maya/restaurante/PMY_GAST_0262.jpg",
+      "src/paraiso-maya/restaurante/PMY_GAST_0270.jpg",
+      "src/paraiso-maya/restaurante/PMY_GAST_0296.jpg"
+    ]
+  }
+};
+
 const bookShell = document.getElementById("bookShell");
 const pager = document.getElementById("pager");
 const leftButton = document.querySelector(".nav-left");
@@ -343,6 +507,142 @@ let activeMap = null;
 let activeDirectionsRenderer = null;
 let userMarker = null;
 let routeLine = null;
+
+function slugify(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "hotel";
+}
+
+function getHotelMedia(pageName) {
+  return (
+    hotelMediaCatalog[pageName] || {
+      banner: ["src/JOIA2.jpg"],
+      habitaciones: [],
+      piscinas: [],
+      restaurante: []
+    }
+  );
+}
+
+function getSectionName(key) {
+  const labels = {
+    habitaciones: "Habitaciones",
+    restaurante: "Restaurantes",
+    piscinas: "Piscinas"
+  };
+
+  return labels[key] || "Experiencias";
+}
+
+function renderHotelSectionPanel(pageName, sectionKey) {
+  const panelId = `hotel-panel-${slugify(pageName)}`;
+  const panel = document.getElementById(panelId);
+  const media = getHotelMedia(pageName)[sectionKey] || [];
+  const title = getSectionName(sectionKey);
+
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <div class="hotel-panel-header">
+      <span>${pageName}</span>
+      <h3>${title}</h3>
+      <button type="button" class="hotel-panel-close" data-close-panel="${panelId}">×</button>
+    </div>
+    <div class="hotel-panel-grid">
+      ${
+        media.length
+          ? media
+              .map(
+                (image) => `
+                  <figure class="hotel-panel-item">
+                    <img src="${image}" alt="${title} de ${pageName}" />
+                  </figure>
+                `
+              )
+              .join("")
+          : `<div class="hotel-panel-empty">No hay imágenes disponibles para ${title.toLowerCase()} en este hotel.</div>`
+      }
+    </div>
+  `;
+
+  panel.classList.add("visible");
+
+  panel.querySelector(".hotel-panel-close")?.addEventListener("click", () => {
+    panel.classList.remove("visible");
+  });
+}
+
+function initializeHotelCarousel(root) {
+  const slides = [...root.querySelectorAll(".hotel-carousel-slide")];
+  const indicators = [...root.querySelectorAll(".hotel-carousel-indicator")];
+  const prev = root.querySelector(".hotel-carousel-prev");
+  const next = root.querySelector(".hotel-carousel-next");
+
+  if (!slides.length) return;
+
+  let currentSlide = 0;
+  let autoTimer = null;
+  let touchStartX = 0;
+
+  const showSlide = (index) => {
+    currentSlide = (index + slides.length) % slides.length;
+
+    slides.forEach((slide, slideIndex) => {
+      slide.classList.toggle("active", slideIndex === currentSlide);
+    });
+
+    indicators.forEach((indicator, indicatorIndex) => {
+      indicator.classList.toggle("active", indicatorIndex === currentSlide);
+      indicator.setAttribute("aria-selected", String(indicatorIndex === currentSlide));
+    });
+  };
+
+  const restartAutoPlay = () => {
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = setInterval(() => {
+      showSlide(currentSlide + 1);
+    }, 4500);
+  };
+
+  prev?.addEventListener("click", () => {
+    showSlide(currentSlide - 1);
+    restartAutoPlay();
+  });
+
+  next?.addEventListener("click", () => {
+    showSlide(currentSlide + 1);
+    restartAutoPlay();
+  });
+
+  indicators.forEach((indicator) => {
+    indicator.addEventListener("click", () => {
+      showSlide(Number(indicator.dataset.slideIndex));
+      restartAutoPlay();
+    });
+  });
+
+  root.addEventListener("touchstart", (event) => {
+    touchStartX = event.touches[0].clientX;
+  }, { passive: true });
+
+  root.addEventListener("touchend", (event) => {
+    const deltaX = event.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(deltaX) > 50) {
+      showSlide(currentSlide + (deltaX < 0 ? 1 : -1));
+      restartAutoPlay();
+    }
+  }, { passive: true });
+
+  root.addEventListener("mouseenter", () => clearInterval(autoTimer));
+  root.addEventListener("mouseleave", restartAutoPlay);
+
+  showSlide(0);
+  restartAutoPlay();
+}
 
 
 /* =========================================================
@@ -841,41 +1141,87 @@ function updateHotelUserMarker() {
    ========================================================= */
 
 function renderHotel(page) {
+  const hotelMedia = getHotelMedia(page.name);
+  const bannerImages = hotelMedia.banner?.length ? hotelMedia.banner : [page.image];
   const stats =
     page.stats
-      .map(
-        ([value, label]) =>
-          `<div><strong>${value}</strong><small>${label}</small></div>`
-      )
+      .map(([value, label]) => {
+        const sectionKey = (() => {
+          const normalized = String(label).trim().toLowerCase();
+          if (normalized.includes("habitac")) return "habitaciones";
+          if (normalized.includes("restau")) return "restaurante";
+          if (normalized.includes("pisc")) return "piscinas";
+          return "habitaciones";
+        })();
+
+        return `
+          <button
+            class="hotel-stat-button"
+            type="button"
+            data-hotel-section="${sectionKey}"
+            data-hotel-name="${page.name}"
+          >
+            <strong>${value}</strong>
+            <small>${label}</small>
+          </button>
+        `;
+      })
       .join("");
+
+  const carouselSlides = bannerImages
+    .map(
+      (image, index) => `
+        <div class="hotel-carousel-slide ${index === 0 ? "active" : ""}" style="background-image:linear-gradient(180deg,rgba(5,12,17,.12),rgba(5,12,17,.5)),url('${image}')"></div>
+      `
+    )
+    .join("");
+
+  const carouselIndicators = bannerImages
+    .map(
+      (_, index) => `
+        <button
+          type="button"
+          class="hotel-carousel-indicator ${index === 0 ? "active" : ""}"
+          data-slide-index="${index}"
+          aria-label="Ver imagen ${index + 1}"
+          aria-selected="${index === 0}"
+        ></button>
+      `
+    )
+    .join("");
 
   const benefits =
     page.benefits
       .map((item) => `<li>${item}</li>`)
       .join("");
 
+  const panelId = `hotel-panel-${slugify(page.name)}`;
+
   return `
     <div class="spread reference-spread hotel-spread">
 
       <article class="reference-left">
 
-        <div
-          class="reference-photo"
-          style="background-image:linear-gradient(180deg,transparent 35%,rgba(5,12,17,.8)),url('${page.image}')"
-        >
-          <div>
+        <div class="reference-photo hotel-carousel" data-hotel-carousel="${page.name}">
+          ${carouselSlides}
+          <div class="reference-photo-content">
             <small>Todo lo incluido · La esencia</small>
             <h1>${page.name}</h1>
           </div>
+          <button class="hotel-carousel-nav hotel-carousel-prev" type="button" aria-label="Imagen anterior">‹</button>
+          <button class="hotel-carousel-nav hotel-carousel-next" type="button" aria-label="Imagen siguiente">›</button>
+          <div class="hotel-carousel-indicators">${carouselIndicators}</div>
         </div>
 
         <div class="reference-copy">
 
           <p>${page.intro}</p>
 
-          <div class="reference-stats">
+          <div class="reference-stats hotel-stats">
             ${stats}
           </div>
+
+          <div class="hotel-panel" id="${panelId}"></div>
 
           <ul>
             ${benefits}
@@ -2818,7 +3164,7 @@ function renderPage() {
 
           <img
             class="cover-logo"
-            src="src/logo png-01.png"
+            src="src/logo png-02.png"
             alt="Logo"
           />
 
@@ -2840,7 +3186,7 @@ function renderPage() {
 
         <section
           class="cover-right"
-          style="background-image:linear-gradient(180deg,rgba(8,20,28,.08) 45%,rgba(6,13,19,.8)),url('${page.image}')"
+          style="background-image:linear-gradient(180deg,rgba(255,255,255,.04) 42%,rgba(59,44,31,.35)),url('${page.image}')"
         >
           <div>
 
@@ -2952,16 +3298,16 @@ function renderPage() {
 
 else {
   bookShell.innerHTML = `
-    <div class="spread back-spread" style="background-image:linear-gradient(90deg,rgba(4,24,39,.65),rgba(10,3,16,.94)),url('${page.image}')">
+    <div class="spread back-spread">
 
-      <section class="back-quote">
+      <section class="back-quote" style="background-image:linear-gradient(rgba(4,24,39,.62),rgba(4,24,39,.62)),url('${page.image}')">
         <span>${page.kicker}</span>
         <h1>“${page.quote}”</h1>
         <span>KM. 309 · PLAYA DEL CARMEN, Q.ROO MÉXICO</span>
       </section>
 
       <section class="back-contact">
-        <img class="cover-logo" src="src/logo png-01.png" alt="Logo">
+        <img class="cover-logo" src="src/logo png-02.png" alt="Logo">
         <h1>PLAYA PARAISO</h1>
         <small>IBEROSTAR</small>
 
@@ -3059,6 +3405,18 @@ function wirePageInteractions() {
     bookShell.querySelector(
       ".map-canvas"
     );
+
+  document.querySelectorAll(".hotel-carousel").forEach((carousel) => {
+    initializeHotelCarousel(carousel);
+  });
+
+  document.querySelectorAll(".hotel-stat-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const hotelName = button.dataset.hotelName;
+      const sectionKey = button.dataset.hotelSection;
+      renderHotelSectionPanel(hotelName, sectionKey);
+    });
+  });
 
   initializeHotelMap();
   initializeGeneralMap();
