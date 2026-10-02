@@ -1,4 +1,8 @@
 // Pega aquí tu clave de Google Maps entre las comillas.
+const appBaseElement = document.createElement("base");
+appBaseElement.href = new URL(".", document.currentScript.src).href;
+document.head.prepend(appBaseElement);
+
 /* =========================================================
    SUPABASE
    ========================================================= */
@@ -160,6 +164,11 @@ function fileToDataURL(file) {
 
 function createMediaUrl(blob) {
   if (!blob) return "";
+
+  if (typeof blob === "string") {
+    return blob;
+  }
+
   return URL.createObjectURL(blob);
 }
 
@@ -187,6 +196,7 @@ const pages = [
   {
     type: "hotel",
     kicker: "HOTEL 1 DE 5 · PARAÍSO DEL MAR",
+    country: "mexico",
     name: "Iberostar Paraíso del Mar",
     location: "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
     image: "src/ParaisoDelMar.jpg",
@@ -202,6 +212,30 @@ const pages = [
       "Snack bar entre el almuerzo y la cena",
       "Acceso a las instalaciones y restaurantes de Iberostar Waves Paraíso Beach"
     ]
+  },
+
+  {
+    type: "country-menu",
+    country: "jamaica",
+    title: "Jamaica",
+    intro: "Una isla de ritmos, paisajes y experiencias bajo el sol del Caribe.",
+    kicker: "JAMAICA"
+  },
+
+  {
+    type: "country-menu",
+    country: "republica-dominicana",
+    title: "República Dominicana",
+    intro: "Playas de arena fina, gastronomía y aventuras para una estancia completa.",
+    kicker: "REPÚBLICA DOMINICANA"
+  },
+
+  {
+    type: "country-menu",
+    country: "brasil",
+    title: "Brasil",
+    intro: "Costa, naturaleza y personalidad brasileña en cada experiencia.",
+    kicker: "BRASIL"
   },
 
   {
@@ -331,6 +365,277 @@ const pages = [
   }
 ];
 
+
+const hotelCountryMenus = {
+  mexico: {
+    key: "mexico",
+    name: "México",
+    intro: "El Caribe mexicano, con sol, diseño y experiencias para toda la familia.",
+    hotels: [
+      {
+        name: "Iberostar Selection Playa Mita",
+        tagline: "El Pacífico, a tu ritmo",
+        description: "Experiencias: surf, vela y rutas junto al mar.",
+        image: "src/paraiso-JOIA/banner/JOIA2.jpg",
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description: "Espacios serenos con diseño tropical y vistas al océano.",
+            keyPoints: ["Suites luminosas", "Terrazas privadas", "Mobiliario contemporáneo"],
+            images: ["src/JOIA2.jpg", "src/ParaisoDelMar.jpg", "src/paraisoBeach.jpg"]
+          },
+          restaurante: {
+            title: "Restaurantes",
+            description: "Gastronomía de autor y sabores locales en un ambiente relajado.",
+            keyPoints: ["Menús creativos", "Cocktails de temporada", "Ambiente íntimo"],
+            images: ["src/paraisoBeach.jpg", "src/ParaisoLindo.jpg", "src/JOIA.jpg"]
+          },
+          piscinas: {
+            title: "Piscinas",
+            description: "Aguas tranquilas y áreas de descanso pensadas para disfrutar del sol.",
+            keyPoints: ["Piscina principal", "Área familiar", "Vista panorámica"],
+            images: ["src/JOIA.jpg", "src/ParaisoDelMar.jpg", "src/paraisoBeach.jpg"]
+          },
+          experiencias: {
+            title: "Experiencias",
+            description: "Surf, vela y rutas junto al mar para vivir la costa con energía.",
+            keyPoints: ["Surf y deportes náuticos", "Rutas costeras", "Excursiones relajadas"],
+            images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/ParaisoDelMar.jpg"]
+          }
+        }
+      },
+      {
+        name: "Iberostar Waves Cozumel",
+        tagline: "Agua entre palmas",
+        description: "Contenido: piscina tropical, playa y ritmo relajado.",
+        image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description: "Diseño acogedor con un toque muy tropical para descansar con calma.",
+            keyPoints: ["Vista a la piscina", "Calidez natural", "Acabados claros"],
+            images: ["src/ParaisoDelMar.jpg", "src/paraisoBeach.jpg", "src/JOIA2.jpg"]
+          },
+          restaurante: {
+            title: "Restaurantes",
+            description: "Sabores ligeros y experiencias gastronómicas de playa y terraza.",
+            keyPoints: ["Bruces al aire libre", "Preparación fresca", "Ambiente relajado"],
+            images: ["src/paraisoBeach.jpg", "src/ParaisoLindo.jpg", "src/JOIA3.jpg"]
+          },
+          piscinas: {
+            title: "Piscinas",
+            description: "Piscina tropical y espacios para disfrutar del sol y del mar.",
+            keyPoints: ["Piscina tropical", "Zona de descanso", "Paseos desde la playa"],
+            images: ["src/JOIA3.jpg", "src/ParaisoDelMar.jpg", "src/paraisoBeach.jpg"]
+          },
+          experiencias: {
+            title: "Experiencias",
+            description: "Bajo la serenidad del Caribe, el tiempo se vive con calma y movimiento.",
+            keyPoints: ["Playa relax", "Actividades de agua", "Ritmos locales"],
+            images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/ParaisoDelMar.jpg"]
+          }
+        }
+      },
+      {
+        name: "Iberostar Selection Cancún",
+        tagline: "La luz entra primero",
+        description: "Contenido: suites, terraza y vista al mar.",
+        image: "src/paraiso-lindo/banner/ParaisoLindo.jpg",
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description: "Suites con luz, amplitud y detalles pensados para una estancia elegante.",
+            keyPoints: ["Suites de doble altura", "Terraza con vista", "Madera y texturas cálidas"],
+            images: ["src/JOIA3.jpg", "src/ParaisoLindo.jpg", "src/JOIA2.jpg"]
+          },
+          restaurante: {
+            title: "Restaurantes",
+            description: "Cocina internacional con un toque contemporáneo y cenas memorables.",
+            keyPoints: ["Cenas al atardecer", "Menús gourmet", "Alta atención"],
+            images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/JOIA.jpg"]
+          },
+          piscinas: {
+            title: "Piscinas",
+            description: "Paseos, relajación y momentos al aire libre con vista al mar.",
+            keyPoints: ["Piscina de descanso", "Zona de solárium", "Lounge de lujo"],
+            images: ["src/JOIA.jpg", "src/JOIA3.jpg", "src/ParaisoDelMar.jpg"]
+          },
+          experiencias: {
+            title: "Experiencias",
+            description: "La luz del Caribe se convierte en la mejor compañía para cada momento.",
+            keyPoints: ["Terrazas y vistas", "Relax premium", "Experiencias exclusivas"],
+            images: ["src/ParaisoDelMar.jpg", "src/JOIA3.jpg", "src/paraisoBeach.jpg"]
+          }
+        }
+      }
+    ]
+  },
+  jamaica: {
+    key: "jamaica",
+    name: "Jamaica",
+    intro: "Ritmos jamaicanos, playas de ensueño y un lujo cálido y sin prisa.",
+    hotels: [
+      {
+        name: "JOIA Rose Hall by Iberostar",
+        tagline: "El Caribe en voz baja",
+        description: "Contenido: experiencias y servicio de mayordomía.",
+        image: "src/paraiso-JOIA/banner/JOIA2.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Elegancia serena con vistas, privacidad y un servicio muy personalizado.", keyPoints: ["Suite premium", "Mobiliario especial", "Ambiente íntimo"], images: ["src/JOIA2.jpg", "src/JOIA3.jpg", "src/JOIA.jpg"] },
+          restaurante: { title: "Restaurantes", description: "La gastronomía se convierte en un momento de disfrute y cultura.", keyPoints: ["Menú de autor", "Cenas sensoriales", "Servicio exclusivo"], images: ["src/JOIA.jpg", "src/JOIA2.jpg", "src/JOIA3.jpg"] },
+          piscinas: { title: "Piscinas", description: "Aguas serenas y espacios de descanso bajo un cielo tropical.", keyPoints: ["Piscina privada", "Lounge exclusivo", "Vista panorámica"], images: ["src/JOIA3.jpg", "src/JOIA2.jpg", "src/JOIA.jpg"] },
+          experiencias: { title: "Experiencias", description: "Experiencias y servicio de mayordomía para una estancia cuidada al detalle.", keyPoints: ["Mayordomía", "Relajación premium", "Ritmos del Caribe"], images: ["src/JOIA.jpg", "src/JOIA3.jpg", "src/JOIA2.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Selection Rose Hall Suites",
+        tagline: "Un jardín de agua",
+        description: "Contenido: piscinas, río lento y acceso al mar.",
+        image: "src/paraiso-maya/banner/paraisoMaya.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Espacios cálidos, cómodos y atentos al descanso de cada huésped.", keyPoints: ["Diseño tropical", "Suite familiar", "Comodidad premium"], images: ["src/ParaisoLindo.jpg", "src/ParaisoDelMar.jpg", "src/JOIA2.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Menús con identidad local y estaciones de la isla.", keyPoints: ["Cocina local", "Espacios abiertos", "Atención cálida"], images: ["src/ParaisoDelMar.jpg", "src/ParaisoLindo.jpg", "src/JOIA3.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscinas y un río lento que aportan calma y frescura.", keyPoints: ["Río lento", "Piscinas familiares", "Lounge tropical"], images: ["src/ParaisoLindo.jpg", "src/JOIA2.jpg", "src/ParaisoDelMar.jpg"] },
+          experiencias: { title: "Experiencias", description: "Paseos en el agua, descanso y libertad para descubrir la isla.", keyPoints: ["Aguas tranquilas", "Mar y playa", "Días de relax"], images: ["src/JOIA2.jpg", "src/ParaisoDelMar.jpg", "src/ParaisoLindo.jpg"] }
+        }
+      },
+      {
+        name: "Coral Level at Iberostar Selection Rose Hall Suites",
+        tagline: "Horizonte reservado",
+        description: "Contenido: habitaciones y áreas exclusivas.",
+        image: "src/paraiso-beach/banner/paraisoBeach.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Espacios exclusivos, tranquilos y diseñados para una estancia unificada.", keyPoints: ["Privacidad", "Terraza", "Luz cálida"], images: ["src/paraisoBeach.jpg", "src/JOIA3.jpg", "src/ParaisoLindo.jpg"] },
+          restaurante: { title: "Restaurantes", description: "La experiencia culinaria acompaña la exclusividad del resort.", keyPoints: ["Servicio premium", "Ambiente íntimo", "Sabor local"], images: ["src/JOIA3.jpg", "src/paraisoBeach.jpg", "src/JOIA2.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscina y zonas de descanso exclusivas para un ambiente selecto.", keyPoints: ["Áreas reservadas", "Lounge", "Ambiente relajado"], images: ["src/paraisoBeach.jpg", "src/JOIA2.jpg", "src/JOIA3.jpg"] },
+          experiencias: { title: "Experiencias", description: "Un punto de vista exclusivo para disfrutar de la isla sin prisas.", keyPoints: ["Área privada", "Servicio dedicado", "Paisaje costero"], images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/ParaisoLindo.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Waves Rose Hall Beach",
+        tagline: "La isla marca el compás",
+        description: "Contenido: música, cocina jamaicana y playa.",
+        image: "src/paraiso-JOIA/banner/JOIA.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Espacios funcionales y acogedores, ideales para descansar entre experiencias.", keyPoints: ["Funcionalidad", "Calidez", "Zonas de relax"], images: ["src/JOIA.jpg", "src/JOIA2.jpg", "src/paraisoBeach.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Cocina jamaicana, ambiente musical y tardes de playa.", keyPoints: ["Sabor local", "Ambientación musical", "Atardeceres"], images: ["src/paraisoBeach.jpg", "src/JOIA.jpg", "src/JOIA3.jpg"] },
+          piscinas: { title: "Piscinas", description: "Espacios de sol y relajación con un ambiente tropical muy vivo.", keyPoints: ["Piscina de verano", "Almohadones y hamacas", "Luz cálida"], images: ["src/JOIA3.jpg", "src/paraisoBeach.jpg", "src/JOIA.jpg"] },
+          experiencias: { title: "Experiencias", description: "Música, cocina y playa para vivir Jamaica con intensidad y calma.", keyPoints: ["Vida local", "Atardecer", "Playas"], images: ["src/JOIA2.jpg", "src/JOIA.jpg", "src/paraisoBeach.jpg"] }
+        }
+      }
+    ]
+  },
+  "republica-dominicana": {
+    key: "republica-dominicana",
+    name: "República Dominicana",
+    intro: "Playa, color y una energía familiar que convierte cada día en una experiencia.",
+    hotels: [
+      {
+        name: "Iberostar Selection Bávaro Suites",
+        tagline: "Suite entre jardines",
+        description: "Contenido: habitaciones familiares.",
+        image: "src/paraiso-maya/banner/paraisoMaya.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Estancias familiares con máxima comodidad y ambiente tropical.", keyPoints: ["Amplias suites", "Espacio familiar", "Comodidad total"], images: ["src/ParaisoDelMar.jpg", "src/ParaisoLindo.jpg", "src/JOIA2.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Combina sabores internacionales con un servicio muy atento.", keyPoints: ["Gastronomía internacional", "Ambiente cálido", "Cenas familiares"], images: ["src/ParaisoLindo.jpg", "src/ParaisoDelMar.jpg", "src/JOIA3.jpg"] },
+          piscinas: { title: "Piscinas", description: "Zonas de descanso y relajación en un entorno de jardines tropicales.", keyPoints: ["Piscina central", "Zona de sol", "Entorno verde"], images: ["src/JOIA3.jpg", "src/ParaisoDelMar.jpg", "src/ParaisoLindo.jpg"] },
+          experiencias: { title: "Experiencias", description: "Espacios para descansar, explorar y compartir en familia.", keyPoints: ["Playas", "Tiempo de calidad", "Familias"], images: ["src/JOIA2.jpg", "src/ParaisoLindo.jpg", "src/ParaisoDelMar.jpg"] }
+        }
+      },
+      {
+        name: "JOIA Bávaro by Iberostar",
+        tagline: "La mesa junto al mar",
+        description: "Contenido: restaurantes y cocina de autor.",
+        image: "src/paraiso-JOIA/banner/JOIA2.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Suite premium con detalles muy cuidadosos y vistas directas.", keyPoints: ["Lujoso", "Vista marina", "Atención premium"], images: ["src/JOIA2.jpg", "src/JOIA3.jpg", "src/ParaisoDelMar.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Cocina de autor con un fuerte sentido del momento y el paisaje.", keyPoints: ["Chef creativo", "Atardecer", "Ambiente elegante"], images: ["src/JOIA3.jpg", "src/JOIA2.jpg", "src/JOIA.jpg"] },
+          piscinas: { title: "Piscinas", description: "Áreas exclusivas para piscina, descanso y vistas panorámicas.", keyPoints: ["Piscina premium", "Lounge", "Vistas al mar"], images: ["src/JOIA.jpg", "src/JOIA2.jpg", "src/JOIA3.jpg"] },
+          experiencias: { title: "Experiencias", description: "Música, cocina y atención para una estancia inspirada en la costa.", keyPoints: ["Cocina de autor", "Servicio premium", "Atardeceres"], images: ["src/JOIA2.jpg", "src/JOIA3.jpg", "src/JOIA.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Waves Punta Cana",
+        tagline: "Agua para todos",
+        description: "Contenido: piscina lago y juegos acuáticos.",
+        image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Habitaciones funcionales, confortables y pensadas para disfrutar sin complicaciones.", keyPoints: ["Espacios amplios", "Comodidad", "Ahorro de energía"], images: ["src/JOIA3.jpg", "src/paraisoBeach.jpg", "src/ParaisoDelMar.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Gastronomía variada y experiencias informales para familias y amigos.", keyPoints: ["Variedad", "Ambiente alegre", "Servicio amable"], images: ["src/paraisoBeach.jpg", "src/JOIA3.jpg", "src/ParaisoLindo.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscina lago y áreas de juegos con un toque de aventura.", keyPoints: ["Piscina lago", "Juegos acuáticos", "Paseos en agua"], images: ["src/ParaisoLindo.jpg", "src/JOIA3.jpg", "src/paraisoBeach.jpg"] },
+          experiencias: { title: "Experiencias", description: "Diversión y contacto con el agua para pasar el día con energía.", keyPoints: ["Juegos acuáticos", "Aventura", "Playa"], images: ["src/JOIA3.jpg", "src/paraisoBeach.jpg", "src/ParaisoLindo.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Waves Dominicana",
+        tagline: "Alegría bajo las palmas",
+        description: "Contenido: cultura y actividades familiares.",
+        image: "src/paraiso-beach/banner/paraisoBeach.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Alojamientos acogedores, luminosos y perfectos para compartir momentos en familia.", keyPoints: ["Cálido", "Luminosas", "Comodidad familiar"], images: ["src/paraisoBeach.jpg", "src/JOIA2.jpg", "src/ParaisoDelMar.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Gastronomía con espíritu local, ambiente alegre y cocina para todo tipo de viajeros.", keyPoints: ["Sabor local", "Aventura gastronómica", "Dinamismo"], images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/ParaisoLindo.jpg"] },
+          piscinas: { title: "Piscinas", description: "Aguas frescas y zonas para disfrutar del sol bajo las palmas.", keyPoints: ["Piscinas familiares", "Espacios de relax", "Sol y sombra"], images: ["src/ParaisoLindo.jpg", "src/paraisoBeach.jpg", "src/JOIA2.jpg"] },
+          experiencias: { title: "Experiencias", description: "Cultura, actividades y días familiares con un aire tropical muy vivo.", keyPoints: ["Cultura", "Actividades", "Familia"], images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/ParaisoLindo.jpg"] }
+        }
+      }
+    ]
+  },
+  brasil: {
+    key: "brasil",
+    name: "Brasil",
+    intro: "Costa viva, naturaleza y un espíritu único que refleja la energía brasileña.",
+    hotels: [
+      {
+        name: "Iberostar Selection Praia do Forte",
+        tagline: "La costa más viva",
+        description: "Contenido: naturaleza y conservación.",
+        image: "src/paraiso-lindo/banner/ParaisoLindo.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Habitaciones con una mezcla de confort y energía tropical.", keyPoints: ["Diseño ligero", "Confort", "Ambiente natural"], images: ["src/JOIA.jpg", "src/paraisoBeach.jpg", "src/ParaisoLindo.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Sabores de la región y ambiente relajado para disfrutar la costa.", keyPoints: ["Gastronomía regional", "Ambiente relajado", "Atención cálida"], images: ["src/paraisoBeach.jpg", "src/JOIA.jpg", "src/ParaisoDelMar.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscinas junto a un entorno verde muy cercano a la costa.", keyPoints: ["Aguas refrescantes", "Jardines", "Relajación"], images: ["src/ParaisoDelMar.jpg", "src/paraisoBeach.jpg", "src/JOIA.jpg"] },
+          experiencias: { title: "Experiencias", description: "Naturaleza, conservación y contacto con la costa en cada momento.", keyPoints: ["Conservación", "Naturaleza", "Costa"], images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/JOIA.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Waves Bahia",
+        tagline: "Sabores de Bahía",
+        description: "Contenido: gastronomía brasileña.",
+        image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Encuentro perfecto entre confort, luz y diseño tropical.", keyPoints: ["Luz natural", "Materiales cálidos", "Confort"], images: ["src/JOIA2.jpg", "src/ParaisoDelMar.jpg", "src/JOIA.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Gastronomía brasileña y cocina internacional para compartir cada momento.", keyPoints: ["Gastronomía local", "Sabor auténtico", "Atardeceres"], images: ["src/JOIA.jpg", "src/JOIA2.jpg", "src/paraisoBeach.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscinas con buen ritmo, sol y un toque de energía contemporánea.", keyPoints: ["Sol y agua", "Lounge", "Relax"], images: ["src/paraisoBeach.jpg", "src/JOIA2.jpg", "src/JOIA3.jpg"] },
+          experiencias: { title: "Experiencias", description: "Una mezcla de sabores, actividades y vida costera muy brasileña.", keyPoints: ["Gastronomía", "Vida costera", "Aventura"], images: ["src/JOIA3.jpg", "src/paraisoBeach.jpg", "src/JOIA2.jpg"] }
+        }
+      },
+      {
+        name: "Iberostar Heritage Grand Amazon",
+        tagline: "Donde confluyen las aguas",
+        description: "Contenido: excursiones amazónicas.",
+        image: "src/paraiso-maya/banner/paraisoMaya.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Espacios serenos inspirados por el entorno natural de la Amazonia.", keyPoints: ["Naturaleza", "Calidez", "Silencio"], images: ["src/ParaisoLindo.jpg", "src/JOIA.jpg", "src/JOIA2.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Cocina con identidad regional, adaptada a paisajes y experiencias.", keyPoints: ["Cocina regional", "Ambiente natural", "Servicio cercano"], images: ["src/JOIA2.jpg", "src/ParaisoLindo.jpg", "src/JOIA3.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscinas y áreas de descanso junto a la exuberante naturaleza.", keyPoints: ["Entorno verde", "Relajación", "Aguas calmadas"], images: ["src/JOIA3.jpg", "src/ParaisoLindo.jpg", "src/JOIA.jpg"] },
+          experiencias: { title: "Experiencias", description: "Excursiones amazónicas y paisajes que invitan a descubrir nuevos ritmos.", keyPoints: ["Amazonia", "Excursiones", "Naturaleza"], images: ["src/JOIA.jpg", "src/ParaisoLindo.jpg", "src/JOIA2.jpg"] }
+        }
+      },
+      {
+        name: "Praia do Forte · Star Prestige",
+        tagline: "Calma sobre el Atlántico",
+        description: "Contenido: piscina exclusiva y servicio personalizado.",
+        image: "src/paraiso-beach/banner/paraisoBeach.jpg",
+        tabs: {
+          habitaciones: { title: "Habitaciones", description: "Suite exclusiva con un estilo sereno y atención muy personalizada.", keyPoints: ["Exclusividad", "Servicio premium", "Relajación"], images: ["src/JOIA3.jpg", "src/JOIA2.jpg", "src/ParaisoLindo.jpg"] },
+          restaurante: { title: "Restaurantes", description: "Recetas de la costa brasileña con una presentación de lujo.", keyPoints: ["Sabor costeño", "Servicio cuidado", "Ambiente premium"], images: ["src/JOIA2.jpg", "src/JOIA3.jpg", "src/paraisoBeach.jpg"] },
+          piscinas: { title: "Piscinas", description: "Piscina exclusiva y un entorno muy tranquilo para respirar calma.", keyPoints: ["Piscina privada", "Lounge exclusivo", "Calma"], images: ["src/paraisoBeach.jpg", "src/JOIA3.jpg", "src/JOIA2.jpg"] },
+          experiencias: { title: "Experiencias", description: "Servicio personalizado y un ambiente de tranquilidad sobre el Atlántico.", keyPoints: ["Servicio selectivo", "Mar abierto", "Calma"], images: ["src/JOIA2.jpg", "src/paraisoBeach.jpg", "src/JOIA3.jpg"] }
+        }
+      }
+    ]
+  }
+};
 
 const hotelMediaCatalog = {
   "Iberostar Paraíso Beach": {
@@ -507,6 +812,8 @@ let activeMap = null;
 let activeDirectionsRenderer = null;
 let userMarker = null;
 let routeLine = null;
+let activeHotelDetail = null;
+let returnPageIndex = null;
 
 function slugify(value) {
   return String(value)
@@ -2553,10 +2860,22 @@ async function renderVideoCards() {
       "videosFilter"
     )?.value || "all";
 
-  const items =
-    await databaseGetAll(
-      "videos"
-    );
+const { data: items, error } =
+  await supabaseClient
+    .from("videos")
+    .select("*, mimeType:mime_type")
+    .order("created_at", {
+      ascending: false
+    });
+
+if (error) {
+  console.error(
+    "ERROR AL CARGAR VIDEOS:",
+    error
+  );
+
+  return;
+}
 
   const filtered =
     filter === "all"
@@ -2693,17 +3012,22 @@ async function renderVideoCards() {
 }
 
 async function editVideo(id) {
-  const items =
-    await databaseGetAll(
-      "videos"
+
+  const { data: item, error } =
+    await supabaseClient
+      .from("videos")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+    console.error(
+      "ERROR AL CARGAR VIDEO PARA EDITAR:",
+      error
     );
 
-  const item =
-    items.find(
-      (entry) =>
-        String(entry.id) ===
-        String(id)
-    );
+    return;
+  }
 
   if (!item) return;
 
@@ -2753,10 +3077,21 @@ async function editVideo(id) {
 }
 
 async function deleteVideo(id) {
-  await databaseDelete(
-    "videos",
-    id
-  );
+
+  const { error } =
+    await supabaseClient
+      .from("videos")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+    console.error(
+      "ERROR AL ELIMINAR VIDEO:",
+      error
+    );
+
+    return;
+  }
 
   await renderVideoCards();
 }
@@ -3061,45 +3396,192 @@ function wireVideos() {
         return;
       }
 
-      if (editId) {
-        const items =
-          await databaseGetAll(
-            "videos"
+           if (editId) {
+
+        const { data: current, error: currentError } =
+          await supabaseClient
+            .from("videos")
+            .select("*")
+            .eq("id", editId)
+            .single();
+
+        if (currentError || !current) {
+          console.error(
+            "ERROR AL CARGAR VIDEO ACTUAL:",
+            currentError
           );
 
-        const current =
-          items.find(
-            (item) =>
-              String(item.id) ===
-              String(editId)
+          alert(
+            "No se pudo cargar el video."
           );
 
-        let video =
+          return;
+        }
+
+        let videoUrl =
           current.video;
 
         let mimeType =
-          current.mimeType;
+          current.mime_type;
 
         if (file) {
-          video = file;
+
+          const fileExt =
+            file.name
+              .split(".")
+              .pop();
+
+          const fileName =
+            `${crypto.randomUUID()}.${fileExt}`;
+
+          const { error: uploadError } =
+            await supabaseClient
+              .storage
+              .from("videos")
+              .upload(
+                fileName,
+                file,
+                {
+                  contentType:
+                    file.type ||
+                    "video/mp4",
+                  upsert: false
+                }
+              );
+
+          if (uploadError) {
+            console.error(
+              "ERROR AL SUBIR VIDEO:",
+              uploadError
+            );
+
+            alert(
+              "No se pudo subir el nuevo video."
+            );
+
+            return;
+          }
+
+          const { data: publicUrlData } =
+            supabaseClient
+              .storage
+              .from("videos")
+              .getPublicUrl(
+                fileName
+              );
+
+          videoUrl =
+            publicUrlData.publicUrl;
+
           mimeType =
             file.type ||
             "video/mp4";
         }
 
-        await databasePut(
-          "videos",
-          {
-            ...current,
-            hotel,
-            title,
-            video,
-            mimeType,
-            start,
-            end
-          }
-        );
+        const { error: updateError } =
+          await supabaseClient
+            .from("videos")
+            .update({
+              hotel,
+              title,
+              video: videoUrl,
+              mime_type: mimeType,
+              start,
+              end
+            })
+            .eq("id", editId);
+
+        if (updateError) {
+          console.error(
+            "ERROR AL ACTUALIZAR VIDEO:",
+            updateError
+          );
+
+          alert(
+            "No se pudo actualizar el video."
+          );
+
+          return;
+        }
+
       } else {
+
+        const fileExt =
+          file.name
+            .split(".")
+            .pop();
+
+        const fileName =
+          `${crypto.randomUUID()}.${fileExt}`;
+
+        const { error: uploadError } =
+          await supabaseClient
+            .storage
+            .from("videos")
+            .upload(
+              fileName,
+              file,
+              {
+                contentType:
+                  file.type ||
+                  "video/mp4",
+                upsert: false
+              }
+            );
+
+        if (uploadError) {
+          console.error(
+            "ERROR AL SUBIR VIDEO:",
+            uploadError
+          );
+
+          alert(
+            "No se pudo subir el video."
+          );
+
+          return;
+        }
+
+        const { data: publicUrlData } =
+          supabaseClient
+            .storage
+            .from("videos")
+            .getPublicUrl(
+              fileName
+            );
+
+        const videoUrl =
+          publicUrlData.publicUrl;
+
+        const { error: insertError } =
+          await supabaseClient
+            .from("videos")
+            .insert([
+              {
+                hotel,
+                title,
+                video: videoUrl,
+                mime_type:
+                  file.type ||
+                  "video/mp4",
+                start,
+                end
+              }
+            ]);
+
+        if (insertError) {
+          console.error(
+            "ERROR AL GUARDAR VIDEO:",
+            insertError
+          );
+
+          alert(
+            "El video se subió, pero no se pudo guardar en la base de datos."
+          );
+
+          return;
+        }
+      }{
         await databaseAdd(
           "videos",
           {
@@ -3133,6 +3615,225 @@ function wireVideos() {
    RENDER HOTEL
    ========================================================= */
 
+function renderCountryMenu(page) {
+  const countryKey = page.country || "mexico";
+  const country = hotelCountryMenus[countryKey] || hotelCountryMenus.mexico;
+  const heroCards = country.hotels
+    .map((hotel, index) => `
+      <button
+        type="button"
+        class="country-card"
+        data-country="${countryKey}"
+        data-hotel-index="${index}"
+        tabindex="0"
+        aria-label="Abrir ficha de ${hotel.name}"
+      >
+        <img src="${hotel.image}" alt="${hotel.name}" />
+        <span class="country-card-label">${country.name}</span>
+        <strong>${hotel.name}</strong>
+        <em>${hotel.tagline}</em>
+        <small>${hotel.description}</small>
+        <span class="country-card-action">Ver ficha</span>
+      </button>
+    `)
+    .join("");
+
+  const menuSequence = pages
+    .map((entry, index) => ({
+      index,
+      country: entry.country || null,
+      type: entry.type
+    }))
+    .filter((entry) => entry.type === "country-menu" || (entry.type === "hotel" && entry.country === "mexico"));
+
+  const currentMenuIndex = menuSequence.findIndex((entry) => entry.index === currentIndex);
+  const previousIndex = menuSequence[(currentMenuIndex - 1 + menuSequence.length) % menuSequence.length]?.index ?? currentIndex;
+  const nextIndex = menuSequence[(currentMenuIndex + 1) % menuSequence.length]?.index ?? currentIndex;
+
+  return `
+    <div class="spread country-menu-spread">
+      <div class="country-header">
+        <div class="country-header-line"></div>
+        <div class="country-header-meta">${page.kicker || country.name.toUpperCase()}</div>
+      </div>
+
+      <div class="country-intro">
+        <div>
+          <span class="country-intro-label">HOTELERÍA</span>
+          <h1>${country.name}</h1>
+        </div>
+        <p>${country.intro}</p>
+      </div>
+
+      <div class="country-grid">
+        ${heroCards}
+      </div>
+
+      <div class="country-footer">
+        <span>IBEROSTAR · REVISTA DIGITAL</span>
+      </div>
+
+      <button type="button" class="country-menu-nav country-nav-prev" data-direction="-1" data-target="${previousIndex}" aria-label="Ver país anterior">‹</button>
+      <button type="button" class="country-menu-nav country-nav-next" data-direction="1" data-target="${nextIndex}" aria-label="Ver siguiente país">›</button>
+      <div class="country-indicator" aria-label="Indicador de país">${country.name}</div>
+    </div>
+  `;
+}
+
+function openHotelDetail(countryKey, hotelIndex) {
+  const country = hotelCountryMenus[countryKey];
+  const hotel = country?.hotels?.[hotelIndex];
+
+  if (!hotel) return;
+
+  returnPageIndex = currentIndex;
+  activeHotelDetail = {
+    countryKey,
+    hotelIndex,
+    activeTab: "habitaciones",
+    galleryIndex: 0
+  };
+
+  renderPage();
+}
+
+function getActiveHotelDetail() {
+  if (!activeHotelDetail) return null;
+  const country = hotelCountryMenus[activeHotelDetail.countryKey];
+  if (!country) return null;
+  return {
+    ...activeHotelDetail,
+    hotel: country.hotels[activeHotelDetail.hotelIndex] || null
+  };
+}
+
+function renderHotelDetail() {
+  const detail = getActiveHotelDetail();
+  if (!detail || !detail.hotel) return "";
+
+  const country = hotelCountryMenus[detail.countryKey];
+  const hotel = detail.hotel;
+  const tabs = [
+    { key: "habitaciones", label: "Habitaciones" },
+    { key: "restaurante", label: "Restaurantes" },
+    { key: "piscinas", label: "Piscinas" },
+    { key: "experiencias", label: "Experiencias" }
+  ];
+  const activeTabKey = detail.activeTab || "habitaciones";
+  const activeTab = hotel.tabs?.[activeTabKey] || hotel.tabs?.habitaciones;
+  const tabImages = (activeTab?.images || [hotel.image]).filter(Boolean);
+  const currentImage = tabImages[detail.galleryIndex] || hotel.image;
+  const galleryCounter = `${Math.min(detail.galleryIndex + 1, tabImages.length) || 1} / ${tabImages.length || 1}`;
+
+  const tabsMarkup = tabs.map((tab) => `
+    <button
+      type="button"
+      role="tab"
+      aria-selected="${tab.key === activeTabKey ? "true" : "false"}"
+      class="hotel-detail-tab ${tab.key === activeTabKey ? "is-active" : ""}"
+      data-hotel-tab="${tab.key}"
+    >
+      ${tab.label}
+    </button>
+  `).join("");
+
+  const thumbnails = tabImages.map((image, index) => `
+    <button
+      type="button"
+      class="hotel-detail-thumb ${index === detail.galleryIndex ? "is-selected" : ""}"
+      data-gallery-index="${index}"
+      aria-label="Ver imagen ${index + 1}"
+    >
+      <img src="${image}" alt="${hotel.name} ${activeTab.title} ${index + 1}" />
+    </button>
+  `).join("");
+
+  const prevHotelIndex = (detail.hotelIndex - 1 + country.hotels.length) % country.hotels.length;
+  const nextHotelIndex = (detail.hotelIndex + 1) % country.hotels.length;
+
+  return `
+    <div class="spread hotel-detail-spread">
+      <div class="hotel-detail-header">
+        <div class="hotel-detail-header-line"></div>
+        <span>${country.name}</span>
+      </div>
+
+      <section class="hotel-hero">
+        <div class="hotel-hero-image-wrap">
+          <img src="${currentImage}" alt="${hotel.name}" class="hotel-hero-image" />
+        </div>
+
+        <div class="hotel-hero-info">
+          <small>${hotel.tagline}</small>
+          <h1>${hotel.name}</h1>
+          <p>${hotel.description}</p>
+          <div class="hotel-detail-keypoints">
+            ${((activeTab?.keyPoints || []).map((point) => `<span>${point}</span>`).join(""))}
+          </div>
+        </div>
+      </section>
+
+      <div class="hotel-detail-tabs" role="tablist" aria-label="Detalles del hotel">
+        ${tabsMarkup}
+      </div>
+
+      <section class="hotel-detail-gallery">
+        <div class="hotel-detail-gallery-main">
+          <button type="button" class="hotel-detail-gallery-arrow hotel-detail-gallery-prev" data-gallery-nav="-1" aria-label="Imagen anterior">‹</button>
+          <img src="${currentImage}" alt="${hotel.name} ${activeTab.title}" />
+          <button type="button" class="hotel-detail-gallery-arrow hotel-detail-gallery-next" data-gallery-nav="1" aria-label="Imagen siguiente">›</button>
+        </div>
+
+        <div class="hotel-detail-gallery-meta">
+          <div class="hotel-detail-gallery-counter">${galleryCounter}</div>
+          <div class="hotel-detail-gallery-thumbs">${thumbnails}</div>
+        </div>
+      </section>
+
+      <div class="hotel-detail-actions">
+        <button type="button" class="hotel-detail-back" aria-label="Volver al menú de hoteles">Volver al menú de hoteles</button>
+        <div class="hotel-detail-nav-arrows">
+          <button type="button" class="hotel-detail-nav" data-hotel-index="${prevHotelIndex}" data-hotel-direction="-1" aria-label="Hotel anterior">‹</button>
+          <button type="button" class="hotel-detail-nav" data-hotel-index="${nextHotelIndex}" data-hotel-direction="1" aria-label="Hotel siguiente">›</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function syncBookRoute() {
+  const page = pages[currentIndex];
+  let nextPath = "/";
+
+  if (activeHotelDetail) {
+    const countryKey = activeHotelDetail.countryKey;
+    const hotel = hotelCountryMenus[countryKey]?.hotels?.[activeHotelDetail.hotelIndex];
+    if (hotel) {
+      nextPath = `/hoteles/${countryKey}/${slugify(hotel.name)}`;
+    }
+  } else if (page.type === "country-menu") {
+    nextPath = `/hoteles/${page.country}`;
+  } else if (page.type === "hotel" && page.country === "mexico") {
+    nextPath = "/hoteles/mexico";
+  } else if (page.type === "map") {
+    nextPath = "/mapa-general";
+  } else if (page.type === "mapamundi") {
+    nextPath = "/mapa-mundi";
+  } else if (page.type === "workspace") {
+    nextPath = "/workspace";
+  } else if (page.type === "media360") {
+    nextPath = "/360";
+  } else if (page.type === "videos") {
+    nextPath = "/videos";
+  }
+
+  const currentPath = window.location.pathname || "/";
+
+  if (currentPath !== nextPath) {
+    history.pushState({ currentIndex, activeHotelDetail, returnPageIndex }, "", nextPath);
+  }
+}
+
 function renderPage() {
   const page =
     pages[currentIndex];
@@ -3147,7 +3848,18 @@ function renderPage() {
     "page-turn"
   );
 
-  if (
+  if (activeHotelDetail) {
+    bookShell.innerHTML = renderHotelDetail();
+  }
+  else if (
+    page.type === "hotel" && page.country === "mexico"
+  ) {
+    bookShell.innerHTML = renderCountryMenu(page);
+  }
+  else if (page.type === "country-menu") {
+    bookShell.innerHTML = renderCountryMenu(page);
+  }
+  else if (
     page.type === "hotel"
   ) {
     bookShell.innerHTML =
@@ -3323,6 +4035,8 @@ else {
 
   renderDots();
 
+  syncBookRoute();
+
   wirePageInteractions();
 
   updateGeneralUserMarker();
@@ -3415,6 +4129,104 @@ function wirePageInteractions() {
       const hotelName = button.dataset.hotelName;
       const sectionKey = button.dataset.hotelSection;
       renderHotelSectionPanel(hotelName, sectionKey);
+    });
+  });
+
+  bookShell.querySelectorAll(".country-card").forEach((card) => {
+    const openCard = () => {
+      const countryKey = card.dataset.country;
+      const hotelIndex = Number(card.dataset.hotelIndex || 0);
+      openHotelDetail(countryKey, hotelIndex);
+    };
+
+    card.addEventListener("click", openCard);
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openCard();
+      }
+    });
+  });
+
+  bookShell.querySelectorAll(".country-menu-nav").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextIndex = Number(button.dataset.target || currentIndex);
+      currentIndex = nextIndex;
+      renderPage();
+    });
+  });
+
+  bookShell.querySelectorAll(".hotel-detail-back").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeHotelDetail = null;
+      currentIndex = returnPageIndex ?? 0;
+      returnPageIndex = null;
+      renderPage();
+    });
+  });
+
+  bookShell.querySelectorAll(".hotel-detail-nav").forEach((button) => {
+    const direction = Number(button.dataset.hotelDirection || 0);
+    const targetIndex = Number(button.dataset.hotelIndex ?? 0);
+    button.addEventListener("click", () => {
+      const detail = getActiveHotelDetail();
+      if (!detail) return;
+      activeHotelDetail = {
+        ...detail,
+        hotelIndex: targetIndex,
+        galleryIndex: 0,
+        activeTab: detail.activeTab || "habitaciones"
+      };
+      renderPage();
+    });
+    if (direction !== 0 && button.getAttribute("aria-label")) {
+      button.setAttribute("tabindex", "0");
+    }
+  });
+
+  bookShell.querySelectorAll("[data-hotel-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const detail = getActiveHotelDetail();
+      if (!detail) return;
+      detail.activeTab = tab.dataset.hotelTab;
+      detail.galleryIndex = 0;
+      activeHotelDetail = { ...detail };
+      renderPage();
+    });
+    tab.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      event.preventDefault();
+      const tabs = Array.from(bookShell.querySelectorAll("[data-hotel-tab]"));
+      const currentIndexPosition = tabs.indexOf(tab);
+      const nextIndex = event.key === "ArrowRight"
+        ? (currentIndexPosition + 1) % tabs.length
+        : (currentIndexPosition - 1 + tabs.length) % tabs.length;
+      tabs[nextIndex]?.focus();
+      tabs[nextIndex]?.click();
+    });
+  });
+
+  bookShell.querySelectorAll("[data-gallery-index]").forEach((thumb) => {
+    thumb.addEventListener("click", () => {
+      const detail = getActiveHotelDetail();
+      if (!detail) return;
+      activeHotelDetail = { ...detail, galleryIndex: Number(thumb.dataset.galleryIndex || 0) };
+      renderPage();
+    });
+  });
+
+  bookShell.querySelectorAll("[data-gallery-nav]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const detail = getActiveHotelDetail();
+      if (!detail) return;
+      const country = hotelCountryMenus[detail.countryKey];
+      const hotel = country?.hotels?.[detail.hotelIndex];
+      const activeTab = hotel?.tabs?.[detail.activeTab || "habitaciones"] || hotel?.tabs?.habitaciones;
+      const total = (activeTab?.images || [hotel.image]).length || 1;
+      const currentIndexPosition = detail.galleryIndex || 0;
+      const nextPosition = (currentIndexPosition + Number(button.dataset.galleryNav || 0) + total) % total;
+      activeHotelDetail = { ...detail, galleryIndex: nextPosition };
+      renderPage();
     });
   });
 
@@ -3888,6 +4700,8 @@ function initializeHotelMap() {
    ========================================================= */
 
 function movePage(direction) {
+  if (activeHotelDetail) return;
+
   currentIndex =
     (
       currentIndex +
@@ -3914,6 +4728,16 @@ rightButton.addEventListener(
 window.addEventListener(
   "keydown",
   (event) => {
+    if (activeHotelDetail) {
+      if (event.key === "Escape") {
+        activeHotelDetail = null;
+        currentIndex = returnPageIndex ?? 0;
+        returnPageIndex = null;
+        renderPage();
+      }
+      return;
+    }
+
     if (
       event.key ===
       "ArrowLeft"
@@ -3930,6 +4754,44 @@ window.addEventListener(
   }
 );
 
+window.addEventListener("popstate", () => {
+  const route = window.location.pathname || "/";
+  const hotelMatch = route.match(/^\/hoteles\/([^/]+)\/([^/]+)$/);
+  const countryMatch = route.match(/^\/hoteles\/([^/]+)$/);
+
+  if (hotelMatch) {
+    const countryKey = hotelMatch[1];
+    const hotelName = hotelMatch[2];
+    const country = hotelCountryMenus[countryKey];
+    const hotelIndex = country?.hotels?.findIndex((hotel) => slugify(hotel.name) === hotelName) ?? -1;
+
+    if (country && hotelIndex >= 0) {
+      activeHotelDetail = { countryKey, hotelIndex, activeTab: "habitaciones", galleryIndex: 0 };
+      returnPageIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
+      currentIndex = returnPageIndex >= 0 ? returnPageIndex : 0;
+      renderPage();
+      return;
+    }
+  }
+
+  if (countryMatch) {
+    const countryKey = countryMatch[1];
+    const targetIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
+    if (targetIndex >= 0) {
+      activeHotelDetail = null;
+      returnPageIndex = null;
+      currentIndex = targetIndex;
+      renderPage();
+      return;
+    }
+  }
+
+  activeHotelDetail = null;
+  returnPageIndex = null;
+  currentIndex = 0;
+  renderPage();
+});
+
 
 /* =========================================================
    SWIPE
@@ -3941,34 +4803,69 @@ const magazineStage =
   );
 
 let startX = 0;
+let startY = 0;
+let swipeStartedOnMap = false;
 
 magazineStage.addEventListener(
   "touchstart",
   (e) => {
+
+    const touch =
+      e.touches[0];
+
     startX =
-      e.touches[0].clientX;
+      touch.clientX;
+
+    startY =
+      touch.clientY;
+
+    swipeStartedOnMap =
+      !!e.target.closest(
+        ".leaflet-container, #hotelMapFrame, #generalMapFrame"
+      );
   }
 );
 
 magazineStage.addEventListener(
   "touchend",
   (e) => {
-    const endX =
-      e.changedTouches[0].clientX;
 
-    const distance =
+    // Si el gesto comenzó dentro de un mapa,
+    // NO cambiar de página.
+    if (swipeStartedOnMap) {
+      swipeStartedOnMap = false;
+      return;
+    }
+
+    const touch =
+      e.changedTouches[0];
+
+    const endX =
+      touch.clientX;
+
+    const endY =
+      touch.clientY;
+
+    const distanceX =
       startX - endX;
 
+    const distanceY =
+      startY - endY;
+
+    // Solo cambiar de página si el movimiento
+    // es principalmente horizontal.
     if (
-      Math.abs(distance) >
-      60
+      Math.abs(distanceX) > 60 &&
+      Math.abs(distanceX) > Math.abs(distanceY)
     ) {
-      if (distance > 0) {
+      if (distanceX > 0) {
         movePage(1);
       } else {
         movePage(-1);
       }
     }
+
+    swipeStartedOnMap = false;
   }
 );
 
