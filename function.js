@@ -194,24 +194,11 @@ const pages = [
   },
 
   {
-    type: "hotel",
-    kicker: "HOTEL 1 DE 5 · PARAÍSO DEL MAR",
+    type: "country-menu",
     country: "mexico",
-    name: "Iberostar Paraíso del Mar",
-    location: "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
-    image: "src/ParaisoDelMar.jpg",
-    intro: "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
-    stats: [
-      ["344", "Habitaciones"],
-      ["7", "Restaurantes"],
-      ["4", "Piscinas"]
-    ],
-    benefits: [
-      "Programa de deporte Fit&Fun y animación diaria",
-      "Desayuno, almuerzo y cena buffet en el restaurante principal",
-      "Snack bar entre el almuerzo y la cena",
-      "Acceso a las instalaciones y restaurantes de Iberostar Waves Paraíso Beach"
-    ]
+    title: "México",
+    intro: "El Caribe mexicano, con sol, diseño y experiencias para toda la familia.",
+    kicker: "MÉXICO"
   },
 
   {
@@ -236,6 +223,27 @@ const pages = [
     title: "Brasil",
     intro: "Costa, naturaleza y personalidad brasileña en cada experiencia.",
     kicker: "BRASIL"
+  },
+
+  {
+    type: "hotel",
+    kicker: "HOTEL 1 DE 5 · PARAÍSO DEL MAR",
+    country: "mexico",
+    name: "Iberostar Paraíso del Mar",
+    location: "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
+    image: "src/ParaisoDelMar.jpg",
+    intro: "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
+    stats: [
+      ["344", "Habitaciones"],
+      ["7", "Restaurantes"],
+      ["4", "Piscinas"]
+    ],
+    benefits: [
+      "Programa de deporte Fit&Fun y animación diaria",
+      "Desayuno, almuerzo y cena buffet en el restaurante principal",
+      "Snack bar entre el almuerzo y la cena",
+      "Acceso a las instalaciones y restaurantes de Iberostar Waves Paraíso Beach"
+    ]
   },
 
   {
@@ -813,6 +821,7 @@ let activeDirectionsRenderer = null;
 let userMarker = null;
 let routeLine = null;
 let activeHotelDetail = null;
+let activeRestaurantMenuIndex = null;
 let returnPageIndex = null;
 
 function slugify(value) {
@@ -1552,42 +1561,96 @@ function renderHotel(page) {
           <small>GASTRONOMÍA</small>
 
           <h3>
-            Reservar Restaurante <b>★</b>
+            Sabores para descubrir
           </h3>
 
-          <div class="food-list">
-            <span>
-              🍝 Bella Italia
-              <small>18:00</small>
-            </span>
-
-            <span>
-              🍜 La Palapa
-              <small>07:00</small>
-            </span>
-
-            <span>
-              🥩 El Gaucho
-              <small>19:00</small>
-            </span>
-
-            <span>
-              🍔 Snack &amp; Grill
-              <small>12:00</small>
-            </span>
-          </div>
-
           <button
-            class="reserve"
+            class="restaurant-menu-open"
             type="button"
+            aria-label="Ver menú de restaurantes de ${page.name}"
           >
-            HACER RESERVACIÓN →
+            Ver menú de restaurantes →
           </button>
 
         </div>
 
       </article>
 
+    </div>
+  `;
+}
+
+const restaurantMenuOptions = [
+  { name: "Bella Italia", cuisine: "ITALIANA", hours: "18:00" },
+  { name: "La Palapa", cuisine: "MEXICANA COSTERA", hours: "07:00" },
+  { name: "El Gaucho", cuisine: "PARRILLA ARGENTINA", hours: "19:00" },
+  { name: "Snack & Grill", cuisine: "CASUAL INTERNACIONAL", hours: "12:00" }
+];
+
+function renderRestaurantMenu(pageIndex) {
+  const hotel = pages[pageIndex];
+  if (!hotel || hotel.type !== "hotel") return "";
+
+  const hotelMedia = getHotelMedia(hotel.name);
+  const heroImage = hotelMedia.banner?.[0] || hotel.image;
+  const restaurantCount = hotel.stats.find(([, label]) =>
+    String(label).toLowerCase().includes("restaurantes")
+  )?.[0] || restaurantMenuOptions.length;
+
+  return `
+    <div class="spread restaurant-menu-spread">
+      <section class="restaurant-menu-story">
+        <div
+          class="restaurant-menu-photo"
+          style="background-image:linear-gradient(180deg,rgba(5,12,17,.08),rgba(5,12,17,.62)),url('${heroImage}')"
+        >
+          <div>
+            <small>EXPERIENCIAS CULINARIAS</small>
+            <h1>${hotel.name}</h1>
+          </div>
+        </div>
+
+        <div class="restaurant-menu-summary">
+          <small>LA MESA DEL HOTEL</small>
+          <h2>Sabores para descubrir</h2>
+          <p>Una selección para disfrutar durante tu estancia en ${hotel.name}.</p>
+          <div class="restaurant-menu-facts">
+            <div><strong>${restaurantCount}</strong><small>Restaurantes</small></div>
+            <div><strong>AI</strong><small>Todo incluido</small></div>
+          </div>
+          <p class="restaurant-menu-note">Los horarios pueden variar según la temporada. Consulta disponibilidad al llegar.</p>
+        </div>
+      </section>
+
+      <section class="restaurant-menu-listing">
+        <header class="restaurant-menu-brand">
+          <img src="src/logo png-02.png" alt="Iberostar The Club" />
+          <button class="restaurant-menu-back" type="button">
+            ← Volver al mapa del hotel
+          </button>
+        </header>
+
+        <div class="restaurant-menu-heading">
+          <div>
+            <small>SELECCIÓN DEL HOTEL · TODO INCLUIDO</small>
+            <h2>Menú de restaurantes</h2>
+          </div>
+          <span>+${restaurantMenuOptions.length} opciones</span>
+        </div>
+
+        <div class="restaurant-menu-options">
+          ${restaurantMenuOptions.map((restaurant, index) => `
+            <article class="restaurant-menu-option">
+              <span class="restaurant-menu-number">${String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>${restaurant.name}</h3>
+                <small>${restaurant.cuisine}</small>
+              </div>
+              <span class="restaurant-menu-hours">${restaurant.hours}</span>
+            </article>
+          `).join("")}
+        </div>
+      </section>
     </div>
   `;
 }
@@ -3644,7 +3707,7 @@ function renderCountryMenu(page) {
       country: entry.country || null,
       type: entry.type
     }))
-    .filter((entry) => entry.type === "country-menu" || (entry.type === "hotel" && entry.country === "mexico"));
+    .filter((entry) => entry.type === "country-menu");
 
   const currentMenuIndex = menuSequence.findIndex((entry) => entry.index === currentIndex);
   const previousIndex = menuSequence[(currentMenuIndex - 1 + menuSequence.length) % menuSequence.length]?.index ?? currentIndex;
@@ -3805,7 +3868,12 @@ function syncBookRoute() {
   const page = pages[currentIndex];
   let nextPath = "/";
 
-  if (activeHotelDetail) {
+  if (activeRestaurantMenuIndex !== null) {
+    const restaurantHotel = pages[activeRestaurantMenuIndex];
+    if (restaurantHotel?.type === "hotel") {
+      nextPath = `/restaurantes/${slugify(restaurantHotel.name)}`;
+    }
+  } else if (activeHotelDetail) {
     const countryKey = activeHotelDetail.countryKey;
     const hotel = hotelCountryMenus[countryKey]?.hotels?.[activeHotelDetail.hotelIndex];
     if (hotel) {
@@ -3813,8 +3881,6 @@ function syncBookRoute() {
     }
   } else if (page.type === "country-menu") {
     nextPath = `/hoteles/${page.country}`;
-  } else if (page.type === "hotel" && page.country === "mexico") {
-    nextPath = "/hoteles/mexico";
   } else if (page.type === "map") {
     nextPath = "/mapa-general";
   } else if (page.type === "mapamundi") {
@@ -3830,7 +3896,7 @@ function syncBookRoute() {
   const currentPath = window.location.pathname || "/";
 
   if (currentPath !== nextPath) {
-    history.pushState({ currentIndex, activeHotelDetail, returnPageIndex }, "", nextPath);
+    history.pushState({ currentIndex, activeHotelDetail, returnPageIndex, activeRestaurantMenuIndex }, "", nextPath);
   }
 }
 
@@ -3848,13 +3914,11 @@ function renderPage() {
     "page-turn"
   );
 
-  if (activeHotelDetail) {
-    bookShell.innerHTML = renderHotelDetail();
+  if (activeRestaurantMenuIndex !== null) {
+    bookShell.innerHTML = renderRestaurantMenu(activeRestaurantMenuIndex);
   }
-  else if (
-    page.type === "hotel" && page.country === "mexico"
-  ) {
-    bookShell.innerHTML = renderCountryMenu(page);
+  else if (activeHotelDetail) {
+    bookShell.innerHTML = renderHotelDetail();
   }
   else if (page.type === "country-menu") {
     bookShell.innerHTML = renderCountryMenu(page);
@@ -4098,6 +4162,7 @@ function renderDots() {
       dot.addEventListener(
         "click",
         () => {
+          activeRestaurantMenuIndex = null;
           currentIndex =
             Number(
               dot.dataset.page
@@ -4119,6 +4184,20 @@ function wirePageInteractions() {
     bookShell.querySelector(
       ".map-canvas"
     );
+
+  bookShell.querySelectorAll(".restaurant-menu-open").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeRestaurantMenuIndex = currentIndex;
+      renderPage();
+    });
+  });
+
+  bookShell.querySelectorAll(".restaurant-menu-back").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeRestaurantMenuIndex = null;
+      renderPage();
+    });
+  });
 
   document.querySelectorAll(".hotel-carousel").forEach((carousel) => {
     initializeHotelCarousel(carousel);
@@ -4701,6 +4780,7 @@ function initializeHotelMap() {
 
 function movePage(direction) {
   if (activeHotelDetail) return;
+  activeRestaurantMenuIndex = null;
 
   currentIndex =
     (
@@ -4728,6 +4808,14 @@ rightButton.addEventListener(
 window.addEventListener(
   "keydown",
   (event) => {
+    if (activeRestaurantMenuIndex !== null) {
+      if (event.key === "Escape") {
+        activeRestaurantMenuIndex = null;
+        renderPage();
+      }
+      return;
+    }
+
     if (activeHotelDetail) {
       if (event.key === "Escape") {
         activeHotelDetail = null;
@@ -4756,8 +4844,23 @@ window.addEventListener(
 
 window.addEventListener("popstate", () => {
   const route = window.location.pathname || "/";
+  const restaurantMenuMatch = route.match(/^\/restaurantes\/([^/]+)$/);
   const hotelMatch = route.match(/^\/hoteles\/([^/]+)\/([^/]+)$/);
   const countryMatch = route.match(/^\/hoteles\/([^/]+)$/);
+
+  if (restaurantMenuMatch) {
+    const targetIndex = pages.findIndex((page) =>
+      page.type === "hotel" && slugify(page.name) === restaurantMenuMatch[1]
+    );
+    if (targetIndex >= 0) {
+      activeRestaurantMenuIndex = targetIndex;
+      activeHotelDetail = null;
+      returnPageIndex = null;
+      currentIndex = targetIndex;
+      renderPage();
+      return;
+    }
+  }
 
   if (hotelMatch) {
     const countryKey = hotelMatch[1];
@@ -4766,6 +4869,7 @@ window.addEventListener("popstate", () => {
     const hotelIndex = country?.hotels?.findIndex((hotel) => slugify(hotel.name) === hotelName) ?? -1;
 
     if (country && hotelIndex >= 0) {
+      activeRestaurantMenuIndex = null;
       activeHotelDetail = { countryKey, hotelIndex, activeTab: "habitaciones", galleryIndex: 0 };
       returnPageIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
       currentIndex = returnPageIndex >= 0 ? returnPageIndex : 0;
@@ -4778,6 +4882,7 @@ window.addEventListener("popstate", () => {
     const countryKey = countryMatch[1];
     const targetIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
     if (targetIndex >= 0) {
+      activeRestaurantMenuIndex = null;
       activeHotelDetail = null;
       returnPageIndex = null;
       currentIndex = targetIndex;
@@ -4786,6 +4891,7 @@ window.addEventListener("popstate", () => {
     }
   }
 
+  activeRestaurantMenuIndex = null;
   activeHotelDetail = null;
   returnPageIndex = null;
   currentIndex = 0;
