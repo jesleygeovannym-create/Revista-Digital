@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Revista Iberostar</title>
+    <base href="/" />
+    <script>
+      const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
+      if (routeEntry) {
+        const routePath = routeEntry.replace(/\/+$/, "") || "/";
+        window.history.replaceState(null, "", routePath);
+      }
+    </script>
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1002,6 +1010,14 @@
       La ubicación se solicitará al abrir la revista.
     </p>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="function.js"></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/routes.js" defer></script>
+    <script src="js/hoteles.js" defer></script>
+    <script src="js/restaurantes.js" defer></script>
+    <script src="js/mapas.js" defer></script>
+    <script src="js/workspace.js" defer></script>
+    <script src="js/media360.js" defer></script>
+    <script src="js/videos.js" defer></script>
+    <script src="function.js" defer></script>
   </body>
 </html>

@@ -663,7 +663,7 @@ const hotelCountryMenus = {
     ]
   },
 
-  jamaica: {
+    jamaica: {
     key: "jamaica",
     name: "Jamaica",
     intro:
@@ -742,6 +742,231 @@ const hotelCountryMenus = {
             ]
           }
         }
+      },
+
+      {
+        name: "Iberostar Selection Rose Hall Suites",
+        tagline: "Elegancia frente al Caribe",
+        description:
+          "Contenido: suites, gastronomía y experiencias frente al mar.",
+        image:
+          "src/paraiso-beach/banner/paraisoBeach.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Suites amplias diseñadas para una estancia cómoda y relajante.",
+            keyPoints: [
+              "Suites amplias",
+              "Vistas al Caribe",
+              "Espacios familiares"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Opciones gastronómicas internacionales y sabores del Caribe.",
+            keyPoints: [
+              "Buffet internacional",
+              "Cocina caribeña",
+              "Cenas especiales"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/JOIA.jpg",
+              "src/ParaisoDelMar.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Espacios acuáticos para relajarse y disfrutar del clima tropical.",
+            keyPoints: [
+              "Piscinas familiares",
+              "Zona de descanso",
+              "Ambiente tropical"
+            ],
+            images: [
+              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Actividades para disfrutar del Caribe y descubrir Jamaica.",
+            keyPoints: [
+              "Actividades acuáticas",
+              "Entretenimiento",
+              "Experiencias caribeñas"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg"
+            ]
+          }
+        }
+      },
+
+      {
+        name: "Coral Level at Iberostar Selection Rose Hall Suites",
+        tagline: "Exclusividad frente al mar",
+        description:
+          "Contenido: servicio personalizado, privacidad y experiencias premium.",
+        image:
+          "src/paraiso-JOIA/banner/JOIA2.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Espacios exclusivos pensados para disfrutar de mayor privacidad y confort.",
+            keyPoints: [
+              "Suites premium",
+              "Mayor privacidad",
+              "Servicio personalizado"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/JOIA3.jpg",
+              "src/JOIA.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Una propuesta gastronómica pensada para una experiencia más exclusiva.",
+            keyPoints: [
+              "Cocina internacional",
+              "Servicio exclusivo",
+              "Cenas especiales"
+            ],
+            images: [
+              "src/JOIA.jpg",
+              "src/JOIA2.jpg",
+              "src/JOIA3.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Zonas de piscina y descanso rodeadas de un ambiente tropical.",
+            keyPoints: [
+              "Piscina exclusiva",
+              "Solárium",
+              "Zona lounge"
+            ],
+            images: [
+              "src/JOIA3.jpg",
+              "src/JOIA2.jpg",
+              "src/JOIA.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Una estancia enfocada en relajación, privacidad y servicio personalizado.",
+            keyPoints: [
+              "Servicio premium",
+              "Relajación",
+              "Experiencias privadas"
+            ],
+            images: [
+              "src/JOIA.jpg",
+              "src/JOIA3.jpg",
+              "src/JOIA2.jpg"
+            ]
+          }
+        }
+      },
+
+      {
+        name: "Iberostar Waves Rose Hall Beach",
+        tagline: "Jamaica frente al mar",
+        description:
+          "Contenido: playa, actividades y ambiente caribeño.",
+        image:
+          "src/paraiso-beach/banner/paraisoBeach.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Habitaciones cómodas para disfrutar de una estancia relajada frente al Caribe.",
+            keyPoints: [
+              "Habitaciones cómodas",
+              "Ambiente tropical",
+              "Espacios familiares"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Sabores internacionales y propuestas gastronómicas para toda la familia.",
+            keyPoints: [
+              "Buffet internacional",
+              "Sabores caribeños",
+              "Opciones familiares"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/JOIA.jpg",
+              "src/ParaisoDelMar.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Piscinas y espacios de descanso para disfrutar del clima de Jamaica.",
+            keyPoints: [
+              "Piscinas",
+              "Solárium",
+              "Zona familiar"
+            ],
+            images: [
+              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Actividades, playa y entretenimiento para disfrutar de unas vacaciones caribeñas.",
+            keyPoints: [
+              "Playa",
+              "Entretenimiento",
+              "Actividades"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg"
+            ]
+          }
+        }
       }
     ]
   },
@@ -753,7 +978,7 @@ const hotelCountryMenus = {
       "Playas de arena fina, gastronomía y aventuras para una estancia completa.",
     hotels: [
       {
-        name: "Iberostar Selection Bávaro",
+        name: "Iberostar Selection Bávaro Suites",
         tagline: "Caribe en movimiento",
         description:
           "Contenido: playa, gastronomía y actividades.",
@@ -815,6 +1040,231 @@ const hotelCountryMenus = {
               "Playa, cultura y actividades para descubrir el espíritu dominicano.",
             keyPoints: [
               "Cultura",
+              "Playa",
+              "Actividades"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg"
+            ]
+          }
+        }
+      },
+
+      {
+        name: "JOIA Bávaro by Iberostar",
+        tagline: "Lujo frente al Caribe",
+        description:
+          "Contenido: servicio personalizado, gastronomía y experiencias premium.",
+        image:
+          "src/paraiso-JOIA/banner/JOIA2.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Suites elegantes pensadas para una estancia tranquila y exclusiva.",
+            keyPoints: [
+              "Suites premium",
+              "Privacidad",
+              "Servicio personalizado"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/JOIA3.jpg",
+              "src/JOIA.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Propuestas gastronómicas para disfrutar de una experiencia de alto nivel.",
+            keyPoints: [
+              "Menú de autor",
+              "Cocina internacional",
+              "Servicio exclusivo"
+            ],
+            images: [
+              "src/JOIA.jpg",
+              "src/JOIA2.jpg",
+              "src/JOIA3.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Espacios de agua y descanso rodeados por un ambiente tropical.",
+            keyPoints: [
+              "Piscina exclusiva",
+              "Lounge",
+              "Solárium"
+            ],
+            images: [
+              "src/JOIA3.jpg",
+              "src/JOIA2.jpg",
+              "src/JOIA.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Experiencias diseñadas para disfrutar del Caribe con mayor exclusividad.",
+            keyPoints: [
+              "Relajación",
+              "Servicio premium",
+              "Experiencias privadas"
+            ],
+            images: [
+              "src/JOIA.jpg",
+              "src/JOIA3.jpg",
+              "src/JOIA2.jpg"
+            ]
+          }
+        }
+      },
+
+      {
+        name: "Iberostar Waves Punta Cana",
+        tagline: "Energía tropical",
+        description:
+          "Contenido: playa, entretenimiento y actividades para disfrutar en familia.",
+        image:
+          "src/paraiso-beach/banner/paraisoBeach.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Espacios cómodos con un ambiente tropical y relajado.",
+            keyPoints: [
+              "Habitaciones cómodas",
+              "Diseño tropical",
+              "Espacios familiares"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Opciones gastronómicas internacionales y sabores del Caribe.",
+            keyPoints: [
+              "Buffet",
+              "Cocina internacional",
+              "Sabores caribeños"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/JOIA.jpg",
+              "src/ParaisoDelMar.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Piscinas y áreas de descanso para disfrutar del clima tropical.",
+            keyPoints: [
+              "Piscinas",
+              "Solárium",
+              "Áreas familiares"
+            ],
+            images: [
+              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Entretenimiento y actividades para disfrutar de Punta Cana.",
+            keyPoints: [
+              "Entretenimiento",
+              "Actividades",
+              "Playa"
+            ],
+            images: [
+              "src/JOIA2.jpg",
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg"
+            ]
+          }
+        }
+      },
+
+      {
+        name: "Iberostar Waves Dominicana",
+        tagline: "Caribe para todos",
+        description:
+          "Contenido: playa, naturaleza y actividades para toda la familia.",
+        image:
+          "src/paraiso-beach/banner/paraisoBeach.jpg",
+
+        tabs: {
+          habitaciones: {
+            title: "Habitaciones",
+            description:
+              "Habitaciones pensadas para disfrutar de una estancia cómoda y tropical.",
+            keyPoints: [
+              "Habitaciones familiares",
+              "Diseño tropical",
+              "Confort"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          restaurante: {
+            title: "Restaurantes",
+            description:
+              "Sabores internacionales y opciones para diferentes gustos.",
+            keyPoints: [
+              "Buffet internacional",
+              "Cocina caribeña",
+              "Opciones familiares"
+            ],
+            images: [
+              "src/paraisoBeach.jpg",
+              "src/JOIA.jpg",
+              "src/ParaisoDelMar.jpg"
+            ]
+          },
+
+          piscinas: {
+            title: "Piscinas",
+            description:
+              "Áreas de piscina y descanso rodeadas de naturaleza tropical.",
+            keyPoints: [
+              "Piscinas familiares",
+              "Solárium",
+              "Zona de descanso"
+            ],
+            images: [
+              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach.jpg",
+              "src/JOIA2.jpg"
+            ]
+          },
+
+          experiencias: {
+            title: "Experiencias",
+            description:
+              "Actividades, naturaleza y playa para disfrutar del Caribe dominicano.",
+            keyPoints: [
+              "Naturaleza",
               "Playa",
               "Actividades"
             ],
@@ -1342,6 +1792,64 @@ let routeLine = null;
 let activeHotelDetail = null;
 let activeRestaurantMenuIndex = null;
 let returnPageIndex = null;
+
+window.RevistaDigital = window.RevistaDigital || {};
+window.RevistaDigital.state = window.RevistaDigital.state || {};
+
+Object.defineProperties(window.RevistaDigital.state, {
+  pages: { enumerable: true, get: () => pages },
+  hotelCountryMenus: { enumerable: true, get: () => hotelCountryMenus },
+  hotelCoordinates: { enumerable: true, get: () => hotelCoordinates },
+  complexBounds: { enumerable: true, get: () => complexBounds },
+  hotelMediaCatalog: { enumerable: true, get: () => hotelMediaCatalog },
+  generalMapCenter: { enumerable: true, get: () => generalMapCenter },
+  generalMapZoom: { enumerable: true, get: () => generalMapZoom },
+  currentIndex: {
+    enumerable: true,
+    get: () => currentIndex,
+    set: (value) => { currentIndex = value; }
+  },
+  currentPosition: {
+    enumerable: true,
+    get: () => currentPosition,
+    set: (value) => { currentPosition = value; }
+  },
+  activeMap: {
+    enumerable: true,
+    get: () => activeMap,
+    set: (value) => { activeMap = value; }
+  },
+  activeDirectionsRenderer: {
+    enumerable: true,
+    get: () => activeDirectionsRenderer,
+    set: (value) => { activeDirectionsRenderer = value; }
+  },
+  userMarker: {
+    enumerable: true,
+    get: () => userMarker,
+    set: (value) => { userMarker = value; }
+  },
+  routeLine: {
+    enumerable: true,
+    get: () => routeLine,
+    set: (value) => { routeLine = value; }
+  },
+  activeHotelDetail: {
+    enumerable: true,
+    get: () => activeHotelDetail,
+    set: (value) => { activeHotelDetail = value; }
+  },
+  activeRestaurantMenuIndex: {
+    enumerable: true,
+    get: () => activeRestaurantMenuIndex,
+    set: (value) => { activeRestaurantMenuIndex = value; }
+  },
+  returnPageIndex: {
+    enumerable: true,
+    get: () => returnPageIndex,
+    set: (value) => { returnPageIndex = value; }
+  }
+});
 
 function slugify(value) {
   return String(value)
@@ -4797,7 +5305,9 @@ function renderPage() {
   );
 
   if (activeRestaurantMenuIndex !== null) {
-    bookShell.innerHTML = renderRestaurantMenu(activeRestaurantMenuIndex);
+    bookShell.innerHTML = window.RevistaDigital.restaurantes.renderMenu(
+      pages[activeRestaurantMenuIndex]
+    );
   }
   else if (activeHotelDetail) {
     bookShell.innerHTML = renderHotelDetail();
@@ -4918,7 +5428,7 @@ function renderPage() {
       <div class="spread">
 
         <iframe
-          src="index_responsive (3).html"
+          src="mapa-mundi/index2.html"
           style="
             width:100%;
             height:740px;
@@ -5061,24 +5571,37 @@ function renderDots() {
    INTERACCIONES
    ========================================================= */
 
-function wirePageInteractions() {
-  const map =
-    bookShell.querySelector(
-      ".map-canvas"
-    );
-
-  bookShell.querySelectorAll(".restaurant-menu-open").forEach((button) => {
+function wireRestaurantInteractionsLegacy(root) {
+  root.querySelectorAll(".restaurant-menu-open").forEach((button) => {
     button.addEventListener("click", () => {
       activeRestaurantMenuIndex = currentIndex;
       renderPage();
     });
   });
 
-  bookShell.querySelectorAll(".restaurant-menu-back").forEach((button) => {
+  root.querySelectorAll(".restaurant-menu-back").forEach((button) => {
     button.addEventListener("click", () => {
       activeRestaurantMenuIndex = null;
       renderPage();
     });
+  });
+}
+
+function wirePageInteractions() {
+  const map =
+    bookShell.querySelector(
+      ".map-canvas"
+    );
+
+  window.RevistaDigital.restaurantes.wireInteractions(bookShell, {
+    open: () => {
+      activeRestaurantMenuIndex = currentIndex;
+      renderPage();
+    },
+    close: () => {
+      activeRestaurantMenuIndex = null;
+      renderPage();
+    }
   });
 
   document.querySelectorAll(".hotel-carousel").forEach((carousel) => {
@@ -5724,63 +6247,6 @@ window.addEventListener(
   }
 );
 
-window.addEventListener("popstate", () => {
-  const route = window.location.pathname || "/";
-  const restaurantMenuMatch = route.match(/^\/restaurantes\/([^/]+)$/);
-  const hotelMatch = route.match(/^\/hoteles\/([^/]+)\/([^/]+)$/);
-  const countryMatch = route.match(/^\/hoteles\/([^/]+)$/);
-
-  if (restaurantMenuMatch) {
-    const targetIndex = pages.findIndex((page) =>
-      page.type === "hotel" && slugify(page.name) === restaurantMenuMatch[1]
-    );
-    if (targetIndex >= 0) {
-      activeRestaurantMenuIndex = targetIndex;
-      activeHotelDetail = null;
-      returnPageIndex = null;
-      currentIndex = targetIndex;
-      renderPage();
-      return;
-    }
-  }
-
-  if (hotelMatch) {
-    const countryKey = hotelMatch[1];
-    const hotelName = hotelMatch[2];
-    const country = hotelCountryMenus[countryKey];
-    const hotelIndex = country?.hotels?.findIndex((hotel) => slugify(hotel.name) === hotelName) ?? -1;
-
-    if (country && hotelIndex >= 0) {
-      activeRestaurantMenuIndex = null;
-      activeHotelDetail = { countryKey, hotelIndex, activeTab: "habitaciones", galleryIndex: 0 };
-      returnPageIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
-      currentIndex = returnPageIndex >= 0 ? returnPageIndex : 0;
-      renderPage();
-      return;
-    }
-  }
-
-  if (countryMatch) {
-    const countryKey = countryMatch[1];
-    const targetIndex = pages.findIndex((page) => (page.type === "country-menu" && page.country === countryKey) || (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico"));
-    if (targetIndex >= 0) {
-      activeRestaurantMenuIndex = null;
-      activeHotelDetail = null;
-      returnPageIndex = null;
-      currentIndex = targetIndex;
-      renderPage();
-      return;
-    }
-  }
-
-  activeRestaurantMenuIndex = null;
-  activeHotelDetail = null;
-  returnPageIndex = null;
-  currentIndex = 0;
-  renderPage();
-});
-
-
 /* =========================================================
    SWIPE
    ========================================================= */
@@ -5863,4 +6329,8 @@ magazineStage.addEventListener(
    ========================================================= */
 
 requestCurrentLocation();
-renderPage();
+if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
+  window.RevistaDigital.routes.restoreCurrentRoute();
+} else {
+  renderPage();
+}
