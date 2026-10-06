@@ -13,6 +13,19 @@
       .replace(/^-+|-+$/g, "") || "hotel";
   }
 
+  function getProjectBasePath() {
+    const baseHref = document.querySelector("base")?.href || window.location.href;
+    return new URL(baseHref, window.location.href).pathname.replace(/\/+$/, "");
+  }
+
+  function getAppRoute(pathname = window.location.pathname) {
+    const projectBasePath = getProjectBasePath();
+    if (projectBasePath && (pathname === projectBasePath || pathname.startsWith(`${projectBasePath}/`))) {
+      pathname = pathname.slice(projectBasePath.length) || "/";
+    }
+    return pathname.replace(/\/+$/, "") || "/";
+  }
+
   function syncBookRoute() {
     const page = state().pages?.[state().currentIndex ?? 0];
     let nextPath = "/";
@@ -42,8 +55,10 @@
       nextPath = "/videos";
     }
 
+    const projectBasePath = getProjectBasePath();
+    const targetPath = nextPath === "/" ? `${projectBasePath}/` : `${projectBasePath}${nextPath}`;
     const currentPath = window.location.pathname || "/";
-    if (currentPath !== nextPath) {
+    if (currentPath !== targetPath) {
       window.history.pushState(
         {
           currentIndex: state().currentIndex,
@@ -52,13 +67,13 @@
           activeRestaurantMenuIndex: state().activeRestaurantMenuIndex
         },
         "",
-        nextPath
+        targetPath
       );
     }
   }
 
   function resolveInitialRoute() {
-    const route = (window.location.pathname || "/").replace(/\/+$/, "") || "/";
+    const route = getAppRoute();
     const parts = route.split("/").filter(Boolean);
 
     if (parts[0] === "hoteles" && parts[1]) {
@@ -73,7 +88,7 @@
   }
 
   function getCurrentRoute() {
-    return (window.location.pathname || "/").replace(/\/+$/, "") || "/";
+    return getAppRoute();
   }
 
   function initializeRouteHandler() {

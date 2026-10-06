@@ -4,5 +4,10 @@ const projectBase = scriptUrl
   : new URL("/", window.location.href);
 
 const target = new URL(projectBase.href);
-target.searchParams.set("route-entry", window.location.pathname);
+const projectBasePath = projectBase.pathname.replace(/\/+$/, "");
+let routePath = window.location.pathname;
+if (projectBasePath && routePath.startsWith(`${projectBasePath}/`)) {
+  routePath = routePath.slice(projectBasePath.length);
+}
+target.searchParams.set("route-entry", routePath || "/");
 window.location.replace(target.href);

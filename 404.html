@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revista Iberostar</title>
+  <script>
+    (function () {
+      const isGitHubPages = window.location.hostname.endsWith("github.io");
+      const projectBase = isGitHubPages ? "/Revista-Digital/" : "/";
+      const projectPrefix = projectBase.replace(/\/$/, "");
+      let routePath = window.location.pathname;
+
+      if (projectPrefix && routePath.startsWith(`${projectPrefix}/`)) {
+        routePath = routePath.slice(projectPrefix.length);
+      }
+
+      const target = new URL(projectBase, window.location.origin);
+      target.searchParams.set("route-entry", routePath || "/");
+      window.location.replace(target.href);
+    })();
+  </script>
+</head>
+<body></body>
+</html>

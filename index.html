@@ -4,11 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Revista Iberostar</title>
+    <base href="./" />
     <script>
       const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
       if (routeEntry) {
-        const routePath = routeEntry.replace(/\/+$/, "") || "/";
-        window.history.replaceState(null, "", routePath);
+        const routePath = `/${routeEntry.replace(/^\/+|\/+$/g, "")}`.replace(/^\/$/, "/");
+        const projectBasePath = new URL(".", window.location.href).pathname.replace(/\/+$/, "");
+        const targetPath = routePath === "/" ? `${projectBasePath}/` : `${projectBasePath}${routePath}`;
+        window.history.replaceState(null, "", targetPath);
       }
     </script>
     <link rel="stylesheet" href="style.css" />

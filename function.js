@@ -5283,10 +5283,12 @@ function syncBookRoute() {
     nextPath = "/videos";
   }
 
+  const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");
+  const targetPath = nextPath === "/" ? `${projectBasePath}/` : `${projectBasePath}${nextPath}`;
   const currentPath = window.location.pathname || "/";
 
-  if (currentPath !== nextPath) {
-    history.pushState({ currentIndex, activeHotelDetail, returnPageIndex, activeRestaurantMenuIndex }, "", nextPath);
+  if (currentPath !== targetPath) {
+    history.pushState({ currentIndex, activeHotelDetail, returnPageIndex, activeRestaurantMenuIndex }, "", targetPath);
   }
 }
 
