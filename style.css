@@ -3467,6 +3467,32 @@ body.intro-lock {
   border-top: 1px solid rgba(150, 125, 70, 0.35);
 }
 
+/* Ficha de restaurante sin recorrido 360°: solo datos, sin interacción */
+.pano-360-ficha-static {
+  cursor: default;
+}
+
+.pano-360-ficha-static:hover,
+.pano-360-ficha-static:focus-visible {
+  transform: none;
+  box-shadow: 0 6px 16px rgba(90, 70, 30, 0.12);
+}
+
+.pano-360-ficha-media-empty {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: linear-gradient(135deg, #efe6d2, #dccdae);
+}
+
+.pano-360-ficha-copy .pano-360-ficha-place {
+  margin-top: 6px;
+  font: 700 11px/1.4 Arial, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b08a3e;
+}
+
 
 
 /* visor modal */

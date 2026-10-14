@@ -134,6 +134,50 @@
     return restaurantMenuOptions;
   };
 
+  // Datos de ficha por restaurante. Playa Paraíso aporta imagen y recorrido
+  // 360°; el resto muestra nombre y cocina, sin inventar imagen ni recorrido.
+  function restaurantFicheEntries(hotelName) {
+    const pano = window.RevistaDigital?.pannellum360;
+    if (pano && typeof pano.getRestaurantFicheData === "function") {
+      const list = pano.getRestaurantFicheData(hotelName);
+      if (Array.isArray(list) && list.length) return list;
+    }
+    return restaurantes.getHotelRestaurants(hotelName).map(([name, cuisine]) => ({
+      name,
+      cuisine: cuisine || "Cocina de autor",
+      image: "",
+      has360: false
+    }));
+  }
+
+  restaurantes.getRestaurantFicheCount = function (hotelName) {
+    return restaurantFicheEntries(hotelName).length;
+  };
+
+  /* Cuadrícula de fichas visuales reutilizable. Cada ficha muestra hotel y
+     país cuando se indica; el botón 360° solo aparece si existe recorrido. */
+  restaurantes.renderRestaurantFiches = function (hotelName, options = {}) {
+    const entries = restaurantFicheEntries(hotelName);
+    if (!entries.length) return "";
+    const hotelLabel = options.hotelLabel || hotelName;
+    const countryLabel = options.countryLabel || "";
+    const place = countryLabel
+      ? `${escapeHtml(hotelLabel)} · ${escapeHtml(countryLabel)}`
+      : escapeHtml(hotelLabel);
+    const cards = entries.map((entry) => {
+      const badge = entry.has360 ? "<b>360°</b>" : "";
+      const media = entry.image
+        ? `<span class="pano-360-ficha-media"><img src="${entry.image}" alt="Recorrido 360° de ${escapeHtml(entry.name)} en ${escapeHtml(hotelName)}" loading="lazy" decoding="async" />${badge}</span>`
+        : `<span class="pano-360-ficha-media pano-360-ficha-media-empty" aria-hidden="true">${badge}</span>`;
+      const copy = `<span class="pano-360-ficha-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.cuisine)}</small><small class="pano-360-ficha-place">${place}</small></span>`;
+      if (entry.has360) {
+        return `<button type="button" class="pano-360-ficha pano-360-ficha-restaurante" data-hotel="${escapeHtml(hotelName)}" data-zone="restaurantes" data-label="${escapeHtml(entry.name)}">${media}${copy}</button>`;
+      }
+      return `<article class="pano-360-ficha pano-360-ficha-restaurante pano-360-ficha-static">${media}${copy}</article>`;
+    }).join("");
+    return `<div class="pano-360-list pano-360-list-restaurantes">${cards}</div>`;
+  };
+
   restaurantes.renderMenu = function (hotelOrIndex) {
     const hotel = typeof hotelOrIndex === "object"
       ? hotelOrIndex

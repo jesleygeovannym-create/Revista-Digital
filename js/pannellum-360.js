@@ -419,6 +419,19 @@
     return RESTAURANTES_PARAISO[hotelName] || [];
   };
 
+  /* Datos por restaurante para construir fichas visuales: nombre, cocina,
+     imagen de vista previa y disponibilidad de recorrido 360°. Solo los
+     hoteles del complejo Playa Paraíso tienen recorrido 360° hoy. */
+  pannellum360.getRestaurantFicheData = function (hotelName) {
+    if (!pannellum360.isPlayaParaiso(hotelName)) return [];
+    return pannellum360.getRestaurantes(hotelName).map(([name, cuisine]) => ({
+      name,
+      cuisine: cuisine || "Restaurante",
+      image: buildPreview(hotelName, "restaurantes", name),
+      has360: true
+    }));
+  };
+
   pannellum360.renderRestaurantCards = function (hotelName) {
     if (!pannellum360.isPlayaParaiso(hotelName)) return "";
     const restaurants = pannellum360.getRestaurantes(hotelName);

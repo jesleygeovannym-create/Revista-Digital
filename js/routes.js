@@ -540,6 +540,24 @@
       return true;
     }
 
+    if (parts.length === 2 && typeof api.getRestaurantHotel === "function") {
+      const hotelMatch = api.getRestaurantHotel(parts[1]);
+      const pano = window.RevistaDigital?.pannellum360;
+      const isParaiso = Boolean(hotelMatch && pano?.isPlayaParaiso?.(hotelMatch.hotel.name));
+      // Los hoteles de Playa Paraíso conservan su página 360° existente.
+      if (hotelMatch && !isParaiso) {
+        const countryRoute = `/restaurantes/${hotelMatch.country.slug}`;
+        document.body.dataset.returnRoute = countryRoute;
+        view.innerHTML = restaurantFichePageMarkup({
+          country: hotelMatch.country,
+          hotel: hotelMatch.hotel,
+          breadcrumbCountryRoute: countryRoute
+        });
+        wirePanoFiches(view);
+        return true;
+      }
+    }
+
     const country = api.getCountryDirectory(parts[1]);
     if (!country) return false;
     const groups = api.getCountryRestaurantGroups(country.slug);
@@ -570,34 +588,62 @@
       const hotel = country.hotels.find((item) => item.slug === parts[2]);
       if (!hotel) return false;
       document.body.dataset.returnRoute = `/restaurantes/${country.slug}`;
-      const count = hotel.restaurants.length;
-      const named = count
-        ? `<div class="restaurant-menu-grid">${hotel.restaurants.map(([name, cuisine]) => `<article class="restaurant-menu-card"><span>${escapeHtml(cuisine || "Cocina de autor")}</span><h3>${escapeHtml(name)}</h3></article>`).join("")}</div>`
-        : `<p class="restaurant-count-note">Este hotel ofrece una experiencia gastronómica que puedes descubrir en su galería.</p>`;
-      const gallery = hotel.photos.length
-        ? `<section class="portal-section">
-            <div class="portal-section-heading"><div><p class="portal-kicker">GALERÍA GASTRONÓMICA</p><h2>Ambientes y platos</h2></div></div>
-            <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${hotel.photos.slice(0, 9).map((src) => hotelImageCard("", src)).join("")}</div>
-          </section>` : "";
-      view.innerHTML = `<main class="portal-page">
-        <div class="portal-breadcrumb"><a href="${href("/")}" data-app-route="/">Inicio</a> / <a href="${href("/restaurantes")}" data-app-route="/restaurantes">Restaurantes</a> / <a href="${href(`/restaurantes/${country.slug}`)}" data-app-route="/restaurantes/${country.slug}">${escapeHtml(country.name)}</a> / ${escapeHtml(hotel.name)}</div>
-        <section class="portal-destination-hero">
-          <img src="${escapeHtml(hotel.image)}" alt="">
-          <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${count === 1 ? "restaurante" : "restaurantes"} para descubrir durante tu estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
-        </section>
-        <section class="portal-section">
-          <div class="portal-section-heading"><div><p class="portal-kicker">LA CARTA</p><h2>Restaurantes de ${escapeHtml(hotel.name)}</h2></div><span class="restaurant-count-note">${count} ${count === 1 ? "opción" : "opciones"}</span></div>
-          ${named}
-        </section>
-        ${gallery}
-        <section class="portal-section">
-          <div class="portal-section-heading"><div><p class="portal-kicker">TODAS LAS CARTAS</p><h2>Todos los restaurantes de ${escapeHtml(country.name)}</h2></div></div>
-          ${restaurantCountryGroupsMarkup(groups)}
-        </section>
-      </main>`;
+      view.innerHTML = restaurantFichePageMarkup({
+        country,
+        hotel,
+        breadcrumbCountryRoute: `/restaurantes/${country.slug}`
+      });
+      wirePanoFiches(view);
       return true;
     }
     return false;
+  }
+
+  /* Página de fichas visuales de un hotel dentro del apartado /restaurantes.
+     Reutiliza renderRestaurantFiches: imagen y recorrido 360° solo si existen. */
+  function restaurantFichePageMarkup({ country, hotel, breadcrumbCountryRoute }) {
+    const api = window.RevistaDigital.restaurantes;
+    const count = Array.isArray(hotel.restaurants) ? hotel.restaurants.length : 0;
+    const countWord = count === 1 ? "restaurante" : "restaurantes";
+    const fiches = api.renderRestaurantFiches(hotel.name, {
+      hotelLabel: hotel.name,
+      countryLabel: country.name
+    });
+    const gallery = Array.isArray(hotel.photos) && hotel.photos.length
+      ? `<section class="portal-section">
+          <div class="portal-section-heading"><div><p class="portal-kicker">GALERÍA GASTRONÓMICA</p><h2>Ambientes y platos</h2></div></div>
+          <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${hotel.photos.slice(0, 9).map((src) => hotelImageCard("", src)).join("")}</div>
+        </section>` : "";
+    const heroImage = hotel.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
+    return `<main class="portal-page">
+      <div class="portal-breadcrumb"><a href="${href("/")}" data-app-route="/">Inicio</a> / <a href="${href("/restaurantes")}" data-app-route="/restaurantes">Restaurantes</a> / <a href="${href(breadcrumbCountryRoute)}" data-app-route="${breadcrumbCountryRoute}">${escapeHtml(country.name)}</a> / ${escapeHtml(hotel.name)}</div>
+      <section class="portal-destination-hero">
+        <img src="${escapeHtml(heroImage)}" alt="">
+        <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${countWord} para descubrir durante tu estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
+      </section>
+      <section class="portal-section">
+        <div class="portal-section-heading"><div><p class="portal-kicker">LA CARTA</p><h2>Restaurantes de ${escapeHtml(hotel.name)}</h2></div><span class="restaurant-count-note">${count} ${count === 1 ? "opción" : "opciones"}</span></div>
+        ${fiches || `<p class="restaurant-count-note">Este hotel ofrece una experiencia gastronómica que puedes descubrir en su galería.</p>`}
+      </section>
+      ${gallery}
+      <section class="portal-section">
+        <div class="portal-section-heading"><div><p class="portal-kicker">MÁS CARTAS</p><h2>Más restaurantes de ${escapeHtml(country.name)}</h2></div></div>
+        <p class="restaurant-count-note"><a href="${href(breadcrumbCountryRoute)}" data-app-route="${breadcrumbCountryRoute}">Ver todos los restaurantes de ${escapeHtml(country.name)} →</a></p>
+      </section>
+    </main>`;
+  }
+
+  function wirePanoFiches(root) {
+    root.querySelectorAll(".pano-360-ficha[data-hotel]").forEach((ficha) => {
+      ficha.addEventListener("click", () => {
+        if (!window.RevistaDigital.pannellum360?.open) return;
+        window.RevistaDigital.pannellum360.open(
+          ficha.dataset.hotel,
+          ficha.dataset.zone,
+          ficha.dataset.label
+        );
+      });
+    });
   }
   function hotelImageCard(alt, src) {
     return `<figure class="hotel-portal-card"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy" decoding="async" /></figure>`;
@@ -743,6 +789,17 @@
       ? window.RevistaDigital.pannellum360.renderSection(hotel.name)
       : "";
 
+    const restaurantCta = window.RevistaDigital.restaurantes?.getRestaurantHotel?.(hotel.slug)
+      ? `<section class="hotel-portal-section hotel-portal-restaurant-cta" id="hotel-cartas">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">GASTRONOMÍA</p>
+            <h2>La carta de restaurantes</h2>
+            <p>Consulta todos los restaurantes de ${escapeHtml(displayName)} en fichas visuales.</p>
+          </div>
+          <a class="portal-hero-link" href="${href(`/restaurantes/${hotel.slug}`)}" data-app-route="/restaurantes/${hotel.slug}">Ver restaurantes de ${escapeHtml(displayName)} →</a>
+        </section>`
+      : "";
+
     return `
       <main class="portal-page">
         <nav class="portal-breadcrumb" aria-label="Migas de pan">
@@ -765,6 +822,7 @@
         ${mapMarkup}
         ${paraiso360}
         ${diningMarkup}
+        ${restaurantCta}
         ${servicesMarkup}
 
         <div class="hotel-portal-actions">
