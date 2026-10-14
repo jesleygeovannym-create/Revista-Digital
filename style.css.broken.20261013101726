@@ -1,0 +1,106 @@
+:root { 
+.guide-route-cancel:hover { border-color: var(--gold); }
+@media (max-width: 992px) {
+  .pano-360-modal { padding: 10px 8px; justify-content: flex-start; background: rgba(6,12,22,0.98); }
+  .pano-360-bar { width: calc(100% - 16px); margin: 0 8px; border-radius: 10px 10px 0 0; padding: 10px 14px; font-size: clamp(14px, 3.8vw, 16px); }
+  .pano-360-stage { width: calc(100% - 16px); margin: 0 8px 8px; height: clamp(240px, 56.25vw, 380px); border-radius: 0 0 10px 10px; }
+}
+:root { 
+.guide-route-cancel:hover { border-color: var(--gold); }
+/* visor modal */
+body.pano-360-open { overflow: hidden; }
+.pano-360-modal { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(6,12,22,0.92); padding: 20px; box-sizing: border-box; }
+.pano-360-bar { width: min(1000px, 90vw); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 20px; color: #f3d79b; font: 700 18px/1.2 'EB Garamond', Georgia, serif; background: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.25)); border-radius: 10px 10px 0 0; box-shadow: 0 10px 40px rgba(0,0,0,.25); box-sizing: border-box; }
+.pano-360-bar strong { letter-spacing: 0.02em; }
+.pano-360-close { flex: none; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255,255,255,0.16); color: #fff; font-size: 26px; line-height: 1; cursor: pointer; transition: background .2s ease; }
+.pano-360-close:hover { background: rgba(255,255,255,0.28); }
+.pano-360-stage { position: relative; width: min(1000px, 90vw); height: clamp(330px, 40vw, 400px); min-height: 0; background: #000; border-radius: 0 0 10px 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+.pano-360-stage #pano360Stage { position: absolute; inset: 0; width: 100%; height: 100%; }
+@media (max-width: 992px) { .pano-360-modal { padding: 10px 8px; justify-content: flex-start; background: rgba(6,12,22,0.98); } .pano-360-bar { width: calc(100% - 16px); margin: 0 8px; border-radius: 10px 10px 0 0; padding: 10px 14px; font-size: clamp(14px, 3.8vw, 16px); } .pano-360-stage { width: calc(100% - 16px); margin: 0 8px 8px; height: clamp(240px, 56.25vw, 380px); border-radius: 0 0 10px 10px; } }
+@media (max-width: 960px) {
+  .pano-360-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .pano-360-list {
+    grid-template-columns: 1fr;
+  }
+
+  .pano-360-bar {
+    font-size: 15px;
+    padding: 10px 14px;
+  }
+}
+
+/* Guía interactiva THE CLUB - POIs */
+.gp-divicon { background: transparent; border: none; }
+.gp-dir { margin-top: 4px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(212,175,55,.6); background: linear-gradient(180deg, rgba(250,244,227,1), rgba(241,228,184,1)); color: #1f1f1f; font-weight: 600; cursor: pointer; }
+.gp-dir:hover { filter: brightness(1.05); }
+
+/* Guía interactiva THE CLUB - Explorador de lugares */
+.guide-explorer { display: flex; flex-direction: column; gap: 18px; }
+.guide-explorer-head { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; justify-content: space-between; }
+.guide-explorer-title { max-width: 620px; }
+.guide-explorer-title h2 { margin: 8px 0 6px; color: var(--green-deep); font: 500 clamp(24px, 3vw, 36px)/1.1 Georgia, serif; }
+.guide-explorer-title p { margin: 0; color: var(--muted); font: 15px/1.6 Arial, sans-serif; }
+.guide-search { display: flex; align-items: center; gap: 8px; min-width: min(320px, 100%); padding: 10px 14px; border: 1px solid rgba(64, 54, 46, .16); border-radius: 999px; background: var(--paper-alt); box-shadow: 0 6px 16px rgba(64, 54, 46, .05); }
+.guide-search span { font-size: 15px; }
+.guide-search input { width: 100%; border: 0; background: transparent; color: var(--green-deep); font: 15px Arial, sans-serif; outline: none; }
+.guide-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.guide-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; border: 1px solid rgba(64, 54, 46, .16); border-radius: 999px; background: var(--paper-alt); color: var(--green-deep); font: 600 12px Arial, sans-serif; letter-spacing: .02em; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease; }
+.guide-chip > span:last-child { color: var(--muted); font-weight: 500; }
+.guide-chip:hover { border-color: var(--gold); }
+.guide-chip.is-active { border-color: #0057b8; background: #0057b8; color: #fff; }
+.guide-chip.is-active > span:last-child { color: rgba(255, 255, 255, .8); }
+.guide-chip-dot { width: 10px; height: 10px; border-radius: 50%; }
+.guide-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.guide-panel { border: 1px solid rgba(64, 54, 46, .1); border-radius: 16px; background: var(--paper-alt); box-shadow: 0 12px 28px rgba(64, 54, 46, .05); }
+.guide-list-panel { display: flex; flex-direction: column; overflow: hidden; }
+.guide-list-head { padding: 14px 18px; border-bottom: 1px solid rgba(64, 54, 46, .08); color: var(--muted); font: 600 12px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.guide-list { margin: 0; padding: 6px; list-style: none; max-height: 520px; overflow: auto; }
+.guide-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+.guide-item:hover { background: rgba(199, 169, 94, .1); }
+.guide-item.is-active { background: rgba(0, 87, 184, .1); box-shadow: inset 0 0 0 1px rgba(0, 87, 184, .35); }
+.guide-item.is-pending .guide-item-name { color: var(--muted); }
+.guide-item-body { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.guide-item-name { color: var(--green-deep); font: 600 15px Georgia, serif; }
+.guide-item-meta { color: var(--muted); font: 12px Arial, sans-serif; }
+.guide-empty { padding: 18px; color: var(--muted); font: 14px Arial, sans-serif; }
+.guide-dot { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 255, 255, .8); }
+.guide-dot--lg { width: 18px; height: 18px; }
+.guide-dot--pending { background: transparent; border: 2px dashed var(--muted); box-shadow: none; }
+.guide-badge { flex: 0 0 auto; padding: 3px 9px; border-radius: 999px; font: 600 10px Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+.guide-badge--ok { background: rgba(46, 139, 87, .14); color: #22694a; }
+.guide-badge--pending { background: rgba(143, 115, 50, .14); color: var(--gold-deep); }
+.guide-side { display: flex; flex-direction: column; gap: 18px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+.guide-detail, .guide-legend { border: 1px solid rgba(64, 54, 46, .1); border-radius: 16px; background: var(--paper-alt); box-shadow: 0 12px 28px rgba(64, 54, 46, .05); padding: 18px; }
+.guide-detail-empty { margin: 0; color: var(--muted); font: 14px/1.6 Arial, sans-serif; }
+.guide-detail-title { margin: 10px 0 4px; color: var(--green-deep); font: 600 20px Georgia, serif; }
+.guide-detail-cat { margin: 0 0 10px; color: var(--gold-deep); font: 600 11px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.guide-detail-desc { margin: 0 0 10px; color: var(--green-deep); font: 14px/1.6 Arial, sans-serif; }
+.guide-detail-row { margin: 4px 0; color: var(--muted); font: 13px Arial, sans-serif; }
+.guide-detail-row strong { color: var(--green-deep); font-weight: 600; margin-right: 4px; }
+.guide-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.guide-focus { padding: 8px 14px; border-radius: 8px; border: 1px solid #0057b8; background: #0057b8; color: #fff; font: 600 13px Arial, sans-serif; }
+.guide-focus:hover { filter: brightness(1.08); }
+.guide-pending-note { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: rgba(143, 115, 50, .1); color: var(--gold-deep); font: 13px/1.5 Arial, sans-serif; }
+.guide-legend-title { margin: 0 0 10px; color: var(--green-deep); font: 600 14px Georgia, serif; }
+.guide-legend-list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.guide-legend-list li { display: flex; align-items: center; gap: 8px; color: var(--green-deep); font: 13px Arial, sans-serif; }
+.guide-legend-list em { margin-left: auto; color: var(--muted); font-style: normal; }
+.guide-legend-note { display: flex; align-items: center; gap: 8px; margin: 14px 0 0; color: var(--muted); font: 12px Arial, sans-serif; }
+@media(max-width: 900px) { .guide-layout { grid-template-columns: 1fr; } }
+@media(max-width: 600px) { .guide-search { width: 100%; } .guide-legend-list { grid-template-columns: 1fr; } }
+
+/* Guía interactiva THE CLUB - Ruta/Cómo llegar */
+.guide-route { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-deep); background: transparent; color: var(--gold-deep); font: 600 13px Arial, sans-serif; cursor: pointer; transition: background .15s ease; }
+.guide-route:hover { background: rgba(199, 169, 94, .14); }
+.guide-route-box { margin-top: 12px; }
+.guide-route-status { margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; font: 13px/1.5 Arial, sans-serif; }
+.guide-route-status.is-loading { background: rgba(0, 87, 184, .08); color: #01447f; }
+.guide-route-status.is-ready { background: rgba(46, 139, 87, .12); color: #22694a; }
+.guide-route-status.is-error { background: rgba(180, 60, 50, .1); color: #8a2b22; }
+.guide-route-cancel { padding: 7px 12px; border-radius: 8px; border: 1px solid rgba(64, 54, 46, .25); background: var(--paper); color: var(--green-deep); font: 600 12px Arial, sans-serif; cursor: pointer; transition: border-color .15s ease; }
+.guide-route-cancel:hover { border-color: var(--gold); }

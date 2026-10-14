@@ -1,0 +1,843 @@
+(function () {
+  window.RevistaDigital = window.RevistaDigital || {};
+  const routes = window.RevistaDigital.routes || {};
+  const state = () => window.RevistaDigital.state;
+  const getDestinationCatalog = () => window.RevistaDigital.hoteles?.getDestinationCatalog?.() || window.RevistaDigital.catalog?.byCountry || {};
+  let activeHotelPortalMap = null;
+
+  function slugify(value = "") {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "hotel";
+  }
+
+  function getProjectBasePath() {
+    const baseHref = document.querySelector("base")?.href || window.location.href;
+    return new URL(baseHref, window.location.href).pathname.replace(/\/+$/, "");
+  }
+
+  function href(path = "/") {
+    const routePath = `/${String(path || "/").replace(/^\/+|\/+$/g, "")}`.replace(/^\/$/, "/");
+    const projectBasePath = getProjectBasePath();
+    return routePath === "/" ? `${projectBasePath}/` : `${projectBasePath}${routePath}`;
+  }
+
+  function escapeHtml(value = "") {
+    return String(value).replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "\"": "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  function getAppRoute(pathname = window.location.pathname) {
+    const projectBasePath = getProjectBasePath();
+    if (projectBasePath && (pathname === projectBasePath || pathname.startsWith(`${projectBasePath}/`))) {
+      pathname = pathname.slice(projectBasePath.length) || "/";
+    }
+    return pathname.replace(/\/index\.html$/i, "").replace(/\/+$/, "") || "/";
+  }
+
+  function syncBookRoute() {
+    const page = state().pages?.[state().currentIndex ?? 0];
+    let nextPath = "/";
+
+    if (state().activeRestaurantMenuIndex !== null && state().activeRestaurantMenuIndex !== undefined) {
+      const restaurantHotel = state().pages?.[state().activeRestaurantMenuIndex];
+      if (restaurantHotel?.type === "hotel") {
+        nextPath = `/restaurantes/${slugify(restaurantHotel.name)}`;
+      }
+    } else if (state().activeHotelDetail) {
+      const countryKey = state().activeHotelDetail.countryKey;
+      const hotel = state().hotelCountryMenus?.[countryKey]?.hotels?.[state().activeHotelDetail.hotelIndex];
+      if (hotel) {
+        nextPath = `/hoteles/${countryKey}/${slugify(hotel.name)}`;
+      }
+    } else if (page?.type === "country-menu") {
+      nextPath = `/hoteles/${page.country}`;
+    } else if (page?.type === "map") {
+      nextPath = "/mapa-general";
+    } else if (page?.type === "mapamundi") {
+      nextPath = "/mapa-mundi";
+    } else if (page?.type === "workspace") {
+      nextPath = "/workspace";
+    } else if (page?.type === "media360") {
+      nextPath = "/360";
+    } else if (page?.type === "videos") {
+      nextPath = "/videos";
+    }
+
+    const projectBasePath = getProjectBasePath();
+    const targetPath = nextPath === "/" ? `${projectBasePath}/` : `${projectBasePath}${nextPath}`;
+    const currentPath = window.location.pathname || "/";
+    if (currentPath !== targetPath) {
+      window.history.pushState(
+        {
+          currentIndex: state().currentIndex,
+          activeHotelDetail: state().activeHotelDetail,
+          returnPageIndex: state().returnPageIndex,
+          activeRestaurantMenuIndex: state().activeRestaurantMenuIndex
+        },
+        "",
+        targetPath
+      );
+    }
+  }
+
+  function resolveInitialRoute() {
+    const route = getAppRoute();
+    const parts = route.split("/").filter(Boolean);
+
+    if (parts[0] === "hoteles" && parts[1]) {
+      return parts[1];
+    }
+
+    if (parts[0] === "restaurantes" && parts[1]) {
+      return parts[1];
+    }
+
+    return "";
+  }
+
+  function getCurrentRoute() {
+    return getAppRoute();
+  }
+
+  function refreshCurrentAppContext(pathname = window.location.pathname) {
+    const target = resolveRouteTarget(pathname);
+    const routeContext = target?.context || getRouteContext(pathname);
+
+    window.RevistaDigital.appContext = {
+      ...target,
+      route: getAppRoute(pathname),
+      countrySlug: routeContext.country || target.countrySlug || null,
+      destinationSlug: routeContext.destination || target.destinationSlug || null,
+      hotelSlug: routeContext.hotel || target.hotelSlug || null,
+      kind: routeContext.kind || target.kind || "default"
+    };
+
+    document.body.dataset.countrySlug = routeContext.country || target.countrySlug || "";
+    document.body.dataset.destinationSlug = routeContext.destination || target.destinationSlug || "";
+    document.body.dataset.hotelSlug = routeContext.hotel || target.hotelSlug || "";
+    document.body.dataset.routeKind = routeContext.kind || target.kind || "default";
+
+    const routeLabels = {
+      "/": "Inicio",
+      "/mapa-general": "Mapa general",
+      "/mapa-mundi": "Mapa mundial",
+      "/workspace": "Workspace",
+      "/360": "360°",
+      "/videos": "Videos"
+    };
+
+    const currentLabel = routeLabels[getAppRoute(pathname)] ||
+      (routeContext.country ? routeContext.country : "Destino");
+
+    document.body.dataset.currentRouteLabel = currentLabel;
+    document.body.dataset.currentRoute = getAppRoute(pathname);
+
+    if (typeof window.updateAppContextBar === "function") {
+      window.updateAppContextBar();
+    }
+
+    return window.RevistaDigital.appContext;
+  }
+
+  function getBreadcrumbs(pathname = window.location.pathname) {
+    const target = resolveRouteTarget(pathname);
+    const context = target.context || getRouteContext(pathname);
+    const breadcrumbs = [];
+
+    if (context.country) {
+      breadcrumbs.push({
+        label: context.country,
+        route: `/${context.country}`
+      });
+    }
+
+    if (context.destination) {
+      breadcrumbs.push({
+        label: context.destination,
+        route: context.country ? `/${context.country}/${context.destination}` : `/${context.destination}`
+      });
+    }
+
+    if (context.hotel) {
+      breadcrumbs.push({
+        label: context.hotel,
+        route: context.country && context.destination ? `/${context.country}/${context.destination}/${context.hotel}` : `/${context.hotel}`
+      });
+    }
+
+    if (!breadcrumbs.length) {
+      breadcrumbs.push({ label: "Inicio", route: "/" });
+    }
+
+    return breadcrumbs;
+  }
+
+  function computeTopNavState(pathname = window.location.pathname) {
+    const breadcrumbs = getBreadcrumbs(pathname);
+    const current = breadcrumbs[breadcrumbs.length - 1] || { label: "Inicio", route: "/" };
+    const previous = breadcrumbs.length > 1 ? breadcrumbs[breadcrumbs.length - 2] : null;
+
+    return {
+      current,
+      previous,
+      breadcrumbs,
+      label: current.label,
+      route: current.route,
+      hasPrevious: Boolean(previous)
+    };
+  }
+
+  function resolveRouteTarget(pathname = window.location.pathname) {
+    const context = getRouteContext(pathname);
+    const routeIndex = window.RevistaDigital?.routeIndex || window.RevistaDigital?.hoteles?.getRouteIndex?.() || [];
+    const match = routeIndex.find((entry) => {
+      if (context.country && entry.type === "country" && entry.slug === context.country) return true;
+      if (context.country && context.destination && entry.type === "destination" && entry.countrySlug === context.country && entry.slug === context.destination) return true;
+      if (context.country && context.destination && context.hotel && entry.type === "hotel" && entry.countrySlug === context.country && entry.destinationSlug === context.destination && entry.slug === context.hotel) return true;
+      return false;
+    });
+
+    return {
+      route: getAppRoute(pathname),
+      context,
+      match: match || null,
+      countrySlug: context.country || match?.countrySlug || null,
+      destinationSlug: context.destination || match?.destinationSlug || null,
+      hotelSlug: context.hotel || match?.slug || null,
+      kind: context.kind
+    };
+  }
+
+  function getRouteContext(pathname = window.location.pathname) {
+    const route = getAppRoute(pathname);
+    const parts = route.split("/").filter(Boolean);
+    const context = {
+      route,
+      kind: "default",
+      country: null,
+      destination: null,
+      hotel: null,
+      segments: parts
+    };
+
+    const directCountryKeys = Object.keys(getDestinationCatalog() || {});
+    const directCountryMatch = parts[0] && directCountryKeys.includes(parts[0]);
+
+    if (parts[0] === "hoteles") {
+      context.kind = "legacy-country";
+      if (parts[1]) context.country = parts[1];
+      if (parts[2]) context.destination = parts[2];
+      if (parts[3]) context.hotel = parts[3];
+      return context;
+    }
+
+    if (parts[0] === "restaurantes") {
+      context.kind = "restaurant";
+      if (parts[1]) context.hotel = parts[1];
+      return context;
+    }
+
+    if (directCountryMatch) {
+      context.kind = "country";
+      context.country = parts[0];
+      if (parts[1]) context.destination = parts[1];
+      if (parts[2]) context.hotel = parts[2];
+      return context;
+    }
+
+    if (parts[0] && ["mapa-general", "mapa-mundi", "workspace", "360", "videos", "complejo-playa-paraiso"].includes(parts[0])) {
+      context.kind = "section";
+      context.destination = parts[0];
+      return context;
+    }
+
+    if (parts.length >= 2 && parts[0] && !parts[2]) {
+      const countrySlug = parts[0];
+      if (directCountryKeys.includes(countrySlug)) {
+        context.kind = "destination";
+        context.country = countrySlug;
+        context.destination = parts[1];
+      }
+    }
+
+    return context;
+  }
+
+  function renderCards(records, getPath, type) {
+    return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
+      <img src="${escapeHtml(item.image || "src/JOIA2.jpg")}" alt="" loading="lazy"><span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubre el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
+  }
+  function renderPortal(route) {
+    const view = document.getElementById("appView");
+    if (!view) return false;
+    const catalog = getDestinationCatalog();
+    if (route === "/mapa-hoteles") {
+      const mapHotels = Object.entries(catalog).flatMap(([countrySlug, country]) => country.destinations.flatMap((destination) =>
+        destination.hotels.map((hotel) => ({ ...hotel, countrySlug, countryName: country.name, destinationSlug: destination.slug, destinationName: destination.name }))
+      )).filter((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]));
+      document.body.dataset.appMode = "portal";
+      document.body.dataset.routeManaged = "true";
+      view.innerHTML = `<main class="portal-page"><div class="portal-breadcrumb">IBEROSTAR · DESTINOS · MAPA GENERAL</div><section class="portal-section portal-all-map-heading"><div><p class="portal-kicker">EXPLORA LOS ALOJAMIENTOS</p><h1>Mapa general de hoteles</h1><p>Selecciona un marcador para abrir la ficha del hotel.</p></div><div id="allHotelsMap" class="portal-all-hotels-map" role="application" aria-label="Mapa general de hoteles Iberostar"></div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">HOTELES CON UBICACIÓN</p><h2>Elige una ficha</h2></div></div><div class="destination-grid">${renderCards(mapHotels, (hotel) => `/${hotel.countrySlug}/${hotel.destinationSlug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      const mapElement = view.querySelector("#allHotelsMap");
+      if (mapElement) window.RevistaDigital.mapas?.initializeAllHotelsMap(mapElement, mapHotels);
+      return true;
+    }
+    const parts = route.split("/").filter(Boolean);
+    const country = parts[0];
+    const countryData = catalog[country];
+    const isHome = !parts.length;
+    if (isHome || (countryData && parts.length === 1)) {
+      document.body.dataset.appMode = "portal";
+      document.body.dataset.routeManaged = "true";
+      const countryCards = Object.entries(catalog).map(([key, item]) => ({ name: item.name, image: item.image, description: `${item.destinations.length} destinos para explorar.`, route: `/${key}` }));
+      let heading = "Encuentra tu próximo destino";
+      let intro = "Explora hoteles y destinos Iberostar. Elige un país para comenzar.";
+      let cards = renderCards(countryCards, (item) => item.route, "country");
+      let breadcrumb = "IBEROSTAR · DESTINOS";
+      let countryMapMarkup = "";
+      let countryHotels = [];
+      if (!isHome) {
+        heading = countryData.name; intro = `Descubre los destinos de ${countryData.name}.`;
+        breadcrumb = `DESTINOS · ${countryData.name.toUpperCase()}`;
+        cards = renderCards(countryData.destinations, (item) => `/${country}/${item.slug}`, "destination");
+        countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
+          ...hotel,
+          countrySlug: country,
+          countryName: countryData.name,
+          destinationSlug: destination.slug,
+          destinationName: destination.name
+        }))).filter((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]));
+        if (countryHotels.length) {
+          countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explora los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div></section>`;
+        }
+      }
+      view.innerHTML = `<main class="portal-page"><section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div><img src="${isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image}" alt="Paisaje de destino" /></section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaja a tu manera" : "Elige dónde hospedarte"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
+      const countryMap = view.querySelector("#countryMap");
+      if (countryMap) {
+        window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels);
+      }
+      return true;
+    }
+    if (countryData && parts.length === 2) {
+      const destination = countryData.destinations.find((item) => item.slug === parts[1]);
+      if (!destination) return false;
+      const hotels = destination.hotels;
+      if (!hotels.length) return false;
+      const hasDestinationMap = hotels.some((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]))
+        || Array.isArray(destination.mapCenter);
+      document.body.dataset.appMode = "portal";
+      document.body.dataset.routeManaged = "true";
+      const mapDescription = destination.mapNotice || "Selecciona un marcador para abrir la ficha del hotel.";
+      view.innerHTML = `<main class="portal-page"><div class="portal-breadcrumb"><a href="${href(`/${country}`)}" data-app-route="/${country}">${escapeHtml(countryData.name)}</a> / ${escapeHtml(destination.name)}</div><section class="portal-destination-hero"><img src="${escapeHtml(destination.image)}" alt=""><div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Ver el complejo Playa Paraíso →</a>` : ""}</div></section>${hasDestinationMap ? `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(destination.name)}</h2><p>${escapeHtml(mapDescription)}</p></div><div class="portal-destination-map" id="destinationMap" role="application" aria-label="Mapa de ${escapeHtml(destination.name)}"></div></section>` : ""}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      const mapElement = view.querySelector("#destinationMap");
+      if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
+      return true;
+    }
+    if (countryData && parts.length === 3) {
+      const destination = countryData.destinations.find((item) => item.slug === parts[1]);
+      if (!destination) return false;
+      const hotel = destination.hotels.find((item) => item.slug === parts[2])
+        || destination.hotels.find((item) => slugify(item.name) === parts[2]);
+      if (!hotel) return false;
+      document.body.dataset.appMode = "portal";
+      document.body.dataset.routeManaged = "true";
+      document.body.dataset.returnRoute = `/${country}/${destination.slug}`;
+      view.innerHTML = renderHotelPortal({ countrySlug: country, countryData, destination, hotel });
+      initHotelPortalMap(view, hotel, destination, countryData);
+      return true;
+    }
+    return false;
+  }
+  function hotelImageCard(alt, src) {
+    return `<figure class="hotel-portal-card"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy" decoding="async" /></figure>`;
+  }
+  function renderHotelPortal(context) {
+    const { countrySlug, countryData, destination, hotel } = context;
+    const stateData = state() || {};
+    const page = hotel.pageIndex != null && Array.isArray(stateData.pages)
+      ? stateData.pages[hotel.pageIndex]
+      : null;
+    const media = stateData.hotelMediaCatalog?.[hotel.name] || {};
+    const content = window.RevistaDigital.hotelContent?.[hotel.name] || null;
+    const official = window.RevistaDigital.officialHotelGalleries?.[hotel.slug] || null;
+    const coordinates = stateData.hotelCoordinates?.[hotel.name];
+    const hasCoordinates = Array.isArray(coordinates);
+
+    const heroImage = hotel.image || content?.image || destination.image || countryData.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
+    const displayName = hotel.name;
+    const intro = hotel.description || page?.intro || content?.description || destination.description || "";
+    const tagline = hotel.tagline || content?.tagline || "";
+    const plainIntro = intro.replace(/\s+/g, " ").trim();
+    const firstSentence = (plainIntro.match(/^.*?[.!?](?=\s|$)/) || [plainIntro])[0];
+    const teaser = tagline || firstSentence;
+    const locationLine = `${destination.name}, ${countryData.name}`;
+    const fullAddress = page?.location || locationLine;
+    const destinationRoute = `/${countrySlug}/${destination.slug}`;
+
+    const rooms = (media.habitaciones?.length ? media.habitaciones : (official?.habitaciones || []));
+    const pools = (media.piscinas?.length ? media.piscinas : (official?.piscinas || []));
+    const dining = (media.restaurante?.length ? media.restaurante : (official?.restaurante || []));
+    const experiences = official?.experiencias || [];
+    const bannerImages = Array.isArray(media.banner) && media.banner.length ? media.banner : [];
+    const gallery = Array.from(new Set([...bannerImages, ...rooms, ...pools, ...dining, ...experiences])).filter(Boolean);
+    const services = (content?.tabs?.servicios?.keyPoints?.length
+      ? content.tabs.servicios.keyPoints
+      : (Array.isArray(page?.benefits) ? page.benefits : []));
+    const stats = (page && Array.isArray(page.stats)) ? page.stats : [];
+    const restaurantMarkup = window.RevistaDigital.restaurantes?.renderHotelRestaurants?.(displayName, page?.name || "") || "";
+
+    const navItems = [["habitaciones", "Habitaciones"], ["restaurantes", "Restaurantes"], ["piscinas", "Piscinas"], ["servicios", "Servicios"]];
+    if (experiences.length) navItems.push(["experiencias", "Experiencias"]);
+    navItems.push(["galeria", "Galería"]);
+    if (hasCoordinates) navItems.push(["ubicacion", "Ubicación"]);
+
+    const heroMarkup = `
+        <section class="hotel-portal-hero">
+          <img class="hotel-portal-hero-bg" src="${escapeHtml(heroImage)}" alt="${escapeHtml(displayName)}" fetchpriority="high" />
+          <div class="hotel-portal-hero-scrim"></div>
+          <div class="hotel-portal-hero-content">
+            <p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${escapeHtml(destination.name).toUpperCase()}</p>
+            <h1>${escapeHtml(displayName)}</h1>
+            <p class="hotel-portal-hero-location">${escapeHtml(locationLine)}</p>
+            ${teaser ? `<p class="hotel-portal-hero-desc">${escapeHtml(teaser)}</p>` : ""}
+            <a class="hotel-portal-hero-cta" href="#hotel-habitaciones">Descubrir el hotel ↓</a>
+          </div>
+        </section>`;
+
+    const aboutMarkup = `
+        <section class="hotel-portal-section hotel-portal-about${stats.length ? " hotel-portal-about-split" : ""}" id="hotel-sobre">
+          <div class="hotel-portal-about-copy">
+            <p class="portal-kicker">SOBRE EL HOTEL</p>
+            <h2>${escapeHtml(displayName)}</h2>
+            ${intro ? `<p>${escapeHtml(intro)}</p>` : ""}
+            <p class="hotel-portal-address">${escapeHtml(fullAddress)}</p>
+          </div>
+          ${stats.length ? `<div class="hotel-portal-stats-panel">${stats.map(([value, label]) => `<div class="hotel-portal-stat"><strong>${escapeHtml(value)}</strong><small>${escapeHtml(label)}</small></div>`).join("")}</div>` : ""}
+        </section>`;
+
+    const roomsMarkup = rooms.length ? `
+        <section class="hotel-portal-section" id="hotel-habitaciones">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">ALOJAMIENTOS</p>
+            <h2>Habitaciones y suites</h2>
+            <p>Descubre las opciones de alojamiento de ${escapeHtml(displayName)}.</p>
+          </div>
+          <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${rooms.map((image) => hotelImageCard(`Habitación de ${escapeHtml(displayName)}`, image)).join("")}</div>
+        </section>` : "";
+
+    const diningMarkup = (dining.length || restaurantMarkup) ? `
+        <section class="hotel-portal-section" id="hotel-restaurantes">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">GASTRONOMÍA</p>
+            <h2>Restaurantes</h2>
+            <p>Descubre los restaurantes de ${escapeHtml(displayName)}.</p>
+          </div>
+          ${restaurantMarkup}
+          ${dining.length ? `<div class="hotel-portal-card-grid hotel-portal-card-grid-3">${dining.map((image) => hotelImageCard(`Restaurante de ${escapeHtml(displayName)}`, image)).join("")}</div>` : ""}
+        </section>` : "";
+
+    const poolsMarkup = pools.length ? `
+        <section class="hotel-portal-section" id="hotel-piscinas">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">PISCINAS</p>
+            <h2>Piscinas</h2>
+            <p>Relájate en las piscinas de ${escapeHtml(displayName)}.</p>
+          </div>
+          <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${pools.map((image) => hotelImageCard(`Piscina de ${escapeHtml(displayName)}`, image)).join("")}</div>
+        </section>` : "";
+
+    const servicesMarkup = services.length ? `
+        <section class="hotel-portal-section" id="hotel-servicios">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">SERVICIOS</p>
+            <h2>Servicios y comodidades</h2>
+            <p>Lo que te espera durante tu estancia.</p>
+          </div>
+          <ul class="hotel-portal-services">${services.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </section>` : "";
+
+    const experiencesMarkup = experiences.length ? `
+        <section class="hotel-portal-section" id="hotel-experiencias">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">EXPERIENCIAS</p>
+            <h2>Experiencias</h2>
+            <p>Momentos únicos en ${escapeHtml(displayName)}.</p>
+          </div>
+          <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${experiences.map((image) => hotelImageCard(`Experiencia en ${escapeHtml(displayName)}`, image)).join("")}</div>
+        </section>` : "";
+
+    const galleryMarkup = gallery.length ? `
+        <section class="hotel-portal-section" id="hotel-galeria">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">GALERÍA</p>
+            <h2>Galería de ${escapeHtml(displayName)}</h2>
+            <p>Un recorrido visual por el hotel.</p>
+          </div>
+          <div class="hotel-portal-gallery">${gallery.map((image) => `<figure><img src="${escapeHtml(image)}" alt="Galería de ${escapeHtml(displayName)}" loading="lazy" decoding="async" /></figure>`).join("")}</div>
+        </section>` : "";
+
+    const mapMarkup = hasCoordinates ? `
+        <section class="hotel-portal-section" id="hotel-ubicacion">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">UBICACIÓN</p>
+            <h2>Dónde estamos</h2>
+            <p>${escapeHtml(fullAddress)}</p>
+          </div>
+          <div class="hotel-portal-map-wrap">
+            <div id="hotelPortalMap" class="hotel-portal-map" role="application" aria-label="Mapa de ${escapeHtml(displayName)}"></div>
+          </div>
+        </section>` : "";
+
+    return `
+      <main class="portal-page">
+        <nav class="portal-breadcrumb" aria-label="Migas de pan">
+          <a href="${href("/")}" data-app-route="/">Inicio</a>
+          <span> / </span>
+          <a href="${href(`/${countrySlug}`)}" data-app-route="/${countrySlug}">${escapeHtml(countryData.name)}</a>
+          <span> / </span>
+          <a href="${href(destinationRoute)}" data-app-route="${destinationRoute}">${escapeHtml(destination.name)}</a>
+          <span> / </span>
+          <span>${escapeHtml(displayName)}</span>
+        </nav>
+
+        ${heroMarkup}
+
+        <nav class="hotel-portal-nav" aria-label="Secciones del hotel">
+          ${navItems.map(([id, label]) => `<a href="#hotel-${id}">${label}</a>`).join("")}
+        </nav>
+
+        ${aboutMarkup}
+        ${roomsMarkup}
+        ${diningMarkup}
+        ${poolsMarkup}
+        ${servicesMarkup}
+        ${experiencesMarkup}
+        ${galleryMarkup}
+        ${mapMarkup}
+
+        <div class="hotel-portal-actions">
+          <a class="hotel-portal-back" href="${href(destinationRoute)}" data-app-route="${destinationRoute}">← Volver a ${escapeHtml(destination.name)}</a>
+        </div>
+      </main>
+    `;
+  }
+  function initHotelPortalMap(view, hotel, destination, countryData) {
+    const element = view?.querySelector("#hotelPortalMap");
+    const coordinates = state()?.hotelCoordinates?.[hotel.name];
+    const mapas = window.RevistaDigital.mapas;
+    if (!element || !Array.isArray(coordinates) || !mapas?.loadLeaflet) return;
+
+    if (activeHotelPortalMap) {
+      try { activeHotelPortalMap.remove(); } catch (error) { /* ignore */ }
+      activeHotelPortalMap = null;
+    }
+
+    mapas.loadLeaflet().then((L) => {
+      const map = L.map(element, { scrollWheelZoom: false, preferCanvas: true });
+      activeHotelPortalMap = map;
+      window.RevistaDigital.state.activeMap = map;
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap contributors"
+      }).addTo(map);
+      L.marker(coordinates)
+        .addTo(map)
+        .bindPopup(`<strong>${escapeHtml(hotel.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small>`)
+        .openPopup();
+      map.setView(coordinates, 15);
+    }).catch((error) => console.warn("No se pudo cargar el mapa del hotel.", error));
+  }
+  function navigate(path) {
+    const target = href(path);
+    const isRestaurantRoute = path.startsWith("/restaurantes/");
+    const restaurantReturnRoute = isRestaurantRoute
+      ? (document.body.dataset.restaurantReturnRoute || getCurrentRoute())
+      : null;
+    if (restaurantReturnRoute) document.body.dataset.restaurantReturnRoute = restaurantReturnRoute;
+    if (window.location.pathname !== target) history.pushState({ appRoute: path, restaurantReturnRoute }, "", target);
+    handleRouteChange(path);
+  }
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-app-route]");
+    if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    navigate(link.dataset.appRoute || "/");
+  });
+
+  function initializeRouteHandler() {
+    window.addEventListener("popstate", (event) => {
+      const route = getCurrentRoute();
+      if (route.startsWith("/restaurantes/") && event.state?.restaurantReturnRoute) {
+        document.body.dataset.restaurantReturnRoute = event.state.restaurantReturnRoute;
+      }
+      handleRouteChange(route);
+    });
+  }
+
+  function restoreCurrentRoute() {
+    handleRouteChange();
+  }
+
+  function handleRouteChange(route = getCurrentRoute()) {
+      route = route.startsWith("/") ? route : `/${route}`;
+      if (route === "/") {
+        document.body.dataset.routeManaged = "true";
+        document.body.dataset.appMode = "portal";
+      }
+      window.RevistaDigital.routeContext = getRouteContext(route);
+      window.RevistaDigital.routeTarget = resolveRouteTarget(route);
+      refreshCurrentAppContext(route);
+      if (!route.startsWith("/restaurantes/")) delete document.body.dataset.restaurantReturnRoute;
+      const legacyRouteAliases = {
+        "/brasil/brasil": "/brasil/praia-do-forte",
+        "/brasil/manaus": "/brasil/amazon",
+        "/brasil/manaus/iberostar-heritage-grand-amazon": "/brasil/amazon/iberostar-heritage-grand-amazon",
+        "/brasil/praia-do-forte/iberostar-waves-bahia": "/brasil/bahia/iberostar-waves-bahia",
+        "/brasil/brasil/iberostar-waves-bahia": "/brasil/bahia/iberostar-waves-bahia",
+        "/brasil/brasil/iberostar-heritage-grand-amazon": "/brasil/amazon/iberostar-heritage-grand-amazon",
+        "/jamaica/rose-hall/joia-rose-hall-by-iberostar": "/jamaica/rose-hall/joia-rose-hall"
+      };
+      if (legacyRouteAliases[route]) {
+        route = legacyRouteAliases[route];
+        history.replaceState(history.state, "", href(route));
+      }
+      if (renderPortal(route)) {
+        state().activeRestaurantMenuIndex = null;
+        state().activeHotelDetail = null;
+        state().returnPageIndex = null;
+        const position = state()?.currentPosition;
+        if (position && document.body.dataset.locationRequested === "true") {
+          window.RevistaDigital.mapas?.renderLocationStatus?.(position);
+        }
+        return;
+      }
+      document.body.dataset.routeManaged = "false";
+      document.body.dataset.appMode = "legacy";
+      const view = document.getElementById("appView");
+      if (view) view.innerHTML = "";
+      const hierarchicalParts = route.split("/").filter(Boolean);
+      if (hierarchicalParts.length === 3 && getDestinationCatalog()[hierarchicalParts[0]]) {
+        const [countrySlug, destinationSlug, hotelSlug] = hierarchicalParts;
+        const countryDestinations = getDestinationCatalog()[countrySlug]?.destinations || [];
+        let destination = countryDestinations.find((item) => item.slug === destinationSlug);
+        let hotel = destination?.hotels.find((item) => item.slug === hotelSlug);
+        if (!hotel) {
+          const match = countryDestinations.map((item) => ({ destination: item, hotel: item.hotels.find((record) => record.slug === hotelSlug) })).find((item) => item.hotel);
+          destination = match?.destination || destination;
+          hotel = match?.hotel || null;
+        }
+        const targetIndex = hotel?.source === "page" ? hotel.pageIndex : -1;
+        const menuDetail = hotel?.source === "menu"
+          ? {
+              countryKey: hotel.countryMenuKey,
+              hotelIndex: hotel.hotelIndex,
+              activeTab: "habitaciones",
+              galleryIndex: 0,
+              ...(hotel.tabOverrides ? { tabOverrides: hotel.tabOverrides } : {}),
+              ...(hotel.aliasOf ? { displayName: hotel.name, tagline: hotel.tagline, description: hotel.description } : {})
+            }
+          : null;
+        if (targetIndex >= 0 || menuDetail) {
+          document.body.dataset.appMode = "hotel";
+          document.body.dataset.routeManaged = "true";
+          document.body.dataset.returnRoute = `/${countrySlug}/${destination.slug}`;
+          state().activeRestaurantMenuIndex = null;
+          state().activeHotelDetail = menuDetail;
+          state().returnPageIndex = targetIndex >= 0 ? targetIndex : 0;
+          state().currentIndex = targetIndex >= 0 ? targetIndex : 0;
+          window.renderPage?.();
+          return;
+        }
+      }
+      const restaurantMenuMatch = route.match(/^\/restaurantes\/([^/]+)$/);
+      const hotelMatch = route.match(/^\/hoteles\/([^/]+)\/([^/]+)$/);
+      const countryMatch = route.match(/^\/hoteles\/([^/]+)$/);
+
+      if (restaurantMenuMatch) {
+        document.body.dataset.restaurantReturnRoute ||= "/";
+        const targetIndex = state().pages?.findIndex((page) =>
+          page.type === "hotel" && slugify(page.name) === restaurantMenuMatch[1]
+        ) ?? -1;
+
+        if (targetIndex >= 0) {
+          state().activeRestaurantMenuIndex = targetIndex;
+          state().activeHotelDetail = null;
+          state().returnPageIndex = null;
+          state().currentIndex = targetIndex;
+          if (typeof window.renderPage === "function") {
+            window.renderPage();
+          }
+          return;
+        }
+
+        const restaurantHotel = Object.values(getDestinationCatalog())
+          .flatMap((country) => country.destinations)
+          .flatMap((destination) => destination.hotels.map((hotel) => ({ hotel, destination })))
+          .find(({ hotel }) => hotel.source === "menu" && (
+            hotel.slug === restaurantMenuMatch[1] || slugify(hotel.name) === restaurantMenuMatch[1]
+          ));
+
+        if (restaurantHotel) {
+          const { hotel, destination } = restaurantHotel;
+          const restaurantReturnRoute = document.body.dataset.restaurantReturnRoute || "/";
+          document.body.dataset.appMode = "hotel";
+          document.body.dataset.routeManaged = "true";
+          state().activeRestaurantMenuIndex = null;
+          state().activeHotelDetail = {
+            countryKey: hotel.countryMenuKey,
+            hotelIndex: hotel.hotelIndex,
+            activeTab: "restaurante",
+            galleryIndex: 0,
+            ...(hotel.aliasOf ? {
+              displayName: hotel.name,
+              tagline: hotel.tagline,
+              description: hotel.description,
+              ...(hotel.tabOverrides ? { tabOverrides: hotel.tabOverrides } : {})
+            } : {})
+          };
+          state().returnPageIndex = 0;
+          state().currentIndex = 0;
+          document.body.dataset.returnRoute = restaurantReturnRoute !== "/"
+            ? restaurantReturnRoute
+            : `/${hotel.countryMenuKey}/${destination.slug}`;
+          window.renderPage?.();
+          return;
+        }
+      }
+
+      if (hotelMatch) {
+        const countryKey = hotelMatch[1];
+        const hotelName = hotelMatch[2];
+        const country = state().hotelCountryMenus?.[countryKey];
+        const hotelIndex = country?.hotels?.findIndex((hotel) => slugify(hotel.name) === hotelName) ?? -1;
+
+        if (country && hotelIndex >= 0) {
+          state().activeRestaurantMenuIndex = null;
+          state().activeHotelDetail = { countryKey, hotelIndex, activeTab: "habitaciones", galleryIndex: 0 };
+          state().returnPageIndex = state().pages?.findIndex((page) =>
+            (page.type === "country-menu" && page.country === countryKey) ||
+            (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico")
+          ) ?? 0;
+          state().currentIndex = state().returnPageIndex >= 0 ? state().returnPageIndex : 0;
+          if (typeof window.renderPage === "function") {
+            window.renderPage();
+          }
+          return;
+        }
+
+        if (country) {
+          const countryPageIndex = state().pages?.findIndex((page) =>
+            (page.type === "country-menu" && page.country === countryKey) ||
+            (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico")
+          ) ?? -1;
+
+          if (countryPageIndex >= 0) {
+            state().activeRestaurantMenuIndex = null;
+            state().activeHotelDetail = null;
+            state().returnPageIndex = null;
+            state().currentIndex = countryPageIndex;
+            if (typeof window.renderPage === "function") {
+              window.renderPage();
+            }
+            return;
+          }
+        }
+      }
+
+      if (countryMatch) {
+        const countryKey = countryMatch[1];
+        const targetIndex = state().pages?.findIndex((page) =>
+          (page.type === "country-menu" && page.country === countryKey) ||
+          (page.type === "hotel" && page.country === "mexico" && countryKey === "mexico")
+        ) ?? -1;
+
+        if (targetIndex >= 0) {
+          state().activeRestaurantMenuIndex = null;
+          state().activeHotelDetail = null;
+          state().returnPageIndex = null;
+          state().currentIndex = targetIndex;
+          if (typeof window.renderPage === "function") {
+            window.renderPage();
+          }
+          return;
+        }
+      }
+
+      const pageTypeByRoute = {
+        "/complejo-playa-paraiso": "complex",
+        "/mapa-general": "map",
+        "/mapa-mundi": "mapamundi",
+        "/workspace": "workspace",
+        "/360": "media360",
+        "/videos": "videos",
+        "/guia-playa-paraiso": "guia"
+      };
+      const pageType = pageTypeByRoute[route];
+
+      if (pageType) {
+        const targetIndex = state().pages?.findIndex((page) => page.type === pageType) ?? -1;
+
+        if (targetIndex >= 0) {
+          state().activeRestaurantMenuIndex = null;
+          state().activeHotelDetail = null;
+          state().returnPageIndex = null;
+          state().currentIndex = targetIndex;
+          if (typeof window.renderPage === "function") {
+            window.renderPage();
+          }
+          return;
+        }
+      }
+
+      state().activeRestaurantMenuIndex = null;
+      state().activeHotelDetail = null;
+      state().returnPageIndex = null;
+      state().currentIndex = 0;
+      if (typeof window.renderPage === "function") {
+        window.renderPage();
+      }
+  }
+
+  routes.slugify = slugify;
+  routes.syncBookRoute = syncBookRoute;
+  routes.resolveInitialRoute = resolveInitialRoute;
+  routes.initializeRouteHandler = initializeRouteHandler;
+  routes.restoreCurrentRoute = restoreCurrentRoute;
+  routes.navigate = navigate;
+  routes.renderPortal = renderPortal;
+  routes.renderHotelPortal = renderHotelPortal;
+  routes.getRouteContext = getRouteContext;
+  routes.resolveRouteTarget = resolveRouteTarget;
+  routes.refreshCurrentAppContext = refreshCurrentAppContext;
+  routes.getBreadcrumbs = getBreadcrumbs;
+  routes.computeTopNavState = computeTopNavState;
+  routes.getCurrentLabel = function (pathname = window.location.pathname) {
+    return computeTopNavState(pathname).label || "Inicio";
+  };
+
+  window.slugify = window.slugify || slugify;
+  window.syncBookRoute = window.syncBookRoute || syncBookRoute;
+  window.resolveInitialRoute = window.resolveInitialRoute || resolveInitialRoute;
+  window.RevistaDigital.routes = routes;
+  window.RevistaDigital.routeContext = getRouteContext();
+  window.RevistaDigital.routeTarget = resolveRouteTarget();
+  refreshCurrentAppContext();
+  window.RevistaDigital.breadcrumbs = getBreadcrumbs();
+  window.RevistaDigital.topNav = computeTopNavState();
+
+  if (document.readyState !== "loading") {
+    initializeRouteHandler();
+  } else {
+    document.addEventListener("DOMContentLoaded", initializeRouteHandler);
+  }
+})();

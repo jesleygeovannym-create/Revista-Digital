@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<base href="./" />
+<script>document.documentElement.dataset.routeStartup = "true";</script>
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var routeEntry = params.get("diag-route");
+    if (routeEntry) {
+      window.__diagRoute = routeEntry;
+      var clean = decodeURIComponent(routeEntry).replace(/\\/g, "/").replace(/\/index\.html$/i, "").replace(/^\/+|\/+$/g, "");
+      var target = new URL(clean ? clean : "", new URL(".", window.location.href).href);
+      window.history.replaceState(null, "", target.href);
+    }
+  })();
+</script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="site-header" id="siteHeader"></header>
+<div id="appView" class="app-view" aria-live="polite"></div>
+<pre id="diagOut" style="position:fixed;z-index:100000;top:0;left:0;right:0;background:#fff;color:#000;font:11px monospace;white-space:pre-wrap;max-height:100vh;overflow:auto"></pre>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js" defer></script>
+<script src="js/pannellum-360.js" defer></script>
+<script src="js/routes.js" defer></script>
+<script src="js/hoteles.js" defer></script>
+<script src="js/restaurantes.js" defer></script>
+<script src="js/mapas.js" defer></script>
+<script src="js/workspace.js" defer></script>
+<script src="js/media360.js" defer></script>
+<script src="js/videos.js" defer></script>
+<script src="js/hotel-gallery-data.js" defer></script>
+<script src="js/hotel-content-data.js" defer></script>
+<script src="js/i18n.js" defer></script>
+<script src="js/search.js" defer></script>
+<script src="js/guia-playa-paraiso.js" defer></script>
+<script src="function.js" defer></script>
+<script>
+window.addEventListener("DOMContentLoaded", function () {
+  var log = [];
+  try {
+    var route = window.RevistaDigital.routes.getRouteContext().route;
+    log.push("route=" + route);
+    log.push("state? " + typeof window.RevistaDigital.state);
+    var st = window.RevistaDigital.state || {};
+    log.push("pages=" + (Array.isArray(st.pages) ? st.pages.length : "none") + " hotelPages=" + (st.pages || []).filter(function (p) { return p.type === "hotel"; }).length);
+    var cat = window.RevistaDigital.hoteles.getDestinationCatalog();
+    var mx = cat["mexico"];
+    log.push("catalog mexico? " + !!mx);
+    (mx.destinations || []).forEach(function (d) {
+      log.push("dest " + d.slug + " hotels=" + (d.hotels || []).map(function (h) { return h.slug; }).join(","));
+    });
+    var parts = route.split("/").filter(Boolean);
+    var dest = mx.destinations.find(function (d) { return d.slug === parts[1]; });
+    log.push("dest found=" + !!dest);
+    var hotel = dest && dest.hotels.find(function (h) { return h.slug === parts[2] || window.RevistaDigital.routes.slugify(h.name) === parts[2]; });
+    log.push("hotel found=" + !!hotel);
+    var res = window.RevistaDigital.routes.renderPortal(route);
+    log.push("renderPortal=" + res);
+    log.push("appView len=" + (document.getElementById("appView").innerHTML.length));
+  } catch (e) {
+    log.push("EXCEPTION: " + (e && e.stack ? e.stack : e));
+  }
+  document.getElementById("diagOut").textContent = log.join("\n");
+});
+</script>
+</body>
+</html>

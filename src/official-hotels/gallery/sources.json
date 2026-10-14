@@ -1,0 +1,730 @@
+{
+    "src/official-hotels/gallery/selection-playa-mita-88144.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Habitaciones",
+                                                                       "imageId":  "88144",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/88144/crops/16:9/712/image"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-85599.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Habitaciones",
+                                                                       "imageId":  "85599",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85599/crops/16:9/712/image.jpg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-60056.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Bares y restaurantes",
+                                                                       "imageId":  "60056",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/60056/crops/5:3/868/image.jpeg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-60053.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Bares y restaurantes",
+                                                                       "imageId":  "60053",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/60053/crops/5:3/868/image.jpeg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-60020.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Playa y piscina",
+                                                                       "imageId":  "60020",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/60020/crops/16:9/955/image.jpeg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-60026.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Playa y piscina",
+                                                                       "imageId":  "60026",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/60026/crops/5:3/868/image.jpeg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-15980.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Hotel y alrededores",
+                                                                       "imageId":  "15980",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/15980/crops/16:9/712/image.jpg"
+                                                                   },
+    "src/official-hotels/gallery/selection-playa-mita-88147.jpg":  {
+                                                                       "hotelSlug":  "selection-playa-mita",
+                                                                       "gallerySection":  "Hotel y alrededores",
+                                                                       "imageId":  "88147",
+                                                                       "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-nayarit/iberostar-selection-playa-mita/",
+                                                                       "sourceImage":  "https://apiimg.iberostar.com/uploads/image/88147/crops/16:9/712/image"
+                                                                   },
+    "src/official-hotels/gallery/waves-cozumel-84231.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Habitaciones",
+                                                                "imageId":  "84231",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84231/crops/5:3/868/image.jpg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-77287.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Habitaciones",
+                                                                "imageId":  "77287",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/77287/crops/5:3/868/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-77482.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Bares y restaurantes",
+                                                                "imageId":  "77482",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/77482/crops/16:9/955/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-77319.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Bares y restaurantes",
+                                                                "imageId":  "77319",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/77319/crops/5:3/868/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-58606.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Playa y piscina",
+                                                                "imageId":  "58606",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/58606/crops/16:9/955/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-58600.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Playa y piscina",
+                                                                "imageId":  "58600",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/58600/crops/5:3/868/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-57610.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Hotel y alrededores",
+                                                                "imageId":  "57610",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/57610/crops/16:9/712/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/waves-cozumel-77484.jpg":  {
+                                                                "hotelSlug":  "waves-cozumel",
+                                                                "gallerySection":  "Hotel y alrededores",
+                                                                "imageId":  "77484",
+                                                                "sourcePage":  "https://www.iberostar.com/es/hoteles/cozumel/iberostar-waves-cozumel/",
+                                                                "sourceImage":  "https://apiimg.iberostar.com/uploads/image/77484/crops/16:9/712/image.jpeg"
+                                                            },
+    "src/official-hotels/gallery/selection-cancun-80390.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "80390",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/80390/crops/16:9/712/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-80416.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "80416",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/80416/crops/16:9/712/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-89266.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "89266",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89266/crops/16:9/712/image"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-85304.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "85304",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85304/crops/16:9/712/image.jpg"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-89281.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "89281",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89281/crops/16:9/955/image"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-89282.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "89282",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89282/crops/5:3/868/image"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-81484.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "81484",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81484/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/selection-cancun-89286.jpg":  {
+                                                                   "hotelSlug":  "selection-cancun",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "89286",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/cancun/iberostar-selection-cancun/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89286/crops/16:9/955/image"
+                                                               },
+    "src/official-hotels/gallery/joia-rose-hall-89473.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Habitaciones",
+                                                                 "imageId":  "89473",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89473/crops/16:9/712/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89461.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Habitaciones",
+                                                                 "imageId":  "89461",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89461/crops/16:9/712/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89477.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Bares y restaurantes",
+                                                                 "imageId":  "89477",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89477/crops/16:9/955/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89474.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Bares y restaurantes",
+                                                                 "imageId":  "89474",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89474/crops/5:3/868/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89748.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Playa y piscina",
+                                                                 "imageId":  "89748",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89748/crops/16:9/955/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-63234.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Playa y piscina",
+                                                                 "imageId":  "63234",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/63234/crops/5:3/868/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89478.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Hotel y alrededores",
+                                                                 "imageId":  "89478",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89478/crops/16:9/955/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/joia-rose-hall-89482.jpg":  {
+                                                                 "hotelSlug":  "joia-rose-hall",
+                                                                 "gallerySection":  "Hotel y alrededores",
+                                                                 "imageId":  "89482",
+                                                                 "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/joia-rose-hall-by-iberostar/",
+                                                                 "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89482/crops/5:3/868/image.jpeg"
+                                                             },
+    "src/official-hotels/gallery/selection-rose-hall-suites-75610.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Habitaciones",
+                                                                             "imageId":  "75610",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/75610/crops/5:3/868/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-85723.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Habitaciones",
+                                                                             "imageId":  "85723",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85723/crops/5:3/868/image.jpg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-85718.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Bares y restaurantes",
+                                                                             "imageId":  "85718",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85718/crops/16:9/955/image.jpg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-62553.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Bares y restaurantes",
+                                                                             "imageId":  "62553",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/62553/crops/5:3/868/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-80051.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Playa y piscina",
+                                                                             "imageId":  "80051",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/80051/crops/16:9/712/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-62742.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Playa y piscina",
+                                                                             "imageId":  "62742",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/62742/crops/16:9/712/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-62738.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Hotel y alrededores",
+                                                                             "imageId":  "62738",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/62738/crops/16:9/712/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/selection-rose-hall-suites-62739.jpg":  {
+                                                                             "hotelSlug":  "selection-rose-hall-suites",
+                                                                             "gallerySection":  "Hotel y alrededores",
+                                                                             "imageId":  "62739",
+                                                                             "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-selection-rose-hall-suites/",
+                                                                             "sourceImage":  "https://apiimg.iberostar.com/uploads/image/62739/crops/16:9/712/image.jpeg"
+                                                                         },
+    "src/official-hotels/gallery/waves-rose-hall-beach-85767.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Habitaciones",
+                                                                        "imageId":  "85767",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85767/crops/16:9/955/image.jpg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61263.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Habitaciones",
+                                                                        "imageId":  "61263",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61263/crops/5:3/868/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61307.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Bares y restaurantes",
+                                                                        "imageId":  "61307",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61307/crops/16:9/955/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61321.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Bares y restaurantes",
+                                                                        "imageId":  "61321",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61321/crops/5:3/868/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61335.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Playa y piscina",
+                                                                        "imageId":  "61335",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61335/crops/16:9/712/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-62628.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Playa y piscina",
+                                                                        "imageId":  "62628",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/62628/crops/16:9/712/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61339.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Hotel y alrededores",
+                                                                        "imageId":  "61339",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61339/crops/16:9/955/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/waves-rose-hall-beach-61241.jpg":  {
+                                                                        "hotelSlug":  "waves-rose-hall-beach",
+                                                                        "gallerySection":  "Hotel y alrededores",
+                                                                        "imageId":  "61241",
+                                                                        "sourcePage":  "https://www.iberostar.com/es/hoteles/montego-bay/iberostar-waves-rose-hall-beach/",
+                                                                        "sourceImage":  "https://apiimg.iberostar.com/uploads/image/61241/crops/5:3/868/image.jpeg"
+                                                                    },
+    "src/official-hotels/gallery/selection-bavaro-suites-85013.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Habitaciones",
+                                                                          "imageId":  "85013",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85013/crops/16:9/712/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-81462.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Habitaciones",
+                                                                          "imageId":  "81462",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81462/crops/16:9/712/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-85015.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Bares y restaurantes",
+                                                                          "imageId":  "85015",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85015/crops/16:9/955/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-85019.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Bares y restaurantes",
+                                                                          "imageId":  "85019",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85019/crops/5:3/868/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-84999.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Playa y piscina",
+                                                                          "imageId":  "84999",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84999/crops/16:9/955/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-85000.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Playa y piscina",
+                                                                          "imageId":  "85000",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/85000/crops/5:3/868/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-84733.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Spa y wellness",
+                                                                          "imageId":  "84733",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84733/crops/16:9/712/image.jpg"
+                                                                      },
+    "src/official-hotels/gallery/selection-bavaro-suites-56198.jpg":  {
+                                                                          "hotelSlug":  "selection-bavaro-suites",
+                                                                          "gallerySection":  "Spa y wellness",
+                                                                          "imageId":  "56198",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-selection-bavaro-suites/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/56198/crops/16:9/712/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/joia-bavaro-56342.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Habitaciones",
+                                                              "imageId":  "56342",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/56342/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-81352.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Habitaciones",
+                                                              "imageId":  "81352",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81352/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-84883.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "84883",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84883/crops/16:9/712/image.jpg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-84882.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "84882",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84882/crops/16:9/712/image.jpg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-81279.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Playa y piscina",
+                                                              "imageId":  "81279",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81279/crops/16:9/955/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-84383.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Playa y piscina",
+                                                              "imageId":  "84383",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84383/crops/5:3/868/image.jpg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-81296.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Hotel y alrededores",
+                                                              "imageId":  "81296",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81296/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/joia-bavaro-81324.jpg":  {
+                                                              "hotelSlug":  "joia-bavaro",
+                                                              "gallerySection":  "Hotel y alrededores",
+                                                              "imageId":  "81324",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/joia-bavaro-by-iberostar/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81324/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-punta-cana-86810.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "86810",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/86810/crops/16:9/712/image"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-86773.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "86773",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/86773/crops/16:9/712/image"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-84995.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "84995",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/84995/crops/16:9/955/image.jpg"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-71784.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "71784",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71784/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-71606.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "71606",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71606/crops/16:9/955/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-71775.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "71775",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71775/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-71792.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "71792",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71792/crops/16:9/955/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-punta-cana-81274.jpg":  {
+                                                                   "hotelSlug":  "waves-punta-cana",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "81274",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-punta-cana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81274/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71714.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "71714",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71714/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71715.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Habitaciones",
+                                                                   "imageId":  "71715",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71715/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71853.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "71853",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71853/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71859.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Bares y restaurantes",
+                                                                   "imageId":  "71859",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71859/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71885.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "71885",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71885/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71927.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Playa y piscina",
+                                                                   "imageId":  "71927",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71927/crops/16:9/955/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-78483.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "78483",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/78483/crops/16:9/955/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/waves-dominicana-71883.jpg":  {
+                                                                   "hotelSlug":  "waves-dominicana",
+                                                                   "gallerySection":  "Hotel y alrededores",
+                                                                   "imageId":  "71883",
+                                                                   "sourcePage":  "https://www.iberostar.com/es/hoteles/punta-cana/iberostar-waves-dominicana/",
+                                                                   "sourceImage":  "https://apiimg.iberostar.com/uploads/image/71883/crops/5:3/868/image.jpeg"
+                                                               },
+    "src/official-hotels/gallery/selection-praia-do-forte-67032.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Habitaciones",
+                                                                           "imageId":  "67032",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67032/crops/16:9/955/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67035.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Habitaciones",
+                                                                           "imageId":  "67035",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67035/crops/5:3/868/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67224.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Bares y restaurantes",
+                                                                           "imageId":  "67224",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67224/crops/5:3/868/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67086.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Bares y restaurantes",
+                                                                           "imageId":  "67086",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67086/crops/16:9/955/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67237.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Playa y piscina",
+                                                                           "imageId":  "67237",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67237/crops/16:9/955/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67258.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Playa y piscina",
+                                                                           "imageId":  "67258",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67258/crops/5:3/868/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-87805.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Hotel y alrededores",
+                                                                           "imageId":  "87805",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/87805/crops/16:9/955/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/selection-praia-do-forte-67254.jpg":  {
+                                                                           "hotelSlug":  "selection-praia-do-forte",
+                                                                           "gallerySection":  "Hotel y alrededores",
+                                                                           "imageId":  "67254",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-selection-praia-do-forte/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67254/crops/5:3/868/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/waves-bahia-66976.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Habitaciones",
+                                                              "imageId":  "66976",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66976/crops/5:3/868/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-86232.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Habitaciones",
+                                                              "imageId":  "86232",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/86232/crops/5:3/868/image"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-68582.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "68582",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/68582/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-67190.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "67190",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67190/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-67265.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Playa y piscina",
+                                                              "imageId":  "67265",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67265/crops/4:5/469/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-67355.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Playa y piscina",
+                                                              "imageId":  "67355",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67355/crops/16:9/955/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-67368.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Hotel y alrededores",
+                                                              "imageId":  "67368",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67368/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-bahia-67319.jpg":  {
+                                                              "hotelSlug":  "waves-bahia",
+                                                              "gallerySection":  "Hotel y alrededores",
+                                                              "imageId":  "67319",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/praia-do-forte/iberostar-bahia/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/67319/crops/16:9/712/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/grand-amazon-expedition-66751.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Camarotes",
+                                                                          "imageId":  "66751",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66751/crops/16:9/955/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-66744.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Camarotes",
+                                                                          "imageId":  "66744",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66744/crops/5:3/868/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-70017.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Bares y restaurantes",
+                                                                          "imageId":  "70017",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/70017/crops/16:9/955/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-69070.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Bares y restaurantes",
+                                                                          "imageId":  "69070",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/69070/crops/5:3/868/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-66791.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Piscina",
+                                                                          "imageId":  "66791",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66791/crops/5:3/868/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-66797.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "El Amazonas",
+                                                                          "imageId":  "66797",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66797/crops/5:3/868/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-81712.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "Piscina",
+                                                                          "imageId":  "81712",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81712/crops/16:9/955/image.jpeg"
+                                                                      },
+    "src/official-hotels/gallery/grand-amazon-expedition-66798.jpg":  {
+                                                                          "hotelSlug":  "grand-amazon-expedition",
+                                                                          "gallerySection":  "El Amazonas",
+                                                                          "imageId":  "66798",
+                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66798/crops/16:9/955/image.jpeg"
+                                                                      }
+}

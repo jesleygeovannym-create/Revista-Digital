@@ -18,6 +18,7 @@ const supabaseClient =
     SUPABASE_URL,
     SUPABASE_KEY
   );
+window.supabaseClient = supabaseClient;
 
 async function probarSupabase() {
   const { data, error } = await supabaseClient
@@ -42,21 +43,132 @@ const generalMapCenter = {
 };
 
 const generalMapZoom = 15;
+const locationDetectionRadiusMeters = 1500;
+const destinationDetectionRadiusMeters = 5000;
 
+// Resort markers use the mapped property location; itinerant cruise ships have no fixed marker.
 const hotelCoordinates = {
   "Iberostar Paraíso del Mar": [20.7612389, -86.9640931],
   "Iberostar Paraíso Maya": [20.7578835, -86.9648766],
   "Iberostar Paraíso Lindo": [20.7596096, -86.9639649],
   "Iberostar Paraíso Beach": [20.7584, -86.9585],
-  "Iberostar Paraíso JOIA": [20.7563073, -86.9629786]
+  "Iberostar Paraíso JOIA": [20.7563073, -86.9629786],
+  "Iberostar Waves Tucán": [20.6043672, -87.0940272],
+  "Iberostar Waves Quetzal": [20.6049008, -87.0935949],
+  "Iberostar Selection Playa Mita": [20.79048, -105.48882],
+  "Iberostar Waves Cozumel": [20.37018, -87.02128],
+  "Iberostar Selection Cancún": [21.06724, -86.77851],
+  // Coral Cancún is a mapped zone within the Selection Cancún resort.
+  "Iberostar Selection Coral Cancún": [21.06724, -86.77851],
+  "JOIA Rose Hall by Iberostar": [18.515118, -77.76817],
+  "Iberostar Selection Rose Hall Suites": [18.51471, -77.76877],
+  "Coral Level at Iberostar Selection Rose Hall Suites": [18.51471, -77.76877],
+  "Iberostar Waves Rose Hall Beach": [18.514986, -77.768163],
+  "Iberostar Selection Bávaro Suites": [18.715302, -68.448757],
+  "JOIA Bávaro by Iberostar": [18.71247, -68.44762],
+  "Iberostar Waves Punta Cana": [18.717486, -68.452083],
+  "Iberostar Waves Dominicana": [18.717329, -68.45228],
+  "Iberostar Selection Praia do Forte": [-12.5462, -37.98689],
+  "Iberostar Waves Bahia": [-12.54995, -37.98746],
+  "Praia do Forte · Star Prestige": [-12.5462, -37.98689]
 };
 
-// Límite del complejo: ningún mapa (general o de hotel) puede
-// alejarse ni desplazarse más allá de este rectángulo.
-const complexBounds = [
-  [20.7553, -86.9663],
-  [20.7630, -86.9578]
+const hotelDetectionRadii = Object.fromEntries(
+  Object.keys(hotelCoordinates).map((hotelName) => [hotelName, locationDetectionRadiusMeters])
+);
+Object.assign(hotelDetectionRadii, {
+  "Iberostar Selection Playa Mita": 2000,
+  "Iberostar Waves Cozumel": 2000,
+  "Iberostar Selection Cancún": 2000
+});
+
+// Perímetro real verificado del complejo Iberostar Playa Paraíso
+// (OpenStreetMap way/138147423 «Iberostar Playa Paraiso Resort», que abarca
+// los cinco hoteles y el Golf Club al oeste). Es la única fuente de verdad
+// para el encuadre inicial y los límites de navegación de los mapas del
+// complejo; no se deriva solo de los marcadores.
+const complexPerimeter = [
+  [20.7531065, -86.9697573],
+  [20.7648525, -86.9573717]
 ];
+
+// Margen pequeño (~60 m N-S, ~140 m E-O) alrededor del perímetro real: deja
+// encuadrar instalaciones del borde (p. ej. el Golf Club) sin que el usuario
+// pueda alejarse hacia la selva o el mar. Ningún mapa del complejo puede
+// desplazarse fuera de este rectángulo.
+const complexBounds = [
+  [20.7525065, -86.9710573],
+  [20.7654525, -86.9560717]
+];
+
+// Encuadre y límites de navegación comunes de los mapas del complejo.
+// Criterio único: encuadrar el perímetro real completo (nada cortado y con
+// el mínimo exterior posible), impedir alejarse más allá de "todo el
+// complejo" y no permitir arrastrar fuera del perímetro + margen pequeño.
+// Si el contenedor aún no tiene tamaño, no hace nada (se reintentará).
+function frameComplexMap(map, L, options = {}) {
+  if (!map || !L) return null;
+  const opts = options || {};
+  const container = typeof map.getContainer === "function" ? map.getContainer() : null;
+  if (container && (!container.clientWidth || !container.clientHeight)) return null;
+
+  const perimeter = opts.perimeter ? L.latLngBounds(opts.perimeter) : L.latLngBounds(complexPerimeter);
+  const navBounds = opts.navBounds ? L.latLngBounds(opts.navBounds) : L.latLngBounds(complexBounds);
+  const padding = typeof opts.padding === "number" ? opts.padding : 8;
+  const maxZoom = typeof opts.maxZoom === "number" ? opts.maxZoom : 18;
+
+  map.options.maxBoundsViscosity = 1.0;
+  map.setMaxBounds(navBounds);
+  map.setMaxZoom(maxZoom);
+
+  map.__programmaticFit = true;
+  try {
+    map.fitBounds(perimeter, { padding: [padding, padding], animate: false });
+  } finally {
+    map.__programmaticFit = false;
+  }
+  // El zoom mínimo es justo el del encuadre: no se puede alejar y ver los
+  // alrededores del complejo.
+  map.setMinZoom(map.getZoom());
+
+  if (!map.__framingGuards) {
+    map.__framingGuards = true;
+    map.on("dragstart", () => { map.__userAdjusted = true; });
+    map.on("zoomstart", () => { if (!map.__programmaticFit) map.__userAdjusted = true; });
+  }
+  return perimeter;
+}
+
+// Reaplica el encuadre tras el primer layout y cuando el contenedor cambia de
+// tamaño, pero solo mientras el usuario no haya movido el mapa (a partir de
+// ahí se respeta su vista).
+function setupComplexMapFraming(map, L, options = {}) {
+  if (!map || !L) return;
+  frameComplexMap(map, L, options);
+
+  const element = typeof map.getContainer === "function" ? map.getContainer() : null;
+  const refit = () => {
+    if (!map || map.__userAdjusted) return;
+    if (element && (!element.clientWidth || !element.clientHeight)) return;
+    try { map.invalidateSize(); } catch (error) { /* ignore */ }
+    frameComplexMap(map, L, options);
+  };
+
+  if (typeof requestAnimationFrame === "function") requestAnimationFrame(refit);
+  setTimeout(refit, 300);
+
+  try {
+    if (element && typeof ResizeObserver === "function") {
+      if (element.__complexResizeObserver) element.__complexResizeObserver.disconnect();
+      const observer = new ResizeObserver(() => {
+        if (typeof requestAnimationFrame === "function") requestAnimationFrame(refit);
+        else refit();
+      });
+      observer.observe(element);
+      element.__complexResizeObserver = observer;
+    }
+  } catch (error) { /* ignore observer errors */ }
+}
 
 
 /* =========================================================
@@ -213,7 +325,7 @@ function createMediaUrl(blob) {
 
 function getHotelNames() {
   return pages
-    .filter((page) => page.type === "hotel")
+    .filter((page) => page?.type === "hotel")
     .map((page) => page.name);
 }
 
@@ -230,6 +342,13 @@ const pages = [
     title: "Iberostar Playa Paraíso",
     subtitle: "La guía interactiva del complejo",
     quote: "Un destino que se queda contigo para siempre"
+  },
+
+  {
+    type: "complex",
+    title: "Iberostar Playa Paraíso",
+    kicker: "EL COMPLEJO · RIVIERA MAYA",
+    intro: "Cinco hoteles, cinco maneras de vivir el Caribe. Elige tu próxima experiencia en Playa Paraíso."
   },
 
   {
@@ -275,7 +394,7 @@ const pages = [
     name: "Iberostar Paraíso del Mar",
     location:
       "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
-    image: "src/ParaisoDelMar.jpg",
+    image: "src/ParaisoDelMar 1.png",
     intro:
       "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
     stats: [
@@ -297,7 +416,7 @@ const pages = [
     name: "Iberostar Paraíso Maya",
     location:
       "Iberostar Selection Paraíso Maya Suites, Carretera Chetumal-Puerto Juárez km 309, Playa Paraíso, Quintana Roo, México",
-    image: "src/paraisoMaya.jpg",
+    image: "src/paraisoMaya 1.png",
     intro:
       "Iberostar Selection Paraíso Maya combina la grandeza de la cultura maya con una experiencia todo incluido frente al Caribe. Sus piscinas, parque acuático, río lento, gastronomía internacional y programas familiares convierten al resort en uno de los destinos más completos de Riviera Maya.",
     stats: [
@@ -319,7 +438,7 @@ const pages = [
     name: "Iberostar Paraíso Lindo",
     location:
       "Iberostar Paraíso Lindo, Playa Paraíso, Quintana Roo, México",
-    image: "src/ParaisoLindo.jpg",
+    image: "src/ParaisoLindo1.png",
     intro:
       "Iberostar Selection Paraíso Lindo combina naturaleza, diversión y descanso en un entorno privilegiado frente al Caribe mexicano. Sus piscinas, parque acuático, río lento y experiencias gastronómicas lo convierten en el lugar ideal para familias y viajeros que buscan disfrutar de la esencia de Riviera Maya con el sello de hospitalidad Iberostar.",
     stats: [
@@ -341,7 +460,7 @@ const pages = [
     name: "Iberostar Paraíso Beach",
     location:
       "Iberostar Paraíso Beach, Playa Paraíso, Quintana Roo, México",
-    image: "src/paraisoBeach.jpg",
+    image: "src/paraisoBeach1.jpg",
     intro:
       "Iberostar Waves Paraíso Beach combina la esencia del Caribe mexicano con una experiencia Todo Incluido diseñada para toda la familia. Rodeado de exuberantes jardines tropicales y una espectacular playa de arena blanca, ofrece gastronomía internacional, entretenimiento para todas las edades, piscinas de gran tamaño y acceso a las experiencias exclusivas que caracterizan a Iberostar. Un destino donde la relajación, la diversión y la sostenibilidad se unen para crear vacaciones inolvidables.",
     stats: [
@@ -363,7 +482,7 @@ const pages = [
     name: "Iberostar Paraíso JOIA",
     location:
       "Iberostar JOIA Paraíso, Playa Paraíso, Quintana Roo, México",
-    image: "src/JOIA.jpg",
+    image: "src/JOIA1.jpg",
     intro:
       "JOIA Paraíso by Iberostar representa la máxima expresión de lujo dentro del complejo Iberostar Playa Paraíso. Diseñado exclusivamente para adultos, ofrece suites elegantes, servicio de mayordomía, experiencias gastronómicas gourmet, spa de clase mundial y acceso privilegiado a una de las playas más hermosas del Caribe mexicano.",
     stats: [
@@ -411,9 +530,15 @@ const pages = [
   },
 
   {
+    type: "guia",
+    title: "Guía interactiva",
+    kicker: "THE CLUB · PLAYA PARAÍSO"
+  },
+
+  {
     type: "back",
     kicker: "CONTRAPORTADA",
-    image: "src/JOIA3.jpg",
+    image: "src/JOIA31.jpg",
     quote: "Un destino que se queda contigo para siempre",
     contact: [
       "+52 984 877 2800",
@@ -456,8 +581,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoDelMar.jpg",
-              "src/paraisoBeach.jpg"
+              "src/ParaisoDelMar 1.png",
+              "src/paraisoBeach1.jpg"
             ]
           },
 
@@ -471,9 +596,9 @@ const hotelCountryMenus = {
               "Ambiente íntimo"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
-              "src/JOIA.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -487,9 +612,9 @@ const hotelCountryMenus = {
               "Vista panorámica"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg",
-              "src/paraisoBeach.jpg"
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png",
+              "src/paraisoBeach1.jpg"
             ]
           },
 
@@ -504,8 +629,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           }
         }
@@ -515,7 +640,7 @@ const hotelCountryMenus = {
         name: "Iberostar Waves Cozumel",
         tagline: "Agua entre palmas",
         description:
-          "Contenido: piscina tropical, playa y ritmo relajado.",
+          "Hotel frente al arrecife coralino de Cozumel, con playa tranquila, piscinas, spa y centro de buceo PADI para explorar los arrecifes de la isla.",
         image:
           "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
 
@@ -530,8 +655,8 @@ const hotelCountryMenus = {
               "Acabados claros"
             ],
             images: [
-              "src/ParaisoDelMar.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoDelMar 1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -546,9 +671,9 @@ const hotelCountryMenus = {
               "Ambiente relajado"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
-              "src/JOIA3.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -562,9 +687,9 @@ const hotelCountryMenus = {
               "Paseos desde la playa"
             ],
             images: [
-              "src/JOIA3.jpg",
-              "src/ParaisoDelMar.jpg",
-              "src/paraisoBeach.jpg"
+              "src/JOIA31.jpg",
+              "src/ParaisoDelMar 1.png",
+              "src/paraisoBeach1.jpg"
             ]
           },
 
@@ -579,8 +704,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           }
         }
@@ -590,7 +715,7 @@ const hotelCountryMenus = {
         name: "Iberostar Selection Cancún",
         tagline: "La luz entra primero",
         description:
-          "Contenido: suites, terraza y vista al mar.",
+          "Complejo de villas frente al Caribe con habitaciones de vistas panorámicas y áreas de piscina semiprivada; su sección Coral Level ofrece una estancia exclusiva para adultos.",
         image:
           "src/paraiso-lindo/banner/ParaisoLindo.jpg",
 
@@ -605,8 +730,8 @@ const hotelCountryMenus = {
               "Madera y texturas cálidas"
             ],
             images: [
-              "src/JOIA3.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/JOIA31.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -622,8 +747,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -637,9 +762,9 @@ const hotelCountryMenus = {
               "Lounge de lujo"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/JOIA3.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/JOIA1.jpg",
+              "src/JOIA31.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -653,9 +778,9 @@ const hotelCountryMenus = {
               "Experiencias exclusivas"
             ],
             images: [
-              "src/ParaisoDelMar.jpg",
-              "src/JOIA3.jpg",
-              "src/paraisoBeach.jpg"
+              "src/ParaisoDelMar 1.png",
+              "src/JOIA31.jpg",
+              "src/paraisoBeach1.jpg"
             ]
           }
         }
@@ -673,7 +798,7 @@ const hotelCountryMenus = {
         name: "JOIA Rose Hall by Iberostar",
         tagline: "El Caribe en voz baja",
         description:
-          "Contenido: experiencias y servicio de mayordomía.",
+          "Resort frente al mar en Montego Bay, solo para adultos, con suites Swim-up y Butler, playa privada, varias piscinas y gastronomía inspirada también en Jamaica.",
         image:
           "src/paraiso-JOIA/banner/JOIA2.jpg",
 
@@ -689,8 +814,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA31.jpg",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -704,9 +829,9 @@ const hotelCountryMenus = {
               "Servicio exclusivo"
             ],
             images: [
-              "src/JOIA.jpg",
+              "src/JOIA1.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg"
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -720,9 +845,9 @@ const hotelCountryMenus = {
               "Vista panorámica"
             ],
             images: [
-              "src/JOIA3.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -736,8 +861,8 @@ const hotelCountryMenus = {
               "Ritmos del Caribe"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/JOIA3.jpg",
+              "src/JOIA1.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg"
             ]
           }
@@ -748,7 +873,7 @@ const hotelCountryMenus = {
         name: "Iberostar Selection Rose Hall Suites",
         tagline: "Elegancia frente al Caribe",
         description:
-          "Contenido: suites, gastronomía y experiencias frente al mar.",
+          "Suites familiares en un resort frente al mar, con Star Camp, spa y acceso a las instalaciones y restaurantes de Iberostar Waves Rose Hall Beach.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -763,8 +888,8 @@ const hotelCountryMenus = {
               "Espacios familiares"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -779,9 +904,9 @@ const hotelCountryMenus = {
               "Cenas especiales"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -795,8 +920,8 @@ const hotelCountryMenus = {
               "Ambiente tropical"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -812,8 +937,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           }
         }
@@ -823,7 +948,7 @@ const hotelCountryMenus = {
         name: "Coral Level at Iberostar Selection Rose Hall Suites",
         tagline: "Exclusividad frente al mar",
         description:
-          "Contenido: servicio personalizado, privacidad y experiencias premium.",
+          "Experiencia Coral Level dentro del complejo Rose Hall, pensada para una estancia más privada con atención personalizada y acceso a los espacios del resort.",
         image:
           "src/paraiso-JOIA/banner/JOIA2.jpg",
 
@@ -839,8 +964,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA31.jpg",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -854,9 +979,9 @@ const hotelCountryMenus = {
               "Cenas especiales"
             ],
             images: [
-              "src/JOIA.jpg",
+              "src/JOIA1.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg"
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -870,9 +995,9 @@ const hotelCountryMenus = {
               "Zona lounge"
             ],
             images: [
-              "src/JOIA3.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -886,8 +1011,8 @@ const hotelCountryMenus = {
               "Experiencias privadas"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/JOIA3.jpg",
+              "src/JOIA1.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg"
             ]
           }
@@ -898,7 +1023,7 @@ const hotelCountryMenus = {
         name: "Iberostar Waves Rose Hall Beach",
         tagline: "Jamaica frente al mar",
         description:
-          "Contenido: playa, actividades y ambiente caribeño.",
+          "Hotel frente al mar en Montego Bay, integrado en un complejo de tres hoteles; combina playa, piscinas, actividades familiares y acceso compartido a instalaciones del resort.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -913,8 +1038,8 @@ const hotelCountryMenus = {
               "Espacios familiares"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -929,9 +1054,9 @@ const hotelCountryMenus = {
               "Opciones familiares"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -945,8 +1070,8 @@ const hotelCountryMenus = {
               "Zona familiar"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -962,8 +1087,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           }
         }
@@ -981,7 +1106,7 @@ const hotelCountryMenus = {
         name: "Iberostar Selection Bávaro Suites",
         tagline: "Caribe en movimiento",
         description:
-          "Contenido: playa, gastronomía y actividades.",
+          "Suites familiares frente a Playa Bávaro, entre jardines tropicales, con varias opciones gastronómicas, spa, Star Camp, piscina infantil y campo de golf de 18 hoyos.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -996,8 +1121,8 @@ const hotelCountryMenus = {
               "Diseño tropical"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -1012,9 +1137,9 @@ const hotelCountryMenus = {
               "Cenas especiales"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -1028,8 +1153,8 @@ const hotelCountryMenus = {
               "Áreas de sombra"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1045,8 +1170,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           }
         }
@@ -1056,7 +1181,7 @@ const hotelCountryMenus = {
         name: "JOIA Bávaro by Iberostar",
         tagline: "Lujo frente al Caribe",
         description:
-          "Contenido: servicio personalizado, gastronomía y experiencias premium.",
+          "Hotel de lujo solo para adultos en Playa Bávaro, con servicio de mayordomía y concierge, jardines, piscinas, restaurantes propios y acceso a golf.",
         image:
           "src/paraiso-JOIA/banner/JOIA2.jpg",
 
@@ -1072,8 +1197,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA31.jpg",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -1087,9 +1212,9 @@ const hotelCountryMenus = {
               "Servicio exclusivo"
             ],
             images: [
-              "src/JOIA.jpg",
+              "src/JOIA1.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg"
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -1103,9 +1228,9 @@ const hotelCountryMenus = {
               "Solárium"
             ],
             images: [
-              "src/JOIA3.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -1119,8 +1244,8 @@ const hotelCountryMenus = {
               "Experiencias privadas"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/JOIA3.jpg",
+              "src/JOIA1.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg"
             ]
           }
@@ -1131,7 +1256,7 @@ const hotelCountryMenus = {
         name: "Iberostar Waves Punta Cana",
         tagline: "Energía tropical",
         description:
-          "Contenido: playa, entretenimiento y actividades para disfrutar en familia.",
+          "Resort todo incluido en primera línea de Playa Bávaro, rodeado de jardines; ofrece Star Camp, spa, buceo, laboratorio de corales y campo de golf de 18 hoyos.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -1146,8 +1271,8 @@ const hotelCountryMenus = {
               "Espacios familiares"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -1162,9 +1287,9 @@ const hotelCountryMenus = {
               "Sabores caribeños"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -1178,8 +1303,8 @@ const hotelCountryMenus = {
               "Áreas familiares"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1195,8 +1320,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           }
         }
@@ -1206,7 +1331,7 @@ const hotelCountryMenus = {
         name: "Iberostar Waves Dominicana",
         tagline: "Caribe para todos",
         description:
-          "Contenido: playa, naturaleza y actividades para toda la familia.",
+          "Hotel todo incluido frente a Playa Bávaro, rodeado de jardines y pensado para familias, con Star Camp, spa, piscinas, gastronomía variada y golf de 18 hoyos.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -1221,8 +1346,8 @@ const hotelCountryMenus = {
               "Confort"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           },
@@ -1237,9 +1362,9 @@ const hotelCountryMenus = {
               "Opciones familiares"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -1253,8 +1378,8 @@ const hotelCountryMenus = {
               "Zona de descanso"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/paraisoBeach.jpg",
+              "src/ParaisoLindo1.png",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1270,8 +1395,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           }
         }
@@ -1289,7 +1414,7 @@ const hotelCountryMenus = {
         name: "Iberostar Selection Praia do Forte",
         tagline: "La costa más viva",
         description:
-          "Contenido: naturaleza y conservación.",
+          "Hotel frente al mar dentro de una reserva natural de Bahía, con estación de vigilancia de tortugas del proyecto TAMAR, cinco piscinas, spa y zonas exclusivas Star Prestige.",
         image:
           "src/paraiso-lindo/banner/ParaisoLindo.jpg",
 
@@ -1304,9 +1429,9 @@ const hotelCountryMenus = {
               "Ambiente natural"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/paraisoBeach.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/JOIA1.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/ParaisoLindo1.png"
             ]
           },
 
@@ -1320,9 +1445,9 @@ const hotelCountryMenus = {
               "Atención cálida"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg",
-              "src/ParaisoDelMar.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoDelMar 1.png"
             ]
           },
 
@@ -1336,9 +1461,9 @@ const hotelCountryMenus = {
               "Relajación"
             ],
             images: [
-              "src/ParaisoDelMar.jpg",
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg"
+              "src/ParaisoDelMar 1.png",
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -1353,8 +1478,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/JOIA.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA1.jpg"
             ]
           }
         }
@@ -1364,7 +1489,7 @@ const hotelCountryMenus = {
         name: "Iberostar Waves Bahia",
         tagline: "Sabores de Bahía",
         description:
-          "Contenido: gastronomía brasileña.",
+          "Resort todo incluido frente a la playa de Praia do Forte, con piscinas, spa, deportes, actividades para familias y habitaciones Star Prestige.",
         image:
           "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
 
@@ -1380,8 +1505,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoDelMar.jpg",
-              "src/JOIA.jpg"
+              "src/ParaisoDelMar 1.png",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -1395,9 +1520,9 @@ const hotelCountryMenus = {
               "Atardeceres"
             ],
             images: [
-              "src/JOIA.jpg",
+              "src/JOIA1.jpg",
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg"
+              "src/paraisoBeach1.jpg"
             ]
           },
 
@@ -1411,9 +1536,9 @@ const hotelCountryMenus = {
               "Relax"
             ],
             images: [
-              "src/paraisoBeach.jpg",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg"
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -1427,8 +1552,8 @@ const hotelCountryMenus = {
               "Aventura"
             ],
             images: [
-              "src/JOIA3.jpg",
-              "src/paraisoBeach.jpg",
+              "src/JOIA31.jpg",
+              "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
           }
@@ -1439,7 +1564,7 @@ const hotelCountryMenus = {
         name: "Iberostar Heritage Grand Amazon",
         tagline: "Donde confluyen las aguas",
         description:
-          "Contenido: excursiones amazónicas.",
+          "Crucero de expedición por el río Amazonas con salida desde Manaus; los itinerarios, excursiones y paisajes cambian según la ruta fluvial.",
         image:
           "src/paraiso-maya/banner/paraisoMaya.jpg",
 
@@ -1454,8 +1579,8 @@ const hotelCountryMenus = {
               "Silencio"
             ],
             images: [
-              "src/ParaisoLindo.jpg",
-              "src/JOIA.jpg",
+              "src/ParaisoLindo1.png",
+              "src/JOIA1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1471,8 +1596,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoLindo.jpg",
-              "src/JOIA3.jpg"
+              "src/ParaisoLindo1.png",
+              "src/JOIA31.jpg"
             ]
           },
 
@@ -1486,9 +1611,9 @@ const hotelCountryMenus = {
               "Aguas calmadas"
             ],
             images: [
-              "src/JOIA3.jpg",
-              "src/ParaisoLindo.jpg",
-              "src/JOIA.jpg"
+              "src/JOIA31.jpg",
+              "src/ParaisoLindo1.png",
+              "src/JOIA1.jpg"
             ]
           },
 
@@ -1502,8 +1627,8 @@ const hotelCountryMenus = {
               "Naturaleza"
             ],
             images: [
-              "src/JOIA.jpg",
-              "src/ParaisoLindo.jpg",
+              "src/JOIA1.jpg",
+              "src/ParaisoLindo1.png",
               "src/JOIA2.jpg"
             ]
           }
@@ -1514,7 +1639,7 @@ const hotelCountryMenus = {
         name: "Praia do Forte · Star Prestige",
         tagline: "Calma sobre el Atlántico",
         description:
-          "Contenido: piscina exclusiva y servicio personalizado.",
+          "Zona premium de Iberostar Selection Praia do Forte con espacios exclusivos, piscina privada, Beach Club, conserjería y servicio personalizado.",
         image:
           "src/paraiso-beach/banner/paraisoBeach.jpg",
 
@@ -1529,9 +1654,9 @@ const hotelCountryMenus = {
               "Relajación"
             ],
             images: [
-              "src/JOIA3.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg",
-              "src/ParaisoLindo.jpg"
+              "src/ParaisoLindo1.png"
             ]
           },
 
@@ -1546,8 +1671,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/JOIA3.jpg",
-              "src/paraisoBeach.jpg"
+              "src/JOIA31.jpg",
+              "src/paraisoBeach1.jpg"
             ]
           },
 
@@ -1561,8 +1686,8 @@ const hotelCountryMenus = {
               "Calma"
             ],
             images: [
-              "src/paraisoBeach.jpg",
-              "src/JOIA3.jpg",
+              "src/paraisoBeach1.jpg",
+              "src/JOIA31.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1578,8 +1703,8 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/paraisoBeach.jpg",
-              "src/JOIA3.jpg"
+              "src/paraisoBeach1.jpg",
+              "src/JOIA31.jpg"
             ]
           }
         }
@@ -1587,6 +1712,55 @@ const hotelCountryMenus = {
     ]
   }
 };
+
+const hotelCoverImages = {
+  "Iberostar Selection Playa Mita": "src/official-hotels/selection-playa-mita.jpg",
+  "Iberostar Waves Cozumel": "src/official-hotels/waves-cozumel.jpg",
+  "Iberostar Selection Cancún": "src/official-hotels/selection-cancun.jpg",
+  "Iberostar Selection Coral Cancún": "src/official-hotels/selection-cancun.jpg",
+  "JOIA Rose Hall by Iberostar": "src/official-hotels/joia-rose-hall.jpg",
+  "Iberostar Selection Rose Hall Suites": "src/official-hotels/selection-rose-hall-suites.jpg",
+  "Coral Level at Iberostar Selection Rose Hall Suites": "src/official-hotels/selection-rose-hall-suites.jpg",
+  "Iberostar Waves Rose Hall Beach": "src/official-hotels/waves-rose-hall-beach.jpg",
+  "Iberostar Selection Bávaro Suites": "src/official-hotels/selection-bavaro-suites.jpg",
+  "JOIA Bávaro by Iberostar": "src/official-hotels/joia-bavaro.jpg",
+  "Iberostar Waves Punta Cana": "src/official-hotels/waves-punta-cana.jpg",
+  "Iberostar Waves Dominicana": "src/official-hotels/waves-dominicana.jpg",
+  "Iberostar Selection Praia do Forte": "src/official-hotels/selection-praia-do-forte.jpg",
+  "Iberostar Waves Bahia": "src/official-hotels/waves-bahia.jpg",
+  "Iberostar Heritage Grand Amazon": "src/official-hotels/grand-amazon-expedition.jpg",
+  "Praia do Forte · Star Prestige": "src/official-hotels/selection-praia-do-forte.jpg"
+};
+
+Object.values(hotelCountryMenus).forEach((country) => {
+  country.hotels.forEach((hotel) => {
+    const hotelContent = window.RevistaDigital.hotelContent?.[hotel.name];
+    if (hotelContent) {
+      hotel.tagline = hotelContent.tagline || hotel.tagline;
+      hotel.description = hotelContent.description || hotel.description;
+      Object.entries(hotelContent.tabs || {}).forEach(([tabKey, section]) => {
+        if (hotel.tabs?.[tabKey]) Object.assign(hotel.tabs[tabKey], section);
+      });
+    }
+    if (hotelCoverImages[hotel.name]) hotel.image = hotelCoverImages[hotel.name];
+    const galleryStem = hotel.image?.match(/^src\/official-hotels\/([^/]+)\.jpg$/)?.[1];
+    const officialGallery = window.RevistaDigital.officialHotelGalleries?.[galleryStem];
+    const galleryTabKeys = {
+      habitaciones: "habitaciones",
+      restaurante: "restaurante",
+      piscinas: "piscinas",
+      experiencias: "experiencias"
+    };
+    if (officialGallery && hotel.tabs) {
+      Object.entries(galleryTabKeys).forEach(([tabKey, galleryKey]) => {
+        const images = officialGallery[galleryKey];
+        if (hotel.tabs[tabKey] && Array.isArray(images) && images.length) {
+          hotel.tabs[tabKey].images = images;
+        }
+      });
+    }
+  });
+});
 
 const hotelMediaCatalog = {
   "Iberostar Paraíso Beach": {
@@ -1768,6 +1942,24 @@ const hotelMediaCatalog = {
       "src/paraiso-maya/restaurante/PMY_GAST_0270.jpg",
       "src/paraiso-maya/restaurante/PMY_GAST_0296.jpg"
     ]
+  },
+
+  "Iberostar Waves Tucán": {
+    banner: [
+      "https://apiimg.iberostar.com/uploads/image/89213/crops/16:9/1920/image.jpeg"
+    ],
+    habitaciones: [],
+    piscinas: [],
+    restaurante: []
+  },
+
+  "Iberostar Waves Quetzal": {
+    banner: [
+      "https://apiimg.iberostar.com/uploads/image/89293/crops/16:9/1920/image.jpeg"
+    ],
+    habitaciones: [],
+    piscinas: [],
+    restaurante: []
   }
 };
 
@@ -1789,21 +1981,31 @@ let activeMap = null;
 let activeDirectionsRenderer = null;
 let userMarker = null;
 let routeLine = null;
+let locationRequestPending = false;
+let locationRequestWatchdog = null;
+let autoLocationAttempted = false;
 let activeHotelDetail = null;
 let activeRestaurantMenuIndex = null;
 let returnPageIndex = null;
 
 window.RevistaDigital = window.RevistaDigital || {};
 window.RevistaDigital.state = window.RevistaDigital.state || {};
+window.RevistaDigital.frameComplexMap = frameComplexMap;
+window.RevistaDigital.setupComplexMapFraming = setupComplexMapFraming;
 
 Object.defineProperties(window.RevistaDigital.state, {
   pages: { enumerable: true, get: () => pages },
   hotelCountryMenus: { enumerable: true, get: () => hotelCountryMenus },
+  hotelCoverImages: { enumerable: true, get: () => hotelCoverImages },
   hotelCoordinates: { enumerable: true, get: () => hotelCoordinates },
+  hotelDetectionRadii: { enumerable: true, get: () => hotelDetectionRadii },
   complexBounds: { enumerable: true, get: () => complexBounds },
+  complexPerimeter: { enumerable: true, get: () => complexPerimeter },
   hotelMediaCatalog: { enumerable: true, get: () => hotelMediaCatalog },
   generalMapCenter: { enumerable: true, get: () => generalMapCenter },
   generalMapZoom: { enumerable: true, get: () => generalMapZoom },
+  locationDetectionRadiusMeters: { enumerable: true, get: () => locationDetectionRadiusMeters },
+  destinationDetectionRadiusMeters: { enumerable: true, get: () => destinationDetectionRadiusMeters },
   currentIndex: {
     enumerable: true,
     get: () => currentIndex,
@@ -1920,6 +2122,8 @@ function renderHotelSectionPanel(
                     <img
                       src="${image}"
                       alt="${title} de ${pageName}"
+                      loading="lazy"
+                      decoding="async"
                     />
                   </figure>
                 `
@@ -2174,8 +2378,70 @@ function loadGoogleMaps() {
    UBICACIÓN
    ========================================================= */
 
-function requestCurrentLocation() {
+function focusActiveMapOnLocation(isAuto) {
+  if (!activeMap || !currentPosition || !window.L) return;
+
+  // Si el usuario ya centró el mapa en un destino concreto, la detección
+  // AUTOMÁTICA de ubicación no debe robarle el encuadre. El botón manual
+  // "Ubicarme" (isAuto falso/indefinido) siempre puede recentrar.
+  const guiapa = window.RevistaDigital && window.RevistaDigital.guiapa;
+  let containerId = "";
+  try { containerId = activeMap.getContainer && activeMap.getContainer() ? activeMap.getContainer().id : ""; } catch (error) { containerId = ""; }
+  const isComplexOverviewMap = containerId === "generalMap" || containerId === "complexPortalMap" || containerId === "hotelPortalMap";
+  if (isAuto) {
+    if (guiapa && guiapa._userFocusedMap === activeMap) return;
+    if (isComplexOverviewMap) return;
+  }
+  if (isComplexOverviewMap) {
+    // En los mapas generales del complejo, "Ubicarme" solo centra en el
+    // usuario dentro del perímetro navegable; nunca reencuadra el complejo.
+    activeMap.panTo([currentPosition.latitude, currentPosition.longitude]);
+    return;
+  }
+
+  const userCoordinates = [currentPosition.latitude, currentPosition.longitude];
+  const mapElement = bookShell.querySelector("#hotelMap");
+  const hotelName = mapElement?.closest(".interactive-map")?.dataset.hotelName;
+  const hotelPoint = hotelCoordinates[hotelName];
+
+  if (hotelPoint) {
+    const isPlayaParaiso = hotelPoint[0] >= complexBounds[0][0] &&
+      hotelPoint[0] <= complexBounds[1][0] &&
+      hotelPoint[1] >= complexBounds[0][1] &&
+      hotelPoint[1] <= complexBounds[1][1];
+    const userIsInsideComplex = userCoordinates[0] >= complexBounds[0][0] &&
+      userCoordinates[0] <= complexBounds[1][0] &&
+      userCoordinates[1] >= complexBounds[0][1] &&
+      userCoordinates[1] <= complexBounds[1][1];
+
+    if (!isPlayaParaiso || userIsInsideComplex) {
+      activeMap.fitBounds(L.latLngBounds([hotelPoint, userCoordinates]), {
+        padding: [35, 35],
+        maxZoom: isPlayaParaiso ? 17 : 15
+      });
+    }
+    return;
+  }
+
+  const bounds = activeMap.getBounds?.();
+  if (bounds) {
+    activeMap.fitBounds(bounds.extend(userCoordinates), {
+      padding: [35, 35],
+      maxZoom: activeMap.getZoom()
+    });
+  } else {
+    activeMap.panTo(userCoordinates);
+  }
+}
+
+function requestCurrentLocation(options = {}) {
+  const wantsWelcome = options && options.welcome === true;
   const status = document.getElementById("locationStatus");
+  document.body.dataset.locationRequested = "true";
+
+  // Evitamos duplicar la detección automática, pero una petición manual
+  // (botón "Ubicarme") siempre debe poder ejecutarse.
+  if (locationRequestPending && wantsWelcome) return;
 
   if (!navigator.geolocation) {
     status.textContent =
@@ -2183,15 +2449,18 @@ function requestCurrentLocation() {
     return;
   }
 
+  locationRequestPending = true;
+  clearTimeout(locationRequestWatchdog);
+  locationRequestWatchdog = setTimeout(() => { locationRequestPending = false; }, 12000);
+
   status.textContent =
     "Solicitando permiso para detectar tu ubicación...";
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
+      locationRequestPending = false;
+      clearTimeout(locationRequestWatchdog);
       currentPosition = position.coords;
-
-      status.textContent =
-        "Ubicación actual disponible para calcular rutas.";
 
       if (activeMap && userMarker) {
         userMarker.setLatLng([
@@ -2199,10 +2468,15 @@ function requestCurrentLocation() {
           currentPosition.longitude
         ]);
 
-        activeMap.panTo([
-          currentPosition.latitude,
-          currentPosition.longitude
-        ]);
+        let containerId = "";
+        try { containerId = activeMap.getContainer && activeMap.getContainer() ? activeMap.getContainer().id : ""; } catch (error) { containerId = ""; }
+        const isComplexOverviewMap = containerId === "generalMap" || containerId === "complexPortalMap" || containerId === "hotelPortalMap";
+        if (!(wantsWelcome && isComplexOverviewMap)) {
+          activeMap.panTo([
+            currentPosition.latitude,
+            currentPosition.longitude
+          ]);
+        }
       } else if (activeMap && window.L) {
         userMarker = L.circleMarker(
           [
@@ -2221,12 +2495,21 @@ function requestCurrentLocation() {
           .bindTooltip("Tu ubicación actual");
       }
 
+      focusActiveMapOnLocation(wantsWelcome);
       updateGeneralUserMarker();
       updateHotelUserMarker();
+      renderLocationStatus(currentPosition);
+      if (wantsWelcome) showLocationWelcome(currentPosition);
     },
-    () => {
-      status.textContent =
-        "Permiso no concedido. Puedes activarlo desde el navegador.";
+    (error) => {
+      locationRequestPending = false;
+      clearTimeout(locationRequestWatchdog);
+      const messages = {
+        1: 'No diste permiso para acceder a tu ubicacion.',
+        2: 'No se pudo determinar tu ubicacion. Comprueba la senal y vuelve a intentar.',
+        3: 'La solicitud de ubicacion tardo demasiado. Vuelve a intentar.'
+      };
+      status.textContent = messages[error?.code] || 'No se pudo obtener tu ubicacion.';
     },
     {
       enableHighAccuracy: true,
@@ -2235,27 +2518,167 @@ function requestCurrentLocation() {
     }
   );
 
-  navigator.geolocation.watchPosition(
-    (position) => {
-      currentPosition = position.coords;
+}
 
-      if (userMarker) {
-        userMarker.setLatLng([
-          currentPosition.latitude,
-          currentPosition.longitude
-        ]);
-      }
 
-      updateGeneralUserMarker();
-      updateHotelUserMarker();
-    },
-    () => {},
-    {
-      enableHighAccuracy: true,
-      maximumAge: 10000,
-      timeout: 15000
+/* =========================================================
+   BIENVENIDA POR UBICACIÓN
+   ========================================================= */
+
+function findNearestHotel(coords) {
+  let closest = null;
+  const catalog = window.RevistaDigital.hoteles?.getDestinationCatalog?.() || {};
+  Object.entries(catalog).forEach(([countrySlug, country]) => {
+    (country.destinations || []).forEach((destination) => {
+      (destination.hotels || []).forEach((hotel) => {
+        if (!Number.isFinite(hotel.latitude) || !Number.isFinite(hotel.longitude)) return;
+        const distance = distanceBetweenCoordinates(coords, { latitude: hotel.latitude, longitude: hotel.longitude });
+        if (!closest || distance < closest.distance) closest = { hotel, country, countrySlug, destination, distance };
+      });
+    });
+  });
+  return closest;
+}
+
+function ensureLocationWelcomeElement() {
+  let element = document.getElementById("locationWelcome");
+  if (element) return element;
+
+  element = document.createElement("aside");
+  element.id = "locationWelcome";
+  element.className = "location-welcome";
+  element.setAttribute("role", "dialog");
+  element.setAttribute("aria-live", "polite");
+  element.hidden = true;
+  element.innerHTML = `
+    <button type="button" class="location-welcome-close" aria-label="Cerrar aviso">&times;</button>
+    <span class="location-welcome-pin" aria-hidden="true"></span>
+    <p class="location-welcome-kicker">¿ESTÁS EN…?</p>
+    <h2 class="location-welcome-region"></h2>
+    <p class="location-welcome-country"></p>
+    <p class="location-welcome-message"></p>
+    <div class="location-welcome-hotel" hidden>
+      <span class="location-welcome-hotel-label">Tu hotel más cercano</span>
+      <strong class="location-welcome-hotel-name"></strong>
+      <small class="location-welcome-hotel-distance"></small>
+    </div>
+    <div class="location-welcome-actions">
+      <a class="location-welcome-btn primary" data-role="hotel" href="#" hidden>Ver este hotel</a>
+      <button type="button" class="location-welcome-btn ghost" data-role="directions" hidden>Cómo llegar</button>
+    </div>`;
+  document.body.appendChild(element);
+  element.querySelector(".location-welcome-close").addEventListener("click", dismissLocationWelcome);
+  return element;
+}
+
+function showLocationWelcome(coords) {
+  const nearby = findNearbyLocation(coords);
+  // Solo mostramos la bienvenida mágica cuando reconocemos un destino/región Iberostar cercano.
+  if (!nearby) return;
+
+  const region = nearby.destination;
+  const country = nearby.country;
+  const nearest = findNearestHotel(coords);
+  if (!region || !country) return;
+
+  const element = ensureLocationWelcomeElement();
+  element.querySelector(".location-welcome-region").textContent = region.name;
+  element.querySelector(".location-welcome-country").textContent = country.name;
+  element.querySelector(".location-welcome-message").textContent =
+    `¡Bienvenido! Nos alegra tenerte tan cerca de ${region.name}. Preparamos todo para que tu visita sea mágica.`;
+
+  const hotelBox = element.querySelector(".location-welcome-hotel");
+  const hotelLink = element.querySelector('[data-role="hotel"]');
+  const directionsButton = element.querySelector('[data-role="directions"]');
+
+  if (nearest?.hotel) {
+    const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
+    hotelBox.hidden = false;
+    element.querySelector(".location-welcome-hotel-name").textContent = nearest.hotel.name;
+    element.querySelector(".location-welcome-hotel-distance").textContent =
+      `a unos ${formatApproximateDistance(nearest.distance)} de ti · ${region.name}, ${country.name}`;
+
+    hotelLink.hidden = false;
+    hotelLink.href = hotelRoute;
+    hotelLink.dataset.appRoute = hotelRoute;
+    hotelLink.onclick = (event) => {
+      event.preventDefault();
+      dismissLocationWelcome();
+      window.RevistaDigital?.routes?.navigate?.(hotelRoute);
+    };
+
+    directionsButton.hidden = false;
+    directionsButton.onclick = () => startWelcomeDirections(nearest);
+  } else {
+    hotelBox.hidden = true;
+    hotelLink.hidden = true;
+    directionsButton.hidden = true;
+  }
+
+  element.hidden = false;
+  element.classList.remove("is-leaving");
+  element.classList.remove("is-visible");
+  void element.offsetWidth;
+  element.classList.add("is-visible");
+
+  clearTimeout(element._hideTimer);
+  element._hideTimer = setTimeout(dismissLocationWelcome, 17000);
+}
+
+function dismissLocationWelcome() {
+  const element = document.getElementById("locationWelcome");
+  if (!element || element.hidden) return;
+  clearTimeout(element._hideTimer);
+  element.classList.remove("is-visible");
+  element.classList.add("is-leaving");
+  setTimeout(() => {
+    element.hidden = true;
+    element.classList.remove("is-leaving");
+  }, 340);
+}
+
+function startWelcomeDirections(nearest) {
+  if (!nearest?.hotel) return;
+  const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
+  const hotelName = nearest.hotel.name;
+  const coordinates = [nearest.hotel.latitude, nearest.hotel.longitude];
+
+  dismissLocationWelcome();
+  window.RevistaDigital?.routes?.navigate?.(hotelRoute);
+
+  // Esperamos a que la ficha del hotel tenga su mapa listo para trazar la ruta
+  // con el motor propio de la revista (OSRM), sin salir a Google Maps.
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts += 1;
+    const mapElement = document.querySelector("#hotelPortalMap");
+    const map = window.RevistaDigital.state?.activeMap;
+    if (mapElement && map && map._container === mapElement) {
+      clearInterval(timer);
+      setTimeout(() => {
+        window.RevistaDigital.mapas?.openDirections?.(hotelName, coordinates);
+        mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 350);
+    } else if (attempts >= 48) {
+      clearInterval(timer);
     }
-  );
+  }, 250);
+}
+
+function autoDetectLocation() {
+  if (autoLocationAttempted) return;
+  autoLocationAttempted = true;
+  if (!navigator.geolocation) return;
+  const start = () => requestCurrentLocation({ welcome: true });
+  if (navigator.permissions?.query) {
+    navigator.permissions.query({ name: "geolocation" })
+      .then((permission) => {
+        if (permission.state !== "denied") start();
+      })
+      .catch(start);
+  } else {
+    start();
+  }
 }
 
 
@@ -2263,9 +2686,10 @@ function requestCurrentLocation() {
    RUTAS
    ========================================================= */
 
-function openDirections(destination) {
+function openDirections(destination, coordinates) {
   const mapElement =
-    bookShell.querySelector("#hotelMap, #generalMap");
+    bookShell.querySelector("#hotelMap, #generalMap") ||
+    document.querySelector("#hotelPortalMap, #destinationMap, #allHotelsMap, #countryMap, #complexPortalMap");
 
   const status =
     document.getElementById("locationStatus");
@@ -2273,7 +2697,7 @@ function openDirections(destination) {
   if (!mapElement) return;
 
   if (!currentPosition) {
-    status.textContent =
+    if (status) status.textContent =
       "Necesitamos permiso para calcular la ruta.";
 
     requestCurrentLocation();
@@ -2284,12 +2708,13 @@ function openDirections(destination) {
     `${currentPosition.latitude},${currentPosition.longitude}`;
 
   if (activeMap && window.L) {
-    const destinationPage =
-      pages.find((item) => item.location === destination) ||
-      pages[currentIndex];
-
+    const destinationPage = pages.find((item) => item.location === destination);
+    const currentHotelDetail = getActiveHotelDetail();
+    const destinationHotelName = destinationPage?.name || currentHotelDetail?.hotel?.name || destination;
     const destinationCoordinates =
-      hotelCoordinates[destinationPage.name];
+      hotelCoordinates[destinationHotelName] ||
+      hotelCoordinates[destination] ||
+      (Array.isArray(coordinates) && coordinates.length === 2 ? coordinates : null);
 
     if (!destinationCoordinates) return;
 
@@ -2299,24 +2724,103 @@ function openDirections(destination) {
     const end =
       `${destinationCoordinates[1]},${destinationCoordinates[0]}`;
 
+    // Perímetro del complejo: se calcula ANTES de usarlo (declararlo después
+    // provocaba un ReferenceError que anulaba el cálculo de la ruta).
+    const isInsideComplexBounds = (point) =>
+      point[0] >= complexBounds[0][0] &&
+      point[0] <= complexBounds[1][0] &&
+      point[1] >= complexBounds[0][1] &&
+      point[1] <= complexBounds[1][1];
+
+    const isComplexPoi = isInsideComplexBounds(destinationCoordinates);
+    const isPlayaParaisoHotel =
+      typeof window.isPlayaParaisoHotel === "boolean"
+        ? window.isPlayaParaisoHotel
+        : isComplexPoi;
+    // El motor público de OSRM solo sirve el perfil "driving": pedir "foot"
+    // devolvía error y la ruta nunca se calculaba. Para los destinos del
+    // complejo se conserva el atajo de ruta directa (más abajo).
+    const profile = "driving";
     const routeRequest =
-      `https://router.project-osrm.org/route/v1/foot/${start};${end}?overview=full&geometries=geojson`;
+      `https://router.project-osrm.org/route/v1/${profile}/${start};${end}?alternatives=true&overview=full&geometries=geojson`;
 
     fetch(routeRequest)
       .then((response) => response.json())
       .then((route) => {
+        const routes =
+          Array.isArray(route.routes) && route.routes.length
+            ? route.routes
+            : [];
+        if (!routes.length) throw new Error("El motor de rutas no devolvió trayectos.");
+        const best = routes.reduce(
+          (shortest, candidate) =>
+            candidate.distance < shortest.distance ? candidate : shortest,
+          routes[0]
+        );
         const osrmCoordinates =
-          route.routes?.[0]?.geometry?.coordinates?.map(
+          best.geometry?.coordinates?.map(
             ([longitude, latitude]) =>
               [latitude, longitude]
+          ) || [];
+
+        const directDistance = distanceBetweenCoordinates(
+          { latitude: currentPosition.latitude, longitude: currentPosition.longitude },
+          { latitude: destinationCoordinates[0], longitude: destinationCoordinates[1] }
+        );
+
+        // Si pedimos cómo llegar a un hotel del complejo Playa Paraíso
+        // y el motor de calles propone un desvío desproporcionado frente
+        // a la distancia directa (los hoteles comparten acceso), marcamos
+        // directamente la ruta más eficiente hasta el hotel.
+        // (isPlayaParaisoHotel ya se resolvió antes de la petición.)
+        const useDirectRoute =
+          isPlayaParaisoHotel &&
+          directDistance < 20000 &&
+          best.distance > directDistance * 1.4;
+
+        routeLine?.remove();
+
+        if (useDirectRoute) {
+          routeLine =
+            L.polyline(
+              [
+                [
+                  currentPosition.latitude,
+                  currentPosition.longitude
+                ],
+                destinationCoordinates
+              ],
+              {
+                color: "#d9b978",
+                weight: 6,
+                opacity: 0.95
+              }
+            ).addTo(activeMap);
+
+          activeMap.fitBounds(
+            routeLine.getBounds(),
+            {
+              padding: [35, 35]
+            }
           );
 
-        // OSRM a veces "engancha" la ruta al camino peatonal más
-        // cercano y no llega exactamente hasta la puerta del hotel.
-        // Forzamos que la línea siempre empiece en tu ubicación real
-        // y termine exactamente en la coordenada del hotel.
+          document.getElementById(
+            "locationStatus"
+          ).textContent =
+            `Ruta directa a ${destination}: ${(
+              directDistance / 1000
+            ).toFixed(1)} km, evitando un rodeo por carretera de ${
+              (best.distance / 1000).toFixed(1)
+            } km.`;
+          return;
+        }
+
+        // OSRM a veces "engancha" la ruta al camino más cercano y no llega
+        // exactamente hasta la puerta del hotel. Forzamos que la línea
+        // siempre empiece en tu ubicación real y termine exactamente en
+        // la coordenada del hotel.
         const routeCoordinates =
-          osrmCoordinates && osrmCoordinates.length
+          osrmCoordinates.length
             ? [
                 [
                   currentPosition.latitude,
@@ -2326,8 +2830,6 @@ function openDirections(destination) {
                 destinationCoordinates
               ]
             : null;
-
-        routeLine?.remove();
 
         routeLine =
           L.polyline(
@@ -2355,9 +2857,9 @@ function openDirections(destination) {
         );
 
         const distance =
-          route.routes?.[0]?.distance
+          best.distance
             ? `${(
-                route.routes[0].distance / 1000
+                best.distance / 1000
               ).toFixed(1)} km`
             : "Ruta calculada";
 
@@ -2710,6 +3212,9 @@ function renderHotel(page) {
   const panelId =
     `hotel-panel-${slugify(page.name)}`;
 
+  const pan360Section =
+    window.RevistaDigital.pannellum360?.renderSection?.(page.name) || "";
+
   return `
     <div class="spread reference-spread hotel-spread">
 
@@ -2806,35 +3311,13 @@ function renderHotel(page) {
 
       </article>
 
+      ${pan360Section}
+
     </div>
   `;
 }
 
-const restaurantMenuOptions = [
-  {
-    name: "Bella Italia",
-    cuisine: "ITALIANA",
-    hours: "18:00"
-  },
-
-  {
-    name: "La Palapa",
-    cuisine: "MEXICANA COSTERA",
-    hours: "07:00"
-  },
-
-  {
-    name: "El Gaucho",
-    cuisine: "PARRILLA ARGENTINA",
-    hours: "19:00"
-  },
-
-  {
-    name: "Snack & Grill",
-    cuisine: "CASUAL INTERNACIONAL",
-    hours: "12:00"
-  }
-];
+const restaurantMenuOptions = window.RevistaDigital.restaurantes.getMenus();
 
 function renderRestaurantMenu(pageIndex) {
   const hotel = pages[pageIndex];
@@ -3164,11 +3647,12 @@ async function renderWorkspaceCards() {
       });
 
   if (error) {
-    console.error(
-      "ERROR AL CARGAR WORKSPACE:",
-      error
-    );
-
+    console.warn("Aviso: no se pudo sincronizar Workspace con la nube:", error);
+    container.innerHTML = `
+      <div class="workspace-empty">
+        No se pudieron cargar las experiencias en este momento (sin conexión).
+      </div>
+    `;
     return;
   }
 
@@ -5034,22 +5518,6 @@ function wireVideos() {
 
           return;
         }
-      }{
-        await databaseAdd(
-          "videos",
-          {
-            hotel,
-            title,
-            video: file,
-            mimeType:
-              file.type ||
-              "video/mp4",
-            start,
-            end,
-            createdAt:
-              Date.now()
-          }
-        );
       }
 
       resetVideoForm();
@@ -5081,7 +5549,7 @@ function renderCountryMenu(page) {
         tabindex="0"
         aria-label="Abrir ficha de ${hotel.name}"
       >
-        <img src="${hotel.image}" alt="${hotel.name}" />
+        <img src="${hotel.image}" alt="${hotel.name}" loading="lazy" decoding="async" />
         <span class="country-card-label">${country.name}</span>
         <strong>${hotel.name}</strong>
         <em>${hotel.tagline}</em>
@@ -5133,11 +5601,188 @@ function renderCountryMenu(page) {
   `;
 }
 
+function renderComplexPage(page) {
+  const hotels = [
+    {
+      pageName: "Iberostar Paraíso Lindo",
+      displayName: "Iberostar Selection Paraíso Lindo",
+      description: "Jardines tropicales, parque acuático y actividades para disfrutar en familia."
+    },
+    {
+      pageName: "Iberostar Paraíso Maya",
+      displayName: "Iberostar Selection Paraíso Maya",
+      description: "Inspiración maya, río lento y experiencias familiares frente al Caribe."
+    },
+    {
+      pageName: "Iberostar Paraíso Beach",
+      displayName: "Iberostar Selection Paraíso Beach",
+      description: "Playa de arena blanca, jardines tropicales y diversión para todas las edades."
+    },
+    {
+      pageName: "Iberostar Paraíso del Mar",
+      displayName: "Iberostar Selection Paraíso del Mar",
+      description: "Gastronomía internacional, actividades y descanso junto a la costa caribeña."
+    },
+    {
+      pageName: "Iberostar Paraíso JOIA",
+      displayName: "JOIA Paraíso by Iberostar",
+      description: "Suites elegantes, servicio personalizado y experiencias solo para adultos."
+    }
+  ].map((entry) => ({
+    ...entry,
+    pageIndex: pages.findIndex((item) => item.type === "hotel" && item.name === entry.pageName),
+    hotel: pages.find((item) => item.type === "hotel" && item.name === entry.pageName)
+  })).filter((entry) => entry.hotel && entry.pageIndex >= 0);
+
+  const coverImage = pages.find((item) => item.type === "cover")?.image || "";
+
+  return `
+    <section class="spread complex-spread">
+      <header class="complex-header">
+        <div class="complex-heading">
+          <span class="complex-kicker">${page.kicker}</span>
+          <h1>${page.title}</h1>
+          <p>${page.intro}</p>
+        </div>
+        <figure class="complex-hero">
+          <img src="${coverImage}" alt="Vista del complejo Iberostar Playa Paraíso" loading="lazy" decoding="async" />
+          <figcaption>Playa Paraíso · Riviera Maya</figcaption>
+        </figure>
+      </header>
+
+      <div class="complex-hotels-heading">
+        <h2>Descubre nuestros hoteles</h2>
+        <span>Selecciona una ficha para explorar</span>
+      </div>
+
+      <div class="complex-hotel-grid">
+        ${hotels.map((entry) => `
+          <button class="complex-hotel-card" type="button" data-complex-hotel-index="${entry.pageIndex}">
+            <img src="${entry.hotel.image}" alt="${entry.displayName}" loading="lazy" decoding="async" />
+            <span class="complex-hotel-copy">
+              <strong>${entry.displayName}</strong>
+              <small>${entry.description}</small>
+              <span class="complex-hotel-action">Ver ficha <span aria-hidden="true">→</span></span>
+            </span>
+          </button>
+        `).join("")}
+      </div>
+
+      <footer class="complex-footer">IBEROSTAR · PLAYA PARAÍSO · QUINTANA ROO, MÉXICO</footer>
+    </section>
+  `;
+}
+
+function distanceBetweenCoordinates(first, second) {
+  const radians = (degrees) => degrees * Math.PI / 180;
+  const latitudeDelta = radians(second.latitude - first.latitude);
+  const longitudeDelta = radians(second.longitude - first.longitude);
+  const firstLatitude = radians(first.latitude);
+  const secondLatitude = radians(second.latitude);
+  const haversine = Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+  return 6371000 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+}
+
+function findNearbyLocation(coords) {
+  let closestHotel = null;
+  let closestDestination = null;
+  const catalog = window.RevistaDigital.hoteles?.getDestinationCatalog?.() || {};
+
+  Object.entries(catalog).forEach(([countrySlug, country]) => {
+    country.destinations.forEach((destination) => {
+      const coordinatesForDestination = [];
+      destination.hotels.forEach((hotel) => {
+        if (!Number.isFinite(hotel.latitude) || !Number.isFinite(hotel.longitude)) return;
+        const point = { latitude: hotel.latitude, longitude: hotel.longitude };
+        coordinatesForDestination.push(point);
+        const distance = distanceBetweenCoordinates(coords, point);
+        const detectionRadius = hotel.detectionRadiusMeters || locationDetectionRadiusMeters;
+        if (distance <= detectionRadius && (!closestHotel || distance < closestHotel.distance)) {
+          closestHotel = { hotel, country, countrySlug, destination, distance };
+        }
+      });
+      const areaCenter = destination.detectionArea?.center;
+      if (areaCenter?.length === 2) {
+        const center = { latitude: areaCenter[0], longitude: areaCenter[1] };
+        const distance = distanceBetweenCoordinates(coords, center);
+        if (distance <= destination.detectionArea.radiusMeters && (!closestDestination || distance < closestDestination.distance)) {
+          closestDestination = { country, countrySlug, destination, distance };
+        }
+      } else if (coordinatesForDestination.length) {
+        const center = coordinatesForDestination.reduce((total, point) => ({
+          latitude: total.latitude + point.latitude / coordinatesForDestination.length,
+          longitude: total.longitude + point.longitude / coordinatesForDestination.length
+        }), { latitude: 0, longitude: 0 });
+        const distance = distanceBetweenCoordinates(coords, center);
+        if (distance <= destinationDetectionRadiusMeters && (!closestDestination || distance < closestDestination.distance)) {
+          closestDestination = { country, countrySlug, destination, distance };
+        }
+      }
+    });
+  });
+
+  if (closestHotel) {
+    return { ...closestHotel, type: "hotel", route: `/${closestHotel.countrySlug}/${closestHotel.destination.slug}/${closestHotel.hotel.slug}` };
+  }
+  if (closestDestination) {
+    return { ...closestDestination, type: "destination", route: `/${closestDestination.countrySlug}/${closestDestination.destination.slug}` };
+  }
+  return null;
+}
+
+function describeNearbyLocation(coords) {
+  const nearby = findNearbyLocation(coords);
+  if (nearby?.type === "hotel") {
+    const distance = formatApproximateDistance(nearby.distance);
+    return `Estás aproximadamente a ${distance} de ${nearby.hotel.name}, en ${nearby.destination.name}, ${nearby.country.name}.`;
+  }
+  if (nearby?.type === "destination") return `Estás en ${nearby.destination.name}, ${nearby.country.name}.`;
+  return "Ubicación actual disponible para calcular rutas. No se detectó un destino Iberostar cercano.";
+}
+
+function formatApproximateDistance(meters) {
+  return meters < 1000
+    ? `${Math.round(meters / 10) * 10} m`
+    : `${(meters / 1000).toLocaleString("es-MX", { maximumFractionDigits: 1 })} km`;
+}
+
+function renderLocationStatus(coords) {
+  const status = document.getElementById("locationStatus");
+  if (!status) return;
+
+  const nearby = findNearbyLocation(coords);
+  const isPortalRoute = document.body.dataset.appMode === "portal";
+  const detail = isPortalRoute ? null : getActiveHotelDetail();
+  const page = isPortalRoute ? null : pages[currentIndex];
+  const selectedHotelName = detail?.displayName || detail?.hotel?.name || (page?.type === "hotel" ? page.name : "");
+  const selectedHotelCoordinates = hotelCoordinates[selectedHotelName] || hotelCoordinates[detail?.hotel?.name];
+  const message = selectedHotelCoordinates
+    ? `Distancia aproximada al hotel ${selectedHotelName}: ${formatApproximateDistance(distanceBetweenCoordinates(coords, { latitude: selectedHotelCoordinates[0], longitude: selectedHotelCoordinates[1] }))}.`
+    : describeNearbyLocation(coords);
+  status.replaceChildren(document.createTextNode(message));
+
+  if (nearby && nearby.hotel?.name !== selectedHotelName) {
+    const link = document.createElement("a");
+    const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");
+    link.href = `${projectBasePath}${nearby.route}`;
+    link.dataset.appRoute = nearby.route;
+    link.className = "location-status-action";
+    link.textContent = nearby.type === "hotel" ? "Explorar hotel" : "Explorar destino";
+    status.append(" ", link);
+  }
+}
 function openHotelDetail(countryKey, hotelIndex) {
   const country = hotelCountryMenus[countryKey];
   const hotel = country?.hotels?.[hotelIndex];
 
   if (!hotel) return;
+
+  const portalRoute = window.RevistaDigital?.routes?.findHotelPortalRoute?.(hotel.name);
+  if (portalRoute) {
+    window.RevistaDigital.routes.navigate(portalRoute);
+    return;
+  }
 
   returnPageIndex = currentIndex;
   activeHotelDetail = {
@@ -5166,17 +5811,54 @@ function renderHotelDetail() {
 
   const country = hotelCountryMenus[detail.countryKey];
   const hotel = detail.hotel;
+  const displayName = detail.displayName || hotel.name;
+  const displayTagline = detail.tagline || hotel.tagline;
+  const displayDescription = detail.description || hotel.description;
+  const displayTabs = detail.tabOverrides
+    ? Object.fromEntries(Object.entries(hotel.tabs || {}).map(([tabKey, section]) => [
+        tabKey,
+        { ...section, ...(detail.tabOverrides[tabKey] || {}) }
+      ]))
+    : hotel.tabs;
   const tabs = [
     { key: "habitaciones", label: "Habitaciones" },
     { key: "restaurante", label: "Restaurantes" },
     { key: "piscinas", label: "Piscinas" },
+    { key: "servicios", label: "Servicios" },
     { key: "experiencias", label: "Experiencias" }
   ];
   const activeTabKey = detail.activeTab || "habitaciones";
-  const activeTab = hotel.tabs?.[activeTabKey] || hotel.tabs?.habitaciones;
+  const sectionLabels = {
+    habitaciones: "Habitaciones",
+    restaurante: "Restaurantes",
+    piscinas: "Piscinas",
+    experiencias: "Experiencias"
+  };
+  const serviceHighlights = Object.entries(sectionLabels)
+    .map(([key, label]) => {
+      const highlights = displayTabs?.[key]?.keyPoints || [];
+      return highlights.length ? `${label}: ${highlights.slice(0, 2).join(" · ")}` : "";
+    })
+    .filter(Boolean);
+  const serviceImages = [...new Set([
+    hotel.image,
+    ...Object.keys(sectionLabels).map((key) => displayTabs?.[key]?.images?.[0])
+  ].filter(Boolean))];
+  const activeTab = activeTabKey === "servicios"
+    ? (displayTabs?.servicios || {
+        title: "Servicios",
+        description: `Explora las áreas y experiencias disponibles en ${displayName}.`,
+        keyPoints: hotel.serviceHighlights?.length ? hotel.serviceHighlights : serviceHighlights,
+        images: serviceImages
+      })
+    : (displayTabs?.[activeTabKey] || displayTabs?.habitaciones);
   const tabImages = (activeTab?.images || [hotel.image]).filter(Boolean);
   const currentImage = tabImages[detail.galleryIndex] || hotel.image;
-  const galleryCounter = `${Math.min(detail.galleryIndex + 1, tabImages.length) || 1} / ${tabImages.length || 1}`;
+  const heroImage = hotel.image || currentImage;
+  const hotelOfficialUrl = window.RevistaDigital.restaurantes?.getHotelRestaurantPageUrl?.(displayName, hotel.name) || "";
+  const restaurantMarkup = activeTabKey === "restaurante"
+    ? window.RevistaDigital.restaurantes?.renderHotelRestaurants?.(displayName, hotel.name) || ""
+    : "";
 
   const tabsMarkup = tabs.map((tab) => `
     <button
@@ -5190,19 +5872,9 @@ function renderHotelDetail() {
     </button>
   `).join("");
 
-  const thumbnails = tabImages.map((image, index) => `
-    <button
-      type="button"
-      class="hotel-detail-thumb ${index === detail.galleryIndex ? "is-selected" : ""}"
-      data-gallery-index="${index}"
-      aria-label="Ver imagen ${index + 1}"
-    >
-      <img src="${image}" alt="${hotel.name} ${activeTab.title} ${index + 1}" />
-    </button>
-  `).join("");
-
   const prevHotelIndex = (detail.hotelIndex - 1 + country.hotels.length) % country.hotels.length;
   const nextHotelIndex = (detail.hotelIndex + 1) % country.hotels.length;
+  const hasHotelCoordinates = Array.isArray(hotelCoordinates[hotel.name]);
 
   return `
     <div class="spread hotel-detail-spread">
@@ -5213,13 +5885,14 @@ function renderHotelDetail() {
 
       <section class="hotel-hero">
         <div class="hotel-hero-image-wrap">
-          <img src="${currentImage}" alt="${hotel.name}" class="hotel-hero-image" />
+          <img src="${heroImage}" alt="${displayName}" class="hotel-hero-image" loading="lazy" decoding="async" />
         </div>
 
         <div class="hotel-hero-info">
-          <small>${hotel.tagline}</small>
-          <h1>${hotel.name}</h1>
-          <p>${hotel.description}</p>
+          <small>${displayTagline}</small>
+          <h1>${displayName}</h1>
+          <p>${displayDescription}</p>
+          ${hotelOfficialUrl ? `<a class="hotel-official-link" href="${hotelOfficialUrl}" target="_blank" rel="noopener noreferrer">Consultar información oficial <span aria-hidden="true">↗</span></a>` : ""}
           <div class="hotel-detail-keypoints">
             ${((activeTab?.keyPoints || []).map((point) => `<span>${point}</span>`).join(""))}
           </div>
@@ -5230,18 +5903,19 @@ function renderHotelDetail() {
         ${tabsMarkup}
       </div>
 
-      <section class="hotel-detail-gallery">
-        <div class="hotel-detail-gallery-main">
-          <button type="button" class="hotel-detail-gallery-arrow hotel-detail-gallery-prev" data-gallery-nav="-1" aria-label="Imagen anterior">‹</button>
-          <img src="${currentImage}" alt="${hotel.name} ${activeTab.title}" />
-          <button type="button" class="hotel-detail-gallery-arrow hotel-detail-gallery-next" data-gallery-nav="1" aria-label="Imagen siguiente">›</button>
-        </div>
-
-        <div class="hotel-detail-gallery-meta">
-          <div class="hotel-detail-gallery-counter">${galleryCounter}</div>
-          <div class="hotel-detail-gallery-thumbs">${thumbnails}</div>
-        </div>
+      <section class="hotel-detail-section-intro" aria-live="polite">
+        <small>${activeTab.title}</small>
+        <p>${activeTab.description || `Explora ${activeTab.title.toLowerCase()} de ${displayName}.`}</p>
       </section>
+
+      ${hasHotelCoordinates ? `
+        <section class="hotel-detail-map-section">
+          <div class="hotel-detail-map-heading"><small>UBICACIÓN</small><h2>Explora el hotel en el mapa</h2></div>
+          ${hotelMap({ name: hotel.name, location: hotel.name })}
+        </section>
+      ` : ""}
+
+      ${restaurantMarkup}
 
       <div class="hotel-detail-actions">
         <button type="button" class="hotel-detail-back" aria-label="Volver al menú de hoteles">Volver al menú de hoteles</button>
@@ -5255,7 +5929,9 @@ function renderHotelDetail() {
 }
 
 function syncBookRoute() {
+  if (document.body.dataset.routeManaged === "true") return;
   const page = pages[currentIndex];
+  if (!page) return;
   let nextPath = "/";
 
   if (activeRestaurantMenuIndex !== null) {
@@ -5281,6 +5957,8 @@ function syncBookRoute() {
     nextPath = "/360";
   } else if (page.type === "videos") {
     nextPath = "/videos";
+  } else if (page.type === "complex") {
+    nextPath = "/complejo-playa-paraiso";
   }
 
   const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");
@@ -5293,8 +5971,20 @@ function syncBookRoute() {
 }
 
 function renderPage() {
-  const page =
-    pages[currentIndex];
+  // Al cambiar de página se desmonta el mapamundi animado (si estaba activo):
+  // cancela temporizadores, animaciones y elimina la instancia de mapa.
+  window.RevistaDigital.mapamundi?.unmount();
+  if (!Number.isInteger(currentIndex) || !pages[currentIndex]) {
+    currentIndex = 0;
+  }
+  if (activeRestaurantMenuIndex !== null && !pages[activeRestaurantMenuIndex]) {
+    activeRestaurantMenuIndex = null;
+  }
+  const page = pages[currentIndex];
+  const isHotelDetail = Boolean(activeHotelDetail) || (
+    activeRestaurantMenuIndex === null && page.type === "hotel"
+  );
+  document.body.dataset.appMode = isHotelDetail ? "hotel" : "tool";
 
   bookShell.classList.remove(
     "page-turn"
@@ -5316,6 +6006,16 @@ function renderPage() {
   }
   else if (page.type === "country-menu") {
     bookShell.innerHTML = renderCountryMenu(page);
+  }
+  else if (page.type === "complex") {
+    bookShell.innerHTML = renderComplexPage(page);
+  }
+  else if (page.type === "guia") {
+    bookShell.innerHTML = `
+      <section class="spread guide-spread">
+        <div id="guiaMount"></div>
+      </section>
+    `;
   }
   else if (
     page.type === "hotel"
@@ -5426,20 +6126,16 @@ function renderPage() {
   else if (
     page.type === "mapamundi"
   ) {
+    // Sección animada del mapamundi (8 animaciones). El ciclo de vida lo
+    // gestiona js/mapamundi.js: mount() al entrar y unmount() al salir.
+    window.RevistaDigital.mapamundi?.unmount();
     bookShell.innerHTML = `
       <div class="spread">
-
-        <iframe
-          src="mapa-mundi/index2.html"
-          style="
-            width:100%;
-            height:740px;
-            border:none;
-          "
-        ></iframe>
-
+        <div id="mapamundiMount"></div>
       </div>
     `;
+    const mapamundiMount = document.getElementById("mapamundiMount");
+    if (mapamundiMount) window.RevistaDigital.mapamundi?.mount(mapamundiMount);
   }
 
   /* NUEVO */
@@ -5498,6 +6194,9 @@ else {
   wirePageInteractions();
 
   updateGeneralUserMarker();
+  if (currentPosition && document.body.dataset.locationRequested === "true") {
+    renderLocationStatus(currentPosition);
+  }
 
   /* NUEVO */
   if (
@@ -5521,6 +6220,24 @@ else {
   ) {
     wireVideos();
     renderVideoCards();
+  }
+
+  /* NUEVO */
+  if (
+    page.type === "guia"
+  ) {
+    renderGuideExplorer();
+  }
+}
+
+function renderGuideExplorer() {
+  const mount = bookShell.querySelector("#guiaMount");
+  if (!mount) return;
+  const guiapa = window.RevistaDigital.guiapa;
+  if (guiapa && typeof guiapa.renderExplorer === "function") {
+    guiapa.renderExplorer(mount);
+  } else {
+    mount.innerHTML = '<p class="guide-empty">La guía interactiva no está disponible.</p>';
   }
 }
 
@@ -5576,6 +6293,14 @@ function renderDots() {
 function wireRestaurantInteractionsLegacy(root) {
   root.querySelectorAll(".restaurant-menu-open").forEach((button) => {
     button.addEventListener("click", () => {
+      if (document.body.dataset.routeManaged === "true") {
+        const restaurantHotel = pages[currentIndex];
+        if (restaurantHotel?.type === "hotel") {
+          document.body.dataset.restaurantReturnRoute = `${document.body.dataset.returnRoute}/${slugify(restaurantHotel.name)}`;
+          window.RevistaDigital.routes?.navigate(`/restaurantes/${slugify(restaurantHotel.name)}`);
+          return;
+        }
+      }
       activeRestaurantMenuIndex = currentIndex;
       renderPage();
     });
@@ -5583,6 +6308,12 @@ function wireRestaurantInteractionsLegacy(root) {
 
   root.querySelectorAll(".restaurant-menu-back").forEach((button) => {
     button.addEventListener("click", () => {
+      if (document.body.dataset.restaurantReturnRoute) {
+        const returnRoute = document.body.dataset.restaurantReturnRoute;
+        delete document.body.dataset.restaurantReturnRoute;
+        window.RevistaDigital.routes?.navigate(returnRoute);
+        return;
+      }
       activeRestaurantMenuIndex = null;
       renderPage();
     });
@@ -5597,10 +6328,24 @@ function wirePageInteractions() {
 
   window.RevistaDigital.restaurantes.wireInteractions(bookShell, {
     open: () => {
+      if (document.body.dataset.routeManaged === "true") {
+        const restaurantHotel = pages[currentIndex];
+        if (restaurantHotel?.type === "hotel") {
+          document.body.dataset.restaurantReturnRoute = `${document.body.dataset.returnRoute}/${slugify(restaurantHotel.name)}`;
+          window.RevistaDigital.routes?.navigate(`/restaurantes/${slugify(restaurantHotel.name)}`);
+          return;
+        }
+      }
       activeRestaurantMenuIndex = currentIndex;
       renderPage();
     },
     close: () => {
+      if (document.body.dataset.restaurantReturnRoute) {
+        const returnRoute = document.body.dataset.restaurantReturnRoute;
+        delete document.body.dataset.restaurantReturnRoute;
+        window.RevistaDigital.routes?.navigate(returnRoute);
+        return;
+      }
       activeRestaurantMenuIndex = null;
       renderPage();
     }
@@ -5615,6 +6360,18 @@ function wirePageInteractions() {
       const hotelName = button.dataset.hotelName;
       const sectionKey = button.dataset.hotelSection;
       renderHotelSectionPanel(hotelName, sectionKey);
+    });
+  });
+
+  bookShell.querySelectorAll(".pano-360-ficha").forEach((button) => {
+    if (button.dataset.pano360Bound === "1") return;
+    button.dataset.pano360Bound = "1";
+    button.addEventListener("click", () => {
+      window.pannellum360Open?.(
+        button.dataset.hotel,
+        button.dataset.zone,
+        button.dataset.label
+      );
     });
   });
 
@@ -5634,6 +6391,18 @@ function wirePageInteractions() {
     });
   });
 
+  bookShell.querySelectorAll(".complex-hotel-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const hotelIndex = Number(card.dataset.complexHotelIndex);
+      if (!Number.isInteger(hotelIndex) || pages[hotelIndex]?.type !== "hotel") return;
+
+      activeHotelDetail = null;
+      activeRestaurantMenuIndex = null;
+      currentIndex = hotelIndex;
+      renderPage();
+    });
+  });
+
   bookShell.querySelectorAll(".country-menu-nav").forEach((button) => {
     button.addEventListener("click", () => {
       const nextIndex = Number(button.dataset.target || currentIndex);
@@ -5644,6 +6413,11 @@ function wirePageInteractions() {
 
   bookShell.querySelectorAll(".hotel-detail-back").forEach((button) => {
     button.addEventListener("click", () => {
+      if (document.body.dataset.routeManaged === "true" && document.body.dataset.returnRoute) {
+        activeHotelDetail = null;
+        window.RevistaDigital.routes?.navigate(document.body.dataset.returnRoute);
+        return;
+      }
       activeHotelDetail = null;
       currentIndex = returnPageIndex ?? 0;
       returnPageIndex = null;
@@ -5663,6 +6437,13 @@ function wirePageInteractions() {
         galleryIndex: 0,
         activeTab: detail.activeTab || "habitaciones"
       };
+      if (document.body.dataset.routeManaged === "true") {
+        const nextHotel = window.RevistaDigital.state.hotelCountryMenus?.[detail.countryKey]?.hotels?.[targetIndex];
+        if (nextHotel && document.body.dataset.returnRoute) {
+          window.RevistaDigital.routes?.navigate(`${document.body.dataset.returnRoute}/${slugify(nextHotel.name)}`);
+          return;
+        }
+      }
       renderPage();
     });
     if (direction !== 0 && button.getAttribute("aria-label")) {
@@ -5689,30 +6470,6 @@ function wirePageInteractions() {
         : (currentIndexPosition - 1 + tabs.length) % tabs.length;
       tabs[nextIndex]?.focus();
       tabs[nextIndex]?.click();
-    });
-  });
-
-  bookShell.querySelectorAll("[data-gallery-index]").forEach((thumb) => {
-    thumb.addEventListener("click", () => {
-      const detail = getActiveHotelDetail();
-      if (!detail) return;
-      activeHotelDetail = { ...detail, galleryIndex: Number(thumb.dataset.galleryIndex || 0) };
-      renderPage();
-    });
-  });
-
-  bookShell.querySelectorAll("[data-gallery-nav]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const detail = getActiveHotelDetail();
-      if (!detail) return;
-      const country = hotelCountryMenus[detail.countryKey];
-      const hotel = country?.hotels?.[detail.hotelIndex];
-      const activeTab = hotel?.tabs?.[detail.activeTab || "habitaciones"] || hotel?.tabs?.habitaciones;
-      const total = (activeTab?.images || [hotel.image]).length || 1;
-      const currentIndexPosition = detail.galleryIndex || 0;
-      const nextPosition = (currentIndexPosition + Number(button.dataset.galleryNav || 0) + total) % total;
-      activeHotelDetail = { ...detail, galleryIndex: nextPosition };
-      renderPage();
     });
   });
 
@@ -5871,9 +6628,9 @@ function wirePageInteractions() {
     );
 
   if (routeButton) {
-    const destination =
-      pages[currentIndex]
-        .location;
+    const destination = bookShell.querySelector(".interactive-map")?.dataset.location ||
+      pages[currentIndex]?.location ||
+      getActiveHotelDetail()?.hotel?.name;
 
     routeButton.addEventListener(
       "click",
@@ -5932,31 +6689,21 @@ function initializeGeneralMap() {
 
   loadLeaflet()
     .then((L) => {
-      const complexCenter =
-        [20.7615, -86.9628];
-
       const generalMap =
         L.map(
           mapElement,
           {
             zoomControl: true,
-            attributionControl: true,
-            maxBounds: complexBounds,
-            maxBoundsViscosity: 1.0
+            attributionControl: true
           }
-        ).setView(
-          complexCenter,
-          16
         );
 
       activeMap =
         generalMap;
 
-      // Zoom mínimo = justo lo que ocupa el complejo. No se puede
-      // alejar más y ver los alrededores.
-      generalMap.setMinZoom(
-        generalMap.getBoundsZoom(complexBounds)
-      );
+      // Encuadre y límites de navegación comunes del complejo (perímetro
+      // real verificado): no se puede alejar ni desplazar fuera del complejo.
+      setupComplexMapFraming(generalMap, L);
 
       const streetLayer =
         L.tileLayer(
@@ -6090,31 +6837,28 @@ function initializeHotelMap() {
       hotelName
     ];
 
+  if (!destinationCoordinates) return;
+
   activeMap = null;
   userMarker = null;
   routeLine = null;
 
   loadLeaflet()
     .then((L) => {
-      activeMap =
-        L.map(
-          mapElement,
-          {
-            zoomControl: true,
-            attributionControl: true,
-            maxBounds: complexBounds,
-            maxBoundsViscosity: 1.0
-          }
-        ).setView(
-          destinationCoordinates,
-          17
-        );
+      const isPlayaParaiso = destinationCoordinates[0] >= complexBounds[0][0] &&
+        destinationCoordinates[0] <= complexBounds[1][0] &&
+        destinationCoordinates[1] >= complexBounds[0][1] &&
+        destinationCoordinates[1] <= complexBounds[1][1];
+      const mapOptions = { zoomControl: true, attributionControl: true };
+      if (isPlayaParaiso) {
+        mapOptions.maxBounds = complexBounds;
+        mapOptions.maxBoundsViscosity = 1.0;
+      }
+      activeMap = L.map(mapElement, mapOptions).setView(destinationCoordinates, isPlayaParaiso ? 17 : 15);
 
       // No dejar alejar el zoom más allá de lo que ocupa el complejo,
       // así nunca se ve lo que hay fuera de Iberostar Playa Paraíso.
-      activeMap.setMinZoom(
-        activeMap.getBoundsZoom(complexBounds)
-      );
+      if (isPlayaParaiso) activeMap.setMinZoom(activeMap.getBoundsZoom(complexBounds));
 
       const streetLayer =
         L.tileLayer(
@@ -6158,8 +6902,10 @@ function initializeHotelMap() {
             .addTo(activeMap)
             .bindTooltip(
               "Tu ubicación actual"
-            );
+          );
       }
+
+      focusActiveMapOnLocation();
 
       activeMap.on(
         "zoomend moveend",
@@ -6330,9 +7076,39 @@ magazineStage.addEventListener(
    INICIO
    ========================================================= */
 
-requestCurrentLocation();
+if (window.RevistaDigital.mapas) {
+  Object.assign(window.RevistaDigital.mapas, {
+    requestCurrentLocation,
+    renderLocationStatus,
+    hotelMap,
+    updateGeneralUserMarker,
+    updateHotelUserMarker,
+    initializeGeneralMap,
+    initializeHotelMap
+  });
+}
+
+const initialLocationStatus = document.getElementById("locationStatus");
+if (initialLocationStatus) initialLocationStatus.textContent = "Usa “Usar mi ubicación” para encontrar el hotel cercano o calcular una ruta.";
+document.getElementById("requestLocationButton")?.addEventListener("click", requestCurrentLocation);
+document.addEventListener("click", (event) => {
+  const link = event.target.closest(".site-tools-menu a");
+  if (!link) return;
+  const tools = link.closest(".site-tools");
+  if (tools) tools.removeAttribute("open");
+});
+window.setTimeout(autoDetectLocation, 700);
+// Vigilancia de contexto cercano: alimenta el aviso "📊 Parece que estás cerca
+// de…". Antes no se iniciaba nunca porque app.js regresaba antes de llamarla
+// cuando las rutas gestionan el arranque.
+if (typeof window.RevistaDigital.location?.startNearbyContextWatch === "function") {
+  window.RevistaDigital.location.startNearbyContextWatch();
+}
 if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
-  window.RevistaDigital.routes.restoreCurrentRoute();
+  if (document.body.dataset.routeManaged !== "true") {
+    window.RevistaDigital.routes.restoreCurrentRoute();
+  }
 } else {
   renderPage();
 }
+delete document.documentElement.dataset.routeStartup;

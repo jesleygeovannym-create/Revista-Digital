@@ -42,7 +42,7 @@
       <div class="hotel-panel-grid">
         ${media.length ? media.map((image) => `
           <figure class="hotel-panel-item">
-            <img src="${image}" alt="${title} de ${pageName}" />
+            <img src="${image}" alt="${title} de ${pageName}" loading="lazy" decoding="async" />
           </figure>
         `).join("") : `
           <div class="hotel-panel-empty">
@@ -127,6 +127,181 @@
     restartAutoPlay();
   }
 
+  const destinationDefinitions = {
+    mexico: {
+      name: "México", image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", destinations: [
+        { slug: "riviera-maya", name: "Riviera Maya", description: "Un refugio frente al Caribe mexicano.", image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", complex: true, pageHotels: true, hotels: [
+          { slug: "iberostar-waves-quetzal", name: "Iberostar Waves Quetzal", image: "https://apiimg.iberostar.com/uploads/image/89293/crops/16:9/1920/image.jpeg", tagline: "Frente al mar y cuatro piscinas en Playacar", description: "Hotel todo incluido frente al mar en Playacar, Playa del Carmen, con acceso directo a la playa, cuatro piscinas, cinco restaurantes de especialidad, spa y programas para familias. Comparte complejo con Iberostar Waves Tucán." },
+          { slug: "iberostar-waves-tucan", name: "Iberostar Waves Tucán", image: "https://apiimg.iberostar.com/uploads/image/89213/crops/16:9/1920/image.jpeg", tagline: "Todo incluido frente al mar en Playacar", description: "Hotel todo incluido en Playacar, Playa del Carmen, con cinco restaurantes de especialidad, tres buffets, spa, deportes acuáticos y actividades para toda la familia. Comparte complejo con Iberostar Waves Quetzal." }
+        ], detectionArea: { center: [20.62, -87.08], radiusMeters: 65000 } },
+        { slug: "cancun", name: "Cancún", description: "Playas turquesa y hospitalidad junto al mar.", image: "src/paraiso-lindo/banner/ParaisoLindo.jpg", imageHotel: "Iberostar Selection Cancún", hotelTerms: ["cancun"], hotelAliases: [{ name: "Iberostar Selection Coral Cancún", slug: "iberostar-selection-coral-cancun", aliasOf: "Iberostar Selection Cancún", tagline: "Exclusivo para adultos", description: "Sección solo para adultos dentro del complejo Selection Cancún, con piscina privada, atención de mayordomo y acceso a las instalaciones del resort." }], detectionArea: { center: [21.1743, -86.8466], radiusMeters: 40000 } },
+        { slug: "cozumel", name: "Cozumel", description: "Naturaleza tropical y experiencias sobre el agua.", image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", imageHotel: "Iberostar Waves Cozumel", hotelTerms: ["cozumel"], detectionArea: { center: [20.42, -86.92], radiusMeters: 30000 } },
+        { slug: "playa-mita", name: "Playa Mita", description: "El Pacífico mexicano, a tu ritmo.", image: "src/paraiso-JOIA/banner/JOIA2.jpg", imageHotel: "Iberostar Selection Playa Mita", hotelTerms: ["playa-mita"], detectionArea: { center: [20.77, -105.53], radiusMeters: 25000 } }
+      ]
+    },
+    jamaica: {
+      name: "Jamaica", image: "src/JOIA2.jpg", imageHotel: "JOIA Rose Hall by Iberostar", destinations: [
+        { slug: "rose-hall", name: "Rose Hall", description: "Descubre la costa y el carácter de Jamaica.", image: "src/JOIA2.jpg", imageHotel: "JOIA Rose Hall by Iberostar", detectionArea: { center: [18.52, -77.82], radiusMeters: 20000 } }
+      ]
+    },
+    "republica-dominicana": {
+      name: "República Dominicana", image: "src/ParaisoDelMar 1.png", imageHotel: "Iberostar Selection Bávaro Suites", destinations: [
+        { slug: "punta-cana", name: "Punta Cana", description: "Playas amplias y paisajes tropicales.", image: "src/ParaisoDelMar 1.png", imageHotel: "Iberostar Selection Bávaro Suites", detectionArea: { center: [18.5818, -68.4043], radiusMeters: 30000 } }
+      ]
+    },
+    brasil: {
+      name: "Brasil", image: "src/paraisoBeach1.jpg", imageHotel: "Iberostar Selection Praia do Forte", destinations: [
+        { slug: "praia-do-forte", name: "Praia do Forte", description: "Resorts junto a la costa de Bahía y a una reserva marina.", image: "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", imageHotel: "Iberostar Selection Praia do Forte", hotelTerms: ["praia-do-forte"], detectionArea: { center: [-12.57, -37.99], radiusMeters: 20000 } },
+        { slug: "bahia", name: "Bahía", description: "Descubre la costa de Bahía y la hospitalidad de Iberostar Waves Bahia.", image: "src/paraisoBeach1.jpg", imageHotel: "Iberostar Waves Bahia", hotelTerms: ["waves-bahia"], detectionArea: { center: [-12.55, -38.00], radiusMeters: 20000 } },
+        { slug: "amazon", name: "Amazonas", description: "Una experiencia fluvial con itinerarios cambiantes por el río Amazonas.", image: "src/JOIA2.jpg", imageHotel: "Iberostar Heritage Grand Amazon", hotelTerms: ["heritage-grand-amazon"], mapCenter: [-3.13417, -60.02944], mapLabel: "Puerto de Manaus · embarque del crucero", mapNotice: "El crucero parte del Puerto de Manaus. Su ubicación cambia con el itinerario.", detectionArea: { center: [-3.13417, -60.02944], radiusMeters: 5000 } }
+      ]
+    }
+  };
+
+  const hotelSlugOverrides = {
+    "JOIA Rose Hall by Iberostar": "joia-rose-hall"
+  };
+
+  function getHotelSlug(name, slugify) {
+    return hotelSlugOverrides[name] || slugify(name);
+  }
+
+  function getDestinationCatalog() {
+    const data = state() || {};
+    const slugify = window.slugify || ((value = "") => String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""));
+
+    return Object.fromEntries(Object.entries(destinationDefinitions).map(([countrySlug, country]) => {
+      const menu = data.hotelCountryMenus?.[countrySlug];
+      const destinations = country.destinations.map((destination) => {
+        const pageHotels = destination.pageHotels ? getHotelNamesFromPages(data.pages, slugify) : [];
+        const catalogHotels = (destination.hotels || []).map((hotel) => ({ ...hotel, source: "catalog" }));
+        const hotels = destination.pageHotels
+          ? [...pageHotels, ...catalogHotels]
+          : (menu?.hotels || []).map((hotel, hotelIndex) => ({
+              slug: getHotelSlug(hotel.name, slugify),
+              name: hotel.name,
+              image: hotel.image,
+              description: hotel.description,
+              tagline: hotel.tagline,
+              source: "menu",
+              hotelIndex,
+              countryMenuKey: countrySlug
+            })).filter((hotel) => !destination.hotelTerms?.length || destination.hotelTerms.some((term) => slugify(hotel.name).includes(term)));
+        const aliases = (destination.hotelAliases || []).flatMap((alias) => {
+          const sourceHotel = hotels.find((hotel) => hotel.name === alias.aliasOf);
+          return sourceHotel ? [{
+            ...sourceHotel,
+            ...alias,
+            tabOverrides: window.RevistaDigital.hotelContent?.[alias.name]?.tabs || null,
+            source: sourceHotel.source,
+            hotelIndex: sourceHotel.hotelIndex,
+            countryMenuKey: sourceHotel.countryMenuKey
+          }] : [];
+        });
+        const destinationHotels = [...hotels, ...aliases].map((hotel) => {
+          const coordinates = data.hotelCoordinates?.[hotel.name];
+          return {
+            ...hotel,
+            countrySlug,
+            countryName: country.name,
+            destinationSlug: destination.slug,
+            destinationName: destination.name,
+            latitude: coordinates?.[0] ?? null,
+            longitude: coordinates?.[1] ?? null,
+            detectionRadiusMeters: data.hotelDetectionRadii?.[hotel.name] ?? data.locationDetectionRadiusMeters ?? 1500
+          };
+        });
+
+        return {
+          ...destination,
+          image: data.hotelCoverImages?.[destination.imageHotel] || destination.image,
+          hotels: destinationHotels
+        };
+      });
+      return [countrySlug, {
+        ...country,
+        image: data.hotelCoverImages?.[country.imageHotel] || country.image,
+        destinations
+      }];
+    }));
+  }
+
+  function getNormalizedCatalog() {
+    const catalog = getDestinationCatalog();
+    const countries = Object.entries(catalog).map(([countrySlug, country]) => ({
+      slug: countrySlug,
+      name: country.name,
+      image: country.image,
+      destinations: (country.destinations || []).map((destination) => ({
+        slug: destination.slug,
+        name: destination.name,
+        image: destination.image,
+        description: destination.description || "",
+        countrySlug,
+        countryName: country.name,
+        hotels: (destination.hotels || []).map((hotel) => ({
+          slug: hotel.slug,
+          name: hotel.name,
+          countrySlug,
+          countryName: country.name,
+          destinationSlug: destination.slug,
+          destinationName: destination.name,
+          latitude: hotel.latitude ?? null,
+          longitude: hotel.longitude ?? null,
+          detectionRadiusMeters: hotel.detectionRadiusMeters ?? 1500,
+          image: hotel.image || destination.image || country.image,
+          description: hotel.description || destination.description || "",
+          tagline: hotel.tagline || "",
+          source: hotel.source || "catalog"
+        }))
+      }))
+    }));
+
+    const normalized = {
+      countries,
+      byCountry: Object.fromEntries(countries.map((country) => [country.slug, country])),
+      byCountryDestination: Object.fromEntries(
+        countries.flatMap((country) => country.destinations.map((destination) => [
+          `${country.slug}/${destination.slug}`,
+          destination
+        ]))
+      )
+    };
+
+    normalized.routeIndex = countries.flatMap((country) => [
+      { type: "country", slug: country.slug, name: country.name, route: `/${country.slug}` },
+      ...country.destinations.map((destination) => ({
+        type: "destination",
+        slug: destination.slug,
+        name: destination.name,
+        route: `/${country.slug}/${destination.slug}`,
+        countrySlug: country.slug
+      })),
+      ...country.destinations.flatMap((destination) => (destination.hotels || []).map((hotel) => ({
+        type: "hotel",
+        slug: hotel.slug,
+        name: hotel.name,
+        route: `/${country.slug}/${destination.slug}/${hotel.slug}`,
+        countrySlug: country.slug,
+        destinationSlug: destination.slug
+      })))
+    ]);
+
+    return normalized;
+  }
+
+  function getHotelNamesFromPages(pages = [], slugify) {
+    return (pages || []).map((page, pageIndex) => page?.type === "hotel" ? {
+      slug: getHotelSlug(page.name, slugify),
+      name: page.name,
+      image: page.image,
+      description: page.intro,
+      source: "page",
+      pageIndex,
+      countryMenuKey: "mexico"
+    } : null).filter(Boolean);
+  }
+
   hoteles.getPageHotels = function () {
     return Array.isArray(state().pages)
       ? state().pages.filter((page) => page && page.type === "hotel")
@@ -143,6 +318,14 @@
   hoteles.getCountryMenus = function () {
     return typeof state().hotelCountryMenus === "object" ? state().hotelCountryMenus : {};
   };
+
+  hoteles.getDestinationCatalog = getDestinationCatalog;
+  hoteles.getNormalizedCatalog = getNormalizedCatalog;
+  hoteles.getRouteIndex = function () {
+    return getNormalizedCatalog().routeIndex || [];
+  };
+  window.RevistaDigital.catalog = getNormalizedCatalog();
+  window.RevistaDigital.routeIndex = window.RevistaDigital.routeIndex || window.RevistaDigital.catalog.routeIndex || [];
 
   hoteles.getMedia = function (pageName) {
     return getHotelMedia(pageName);
