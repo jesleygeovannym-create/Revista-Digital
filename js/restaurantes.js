@@ -145,12 +145,43 @@
       }
       return "";
     }
-
     const hotelMedia = window.getHotelMedia ? window.getHotelMedia(hotel.name) : {};
     const heroImage = hotelMedia.banner?.[0] || hotel.image;
-    const restaurantCount = hotel.stats.find(([, label]) =>
-      String(label).toLowerCase().includes("restaurantes")
-    )?.[0] || restaurantMenuOptions.length;
+
+    const catalogRestaurants = restaurantes.getHotelRestaurants(hotel.name);
+    const paraiso = paraisoRestaurants(hotel.name);
+    const pannellum = window.RevistaDigital?.pannellum360;
+    const hasParaisoCards = Boolean(
+      pannellum &&
+      typeof pannellum.renderRestaurantCards === "function" &&
+      typeof pannellum.isPlayaParaiso === "function" &&
+      pannellum.isPlayaParaiso(hotel.name) &&
+      pannellum.getRestaurantes(hotel.name).length
+    );
+
+    const menuEntries = catalogRestaurants.length
+      ? catalogRestaurants.map(([name, cuisine]) => ({ name, cuisine }))
+      : (paraiso.length
+          ? paraiso.map(([name, cuisine]) => ({ name, cuisine }))
+          : restaurantMenuOptions);
+
+    const restaurantCount = menuEntries.length
+      || hotel.stats.find(([, label]) => String(label).toLowerCase().includes("restaurantes"))?.[0]
+      || restaurantMenuOptions.length;
+
+    const restaurantListingMarkup = hasParaisoCards
+      ? pannellum.renderRestaurantCards(hotel.name)
+      : `<div class="restaurant-menu-options">
+          ${menuEntries.map((restaurant, index) => `
+            <article class="restaurant-menu-option">
+              <span class="restaurant-menu-number">${String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>${escapeHtml(restaurant.name)}</h3>
+                <small>${escapeHtml(restaurant.cuisine || "Cocina de autor")}</small>
+              </div>
+              ${restaurant.hours ? `<span class="restaurant-menu-hours">${escapeHtml(restaurant.hours)}</span>` : ""}
+            </article>`).join("")}
+        </div>`;
 
     return `
       <div class="spread restaurant-menu-spread">
@@ -253,53 +284,12 @@
             </div>
 
             <span>
-              +${restaurantMenuOptions.length} opciones
+              ${restaurantCount} ${restaurantCount === 1 ? "opción" : "opciones"}
             </span>
 
           </div>
 
-          <div class="restaurant-menu-options">
-
-            ${restaurantMenuOptions
-              .map(
-                (restaurant, index) => `
-                  <article
-                    class="restaurant-menu-option"
-                  >
-
-                    <span
-                      class="restaurant-menu-number"
-                    >
-                      ${String(index + 1).padStart(
-                        2,
-                        "0"
-                      )}
-                    </span>
-
-                    <div>
-
-                      <h3>
-                        ${restaurant.name}
-                      </h3>
-
-                      <small>
-                        ${restaurant.cuisine}
-                      </small>
-
-                    </div>
-
-                    <span
-                      class="restaurant-menu-hours"
-                    >
-                      ${restaurant.hours}
-                    </span>
-
-                  </article>
-                `
-              )
-              .join("")}
-
-          </div>
+          ${restaurantListingMarkup}
 
         </section>
 

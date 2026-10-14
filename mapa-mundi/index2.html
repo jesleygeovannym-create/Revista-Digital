@@ -71,12 +71,16 @@
     .col{padding-top:6px}
     .col + .col{margin-top:20px;border-top:1px solid var(--line);padding-top:20px}
   }
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+        color:var(--muted);text-decoration:none;margin-bottom:22px;padding:6px 2px;transition:color .15s}
+  .back:hover{color:var(--gold)}
   *{font-family:'EB Garamond',Georgia,serif !important}
 </style>
 </head>
 <body>
 
 <div class="sheet">
+  <a class="back" id="back" href="../index.html">← Volver a la revista</a>
   <header>
     <div>
       <h1>The Iberostar Hotels</h1>
@@ -299,6 +303,20 @@ d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').th
 document.addEventListener('touchstart',function(ev){
   if(!ev.target.closest('.grid')) tip.style('opacity',0);
 }, {passive:true});
+
+const back = document.getElementById('back');
+if(back){
+  back.addEventListener('click',function(ev){
+    // Vuelve a la página anterior solo si venimos de la propia revista (mismo origen).
+    let fromRevista = false;
+    try{
+      const ref = document.referrer;
+      fromRevista = !!ref && new URL(ref).origin === location.origin && ref !== location.href;
+    }catch(_){ fromRevista = false; }
+    if(fromRevista && history.length > 1){ ev.preventDefault(); history.back(); }
+    // Si no, el enlace sigue su href por defecto: ../index.html
+  });
+}
 
 const byRegion = d3.group(DEST,d=>d.r);
 const lists = d3.select('#lists');

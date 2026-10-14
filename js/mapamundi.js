@@ -1,7 +1,7 @@
 /* =========================================================
    MAPAMUNDI ANIMADO · Iberostar Destinos
-   Sección SPA "/mapa-mundi". Muestra los destinos Iberostar
-   sobre un mapa mundial con 8 animaciones y ciclo de vida
+   Sección SPA "/mapa-hoteles" (Mapa general de hoteles). Muestra
+   los destinos Iberostar sobre un mapa mundial con 8 animaciones y ciclo de vida
    explícito: mount() al entrar en la sección, unmount() al
    salir (cancela temporizadores, animaciones y elimina el
    mapa para no dejar instancias huérfanas).
@@ -152,7 +152,7 @@
       '<div class="mapamundi-frame">' +
         '<div class="mapamundi-map" id="mapamundiMap" role="application" aria-label="Mapamundi de destinos Iberostar"></div>' +
         '<div class="mapamundi-actions">' +
-          '<a class="mapamundi-btn" href="mapa-mundi/index2.html" target="_blank" rel="noopener">Planisferio Interactivo (D3) ↗</a>' +
+          '<a class="mapamundi-btn" href="mapa-mundi/index2.html">Planisferio Interactivo (D3) ↗</a>' +
           '<button type="button" class="mapamundi-btn" data-mapamundi-replay>Repetir animaciones</button>' +
         "</div>" +
       "</div>" +
@@ -165,13 +165,21 @@
   function runCountUp(root) {
     var nodes = root.querySelectorAll("[data-count-to]");
     if (!nodes.length) return;
+    /* Evita duplicar la animación si se repite o se re-entra en la sección. */
+    if (instance && instance.timers.countRaf) {
+      window.cancelAnimationFrame(instance.timers.countRaf);
+      instance.timers.countRaf = null;
+    }
     if (prefersReducedMotion()) {
       nodes.forEach(function (node) { node.textContent = node.getAttribute("data-count-to"); });
       return;
     }
+    var owner = instance;
+    if (!owner) return;
     var duration = 900;
     var start = performance.now();
     function frame(now) {
+      if (!instance || instance !== owner) return;
       var progress = Math.min(1, (now - start) / duration);
       var eased = 1 - Math.pow(1 - progress, 3);
       nodes.forEach(function (node) {
@@ -179,31 +187,53 @@
         node.textContent = String(Math.round(target * eased));
       });
       if (progress < 1) {
-        instance.timers.countRaf = window.requestAnimationFrame(frame);
+        owner.timers.countRaf = window.requestAnimationFrame(frame);
       }
     }
-    instance.timers.countRaf = window.requestAnimationFrame(frame);
+    owner.timers.countRaf = window.requestAnimationFrame(frame);
   }
 
   function startDrift() {
-    if (prefersReducedMotion() || !instance.map) return;
-    instance.timers.drift = window.setInterval(function () {
-      if (!instance.map || instance.userInteracted) return;
-      try {
-        instance.map.panBy([26, 0], { animate: true, duration: 2.4, easeLinearity: 0.6 });
-      } catch (error) { /* el mapa pudo cerrarse */ }
-    }, 5200);
+    if (prefersReducedMotion() || !instance || !instance.map) return;
+    /* Un solo bucle de deriva: si ya había uno, se cancela antes de reanudar. */
+    stopDrift();
+    var owner = instance;
+    owner.userInteracted = false;
+    var map = owner.map;
+    var SPEED = 7; /* píxeles por segundo */
+    var accumulator = 0;
+    var last = performance.now();
+    function step(now) {
+      if (!instance || instance !== owner || !owner.map || owner.userInteracted) return;
+      var delta = Math.min(64, now - last);
+      last = now;
+      accumulator += (SPEED * delta) / 1000;
+      var shift = Math.round(accumulator);
+      if (shift !== 0) {
+        accumulator -= shift;
+        try {
+          map.panBy([shift, 0], { animate: false, noMoveStart: true });
+        } catch (error) { /* el mapa pudo cerrarse */ }
+      }
+      owner.timers.driftRaf = window.requestAnimationFrame(step);
+    }
+    owner.timers.driftRaf = window.requestAnimationFrame(step);
   }
 
   function stopDrift(target) {
     var owner = target || instance;
-    if (owner && owner.timers && owner.timers.drift) {
+    if (!owner || !owner.timers) return;
+    if (owner.timers.driftRaf) {
+      window.cancelAnimationFrame(owner.timers.driftRaf);
+      owner.timers.driftRaf = null;
+    }
+    if (owner.timers.drift) {
       window.clearInterval(owner.timers.drift);
       owner.timers.drift = null;
     }
   }
 
-  function buildMap(root) {
+  function buildMap(root, owner) {
     var engine = window.RevistaDigital.mapas;
     if (!engine || typeof engine.loadLeaflet !== "function") {
       root.querySelector("#mapamundiMap").innerHTML =
@@ -213,7 +243,15 @@
 
     return engine.loadLeaflet().then(function (L) {
       var element = root.querySelector("#mapamundiMap");
-      if (!element || !instance) return null;
+      if (!element || instance !== owner) return null;
+
+      /* Deriva continua: la animación CSS "mapaMundiDrift" original dura ~32 s
+         (2 iteraciones) y después detenía el movimiento. Se reutiliza el mismo
+         keyframe existente en bucle para mantener un vaivén sutil y sin saltos.
+         El modo de movimiento reducido (CSS !important) la sigue desactivando. */
+      if (!prefersReducedMotion()) {
+        element.style.animation = "mapaMundiDrift 16s ease-in-out infinite";
+      }
 
       var map = L.map(element, {
         zoomControl: true,
@@ -237,8 +275,21 @@
       }).addTo(map);
 
       map.on("dragstart zoomstart", function () {
+        if (instance !== owner) return;
         instance.userInteracted = true;
-        stopDrift();
+        stopDrift(owner);
+      });
+
+      /* Con un popup abierto, se detiene la deriva para que la información
+         permanezca fija y visible; al cerrarlo se reanuda si el usuario no ha
+         interactuado manualmente con el mapa. */
+      map.on("popupopen", function () {
+        if (instance !== owner) return;
+        stopDrift(owner);
+      });
+      map.on("popupclose", function () {
+        if (instance !== owner || owner.userInteracted) return;
+        startDrift();
       });
 
       /* 5 · arcos de conexión desde el hub europeo */
@@ -276,6 +327,7 @@
           " hotel" + (destination.total > 1 ? "es" : "") + "<br>" + escapeHtml(categoryNames(destination)) + "</small>";
 
         var marker = L.marker([destination.lat, destination.lon], {
+          riseOnHover: true,
           icon: L.divIcon({
             className: "mapamundi-dot",
             html: '<span class="mapamundi-pulse" style="background:' + categoryColor(destination) + '55"></span>' +
@@ -285,13 +337,23 @@
             iconAnchor: [0, 0],
             popupAnchor: [0, -6]
           })
-        }).bindPopup(popup);
+        })
+          /* Hover (ratón): información rápida. */
+          .bindTooltip(popup, {
+            direction: "top",
+            offset: [0, -8],
+            opacity: 0.97,
+            sticky: false,
+            className: "mapamundi-tooltip"
+          })
+          /* Clic o toque: contenido que permanece visible hasta cerrarlo. */
+          .bindPopup(popup);
 
         if (reduced) {
           marker.addTo(map);
         } else {
-          instance.timers.stagger.push(window.setTimeout(function () {
-            if (instance) marker.addTo(map);
+          owner.timers.stagger.push(window.setTimeout(function () {
+            if (instance === owner) marker.addTo(map);
           }, 260 + index * 55));
         }
       });
@@ -306,40 +368,42 @@
     if (!container) return null;
     mapamundi.unmount();
 
-    instance = {
+    var owner = {
       container: container,
       map: null,
       userInteracted: false,
-      timers: { stagger: [], countRaf: null, drift: null, exit: null }
+      timers: { stagger: [], countRaf: null, drift: null, driftRaf: null, exit: null }
     };
+    instance = owner;
 
     container.innerHTML = buildMarkup();
     var root = container.querySelector(".mapamundi-page");
-    instance.root = root;
+    owner.root = root;
 
     runCountUp(root);
 
     var replay = root.querySelector("[data-mapamundi-replay]");
     if (replay) {
       replay.addEventListener("click", function () {
+        if (instance !== owner) return;
         root.setAttribute("data-anim", "in");
         runCountUp(root);
         startDrift();
       });
     }
 
-    buildMap(root).then(function (map) {
-      if (!instance) {
+    buildMap(root, owner).then(function (map) {
+      if (!instance || instance !== owner) {
         if (map) map.remove();
         return;
       }
-      instance.map = map;
+      owner.map = map;
       startDrift();
     }).catch(function (error) {
       console.warn("Mapamundi: no se pudo inicializar el mapa.", error);
     });
 
-    return instance;
+    return owner;
   };
 
   mapamundi.unmount = function () {

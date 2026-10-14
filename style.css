@@ -3545,7 +3545,7 @@ body.pano-360-open { overflow: hidden; }
 /* =========================================================
    AVISO DE UBICACIÓN (bienvenida por geolocalización)
    ========================================================= */
-.location-welcome { position:fixed; right:18px; bottom:18px; z-index:1200; width:min(360px,calc(100vw - 28px)); padding:22px 22px 20px; border:1px solid #d9c9ae; border-radius:16px; background:linear-gradient(180deg,var(--paper-alt),var(--paper)); box-shadow:0 22px 54px rgba(9,4,3,.22); color:var(--green); }
+.location-welcome { position:fixed; left:18px; bottom:18px; z-index:1200; width:min(360px,calc(100vw - 28px)); padding:22px 22px 20px; border:1px solid #d9c9ae; border-radius:16px; background:linear-gradient(180deg,var(--paper-alt),var(--paper)); box-shadow:0 22px 54px rgba(9,4,3,.22); color:var(--green); }
 .location-welcome[hidden] { display:none; }
 .location-welcome-close { position:absolute; top:10px; right:12px; width:30px; height:30px; border:0; border-radius:50%; background:rgba(64,54,46,.08); color:var(--green-deep); font-size:19px; line-height:1; cursor:pointer; }
 .location-welcome-close:hover,.location-welcome-close:focus-visible { background:rgba(64,54,46,.16); }
@@ -3620,3 +3620,11 @@ body.pano-360-open { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .mapamundi-page *,.mapamundi-pulse,.mapamundi-arc { animation:none !important; transition:none !important; }
 }
+/* Tipografía EB Garamond para la sección «Mapa general de hoteles».
+   El modo "tool" fuerza Arial con !important sobre .magazine-stage; se
+   reafirma EB Garamond (ya cargada en index.html) solo dentro de esta
+   sección, sin alterar el resto de la revista ni el Mapamundi Leaflet. */
+.mapamundi-page,
+.mapamundi-page * { font-family:"EB Garamond",Georgia,serif !important; }
+body[data-app-mode="tool"] .mapamundi-page,
+body[data-app-mode="tool"] .mapamundi-page * { font-family:"EB Garamond",Georgia,serif !important; }

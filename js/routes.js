@@ -61,10 +61,8 @@
       }
     } else if (page?.type === "country-menu") {
       nextPath = `/hoteles/${page.country}`;
-    } else if (page?.type === "map") {
-      nextPath = "/mapa-general";
     } else if (page?.type === "mapamundi") {
-      nextPath = "/mapa-mundi";
+      nextPath = "/mapa-hoteles";
     } else if (page?.type === "workspace") {
       nextPath = "/workspace";
     } else if (page?.type === "media360") {
@@ -129,7 +127,7 @@
 
     const routeLabels = {
       "/": "Inicio",
-      "/mapa-general": "Mapa general",
+      "/mapa-hoteles": "Mapa general de hoteles",
       "/mapa-mundi": "Mapa mundial",
       "/workspace": "Workspace",
       "/360": "360°",
@@ -256,7 +254,7 @@
       return context;
     }
 
-    if (parts[0] && ["mapa-general", "mapa-mundi", "workspace", "360", "videos", "complejo-playa-paraiso", "guia-playa-paraiso"].includes(parts[0])) {
+    if (parts[0] && ["mapa-hoteles", "mapa-mundi", "workspace", "360", "videos", "complejo-playa-paraiso", "guia-playa-paraiso"].includes(parts[0])) {
       context.kind = "section";
       context.destination = parts[0];
       return context;
@@ -343,17 +341,6 @@
     const view = document.getElementById("appView");
     if (!view) return false;
     const catalog = getDestinationCatalog();
-    if (route === "/mapa-hoteles") {
-      const mapHotels = Object.entries(catalog).flatMap(([countrySlug, country]) => country.destinations.flatMap((destination) =>
-        destination.hotels.map((hotel) => ({ ...hotel, countrySlug, countryName: country.name, destinationSlug: destination.slug, destinationName: destination.name }))
-      )).filter((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]));
-      document.body.dataset.appMode = "portal";
-      document.body.dataset.routeManaged = "true";
-      view.innerHTML = `<main class="portal-page"><div class="portal-breadcrumb">IBEROSTAR · DESTINOS · MAPA GENERAL</div><section class="portal-section portal-all-map-heading"><div><p class="portal-kicker">EXPLORA LOS ALOJAMIENTOS</p><h1>Mapa general de hoteles</h1><p>Selecciona un marcador para abrir la ficha del hotel.</p></div><div class="portal-map-frame"><div id="allHotelsMap" class="portal-all-hotels-map" role="application" aria-label="Mapa general de hoteles Iberostar"></div>${portalMapActions(mapHotels)}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">HOTELES CON UBICACIÓN</p><h2>Elige una ficha</h2></div></div><div class="destination-grid">${renderCards(mapHotels, (hotel) => `/${hotel.countrySlug}/${hotel.destinationSlug}/${hotel.slug}`, "hotel")}</div></section></main>`;
-      const mapElement = view.querySelector("#allHotelsMap");
-      if (mapElement) window.RevistaDigital.mapas?.initializeAllHotelsMap(mapElement, mapHotels);
-      return true;
-    }
     if (route === "/complejo-playa-paraiso") {
       const complexEntry = Object.entries(catalog || {})
         .flatMap(([countrySlug, country]) => (country.destinations || []).map((destination) => ({ countrySlug, country, destination })))
@@ -596,7 +583,7 @@
         <div class="portal-breadcrumb"><a href="${href("/")}" data-app-route="/">Inicio</a> / <a href="${href("/restaurantes")}" data-app-route="/restaurantes">Restaurantes</a> / <a href="${href(`/restaurantes/${country.slug}`)}" data-app-route="/restaurantes/${country.slug}">${escapeHtml(country.name)}</a> / ${escapeHtml(hotel.name)}</div>
         <section class="portal-destination-hero">
           <img src="${escapeHtml(hotel.image)}" alt="">
-          <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>Carta de restaurantes del hotel.${count ? ` ${count} ${count === 1 ? "restaurante" : "restaurantes"} para disfrutar.` : ""}</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver ficha del hotel <span>→</span></a></div>
+          <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${count === 1 ? "restaurante" : "restaurantes"} para descubrir durante tu estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
         </section>
         <section class="portal-section">
           <div class="portal-section-heading"><div><p class="portal-kicker">LA CARTA</p><h2>Restaurantes de ${escapeHtml(hotel.name)}</h2></div><span class="restaurant-count-note">${count} ${count === 1 ? "opción" : "opciones"}</span></div>
@@ -604,7 +591,7 @@
         </section>
         ${gallery}
         <section class="portal-section">
-          <div class="portal-section-heading"><div><p class="portal-kicker">TODO ${escapeHtml(country.name).toUpperCase()}</p><h2>Todos los restaurantes de ${escapeHtml(country.name)}</h2></div></div>
+          <div class="portal-section-heading"><div><p class="portal-kicker">TODAS LAS CARTAS</p><h2>Todos los restaurantes de ${escapeHtml(country.name)}</h2></div></div>
           ${restaurantCountryGroupsMarkup(groups)}
         </section>
       </main>`;
@@ -996,7 +983,7 @@
           console.warn("No se pudieron leer los destinos del mapa.", error);
         }
       }
-      if (name || coordinates) window.openDirections?.(name, coordinates);
+      if (name || coordinates) window.RevistaDigital?.mapas?.openDirections?.(name, coordinates);
       return;
     }
     const gpdir = event.target.closest(".gp-dir");
@@ -1005,7 +992,7 @@
       const lng = parseFloat(gpdir.dataset.lng);
       const nm = gpdir.dataset.name || "POI";
       if (!isNaN(lat) && !isNaN(lng)) {
-        try { window.openDirections?.(nm, [lat, lng]); } catch (e) {}
+        try { window.RevistaDigital?.mapas?.openDirections?.(nm, [lat, lng]); } catch (e) {}
       }
       return;
     }
@@ -1085,6 +1072,8 @@
       refreshCurrentAppContext(route);
       if (!route.startsWith("/restaurantes/")) delete document.body.dataset.restaurantReturnRoute;
       const legacyRouteAliases = {
+        "/mapa-general": "/mapa-hoteles",
+        "/mapa-mundi": "/mapa-hoteles",
         "/brasil/brasil": "/brasil/praia-do-forte",
         "/brasil/manaus": "/brasil/amazon",
         "/brasil/manaus/iberostar-heritage-grand-amazon": "/brasil/amazon/iberostar-heritage-grand-amazon",
@@ -1272,8 +1261,7 @@
 
       const pageTypeByRoute = {
         "/complejo-playa-paraiso": "complex",
-        "/mapa-general": "map",
-        "/mapa-mundi": "mapamundi",
+        "/mapa-hoteles": "mapamundi",
         "/workspace": "workspace",
         "/360": "media360",
         "/videos": "videos",

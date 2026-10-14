@@ -499,14 +499,6 @@ const pages = [
   },
 
   {
-    type: "map",
-    kicker: "MAPA GENERAL · 5 HOTELES",
-    title: "Iberostar Playa Paraíso",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=90"
-  },
-
-  {
     type: "mapamundi",
     title: "Mapa Mundi"
   },
@@ -2687,253 +2679,11 @@ function autoDetectLocation() {
    ========================================================= */
 
 function openDirections(destination, coordinates) {
-  const mapElement =
-    bookShell.querySelector("#hotelMap, #generalMap") ||
-    document.querySelector("#hotelPortalMap, #destinationMap, #allHotelsMap, #countryMap, #complexPortalMap");
-
-  const status =
-    document.getElementById("locationStatus");
-
-  if (!mapElement) return;
-
-  if (!currentPosition) {
-    if (status) status.textContent =
-      "Necesitamos permiso para calcular la ruta.";
-
-    requestCurrentLocation();
-    return;
-  }
-
-  const origin =
-    `${currentPosition.latitude},${currentPosition.longitude}`;
-
-  if (activeMap && window.L) {
-    const destinationPage = pages.find((item) => item.location === destination);
-    const currentHotelDetail = getActiveHotelDetail();
-    const destinationHotelName = destinationPage?.name || currentHotelDetail?.hotel?.name || destination;
-    const destinationCoordinates =
-      hotelCoordinates[destinationHotelName] ||
-      hotelCoordinates[destination] ||
-      (Array.isArray(coordinates) && coordinates.length === 2 ? coordinates : null);
-
-    if (!destinationCoordinates) return;
-
-    const start =
-      `${currentPosition.longitude},${currentPosition.latitude}`;
-
-    const end =
-      `${destinationCoordinates[1]},${destinationCoordinates[0]}`;
-
-    // Perímetro del complejo: se calcula ANTES de usarlo (declararlo después
-    // provocaba un ReferenceError que anulaba el cálculo de la ruta).
-    const isInsideComplexBounds = (point) =>
-      point[0] >= complexBounds[0][0] &&
-      point[0] <= complexBounds[1][0] &&
-      point[1] >= complexBounds[0][1] &&
-      point[1] <= complexBounds[1][1];
-
-    const isComplexPoi = isInsideComplexBounds(destinationCoordinates);
-    const isPlayaParaisoHotel =
-      typeof window.isPlayaParaisoHotel === "boolean"
-        ? window.isPlayaParaisoHotel
-        : isComplexPoi;
-    // El motor público de OSRM solo sirve el perfil "driving": pedir "foot"
-    // devolvía error y la ruta nunca se calculaba. Para los destinos del
-    // complejo se conserva el atajo de ruta directa (más abajo).
-    const profile = "driving";
-    const routeRequest =
-      `https://router.project-osrm.org/route/v1/${profile}/${start};${end}?alternatives=true&overview=full&geometries=geojson`;
-
-    fetch(routeRequest)
-      .then((response) => response.json())
-      .then((route) => {
-        const routes =
-          Array.isArray(route.routes) && route.routes.length
-            ? route.routes
-            : [];
-        if (!routes.length) throw new Error("El motor de rutas no devolvió trayectos.");
-        const best = routes.reduce(
-          (shortest, candidate) =>
-            candidate.distance < shortest.distance ? candidate : shortest,
-          routes[0]
-        );
-        const osrmCoordinates =
-          best.geometry?.coordinates?.map(
-            ([longitude, latitude]) =>
-              [latitude, longitude]
-          ) || [];
-
-        const directDistance = distanceBetweenCoordinates(
-          { latitude: currentPosition.latitude, longitude: currentPosition.longitude },
-          { latitude: destinationCoordinates[0], longitude: destinationCoordinates[1] }
-        );
-
-        // Si pedimos cómo llegar a un hotel del complejo Playa Paraíso
-        // y el motor de calles propone un desvío desproporcionado frente
-        // a la distancia directa (los hoteles comparten acceso), marcamos
-        // directamente la ruta más eficiente hasta el hotel.
-        // (isPlayaParaisoHotel ya se resolvió antes de la petición.)
-        const useDirectRoute =
-          isPlayaParaisoHotel &&
-          directDistance < 20000 &&
-          best.distance > directDistance * 1.4;
-
-        routeLine?.remove();
-
-        if (useDirectRoute) {
-          routeLine =
-            L.polyline(
-              [
-                [
-                  currentPosition.latitude,
-                  currentPosition.longitude
-                ],
-                destinationCoordinates
-              ],
-              {
-                color: "#d9b978",
-                weight: 6,
-                opacity: 0.95
-              }
-            ).addTo(activeMap);
-
-          activeMap.fitBounds(
-            routeLine.getBounds(),
-            {
-              padding: [35, 35]
-            }
-          );
-
-          document.getElementById(
-            "locationStatus"
-          ).textContent =
-            `Ruta directa a ${destination}: ${(
-              directDistance / 1000
-            ).toFixed(1)} km, evitando un rodeo por carretera de ${
-              (best.distance / 1000).toFixed(1)
-            } km.`;
-          return;
-        }
-
-        // OSRM a veces "engancha" la ruta al camino más cercano y no llega
-        // exactamente hasta la puerta del hotel. Forzamos que la línea
-        // siempre empiece en tu ubicación real y termine exactamente en
-        // la coordenada del hotel.
-        const routeCoordinates =
-          osrmCoordinates.length
-            ? [
-                [
-                  currentPosition.latitude,
-                  currentPosition.longitude
-                ],
-                ...osrmCoordinates,
-                destinationCoordinates
-              ]
-            : null;
-
-        routeLine =
-          L.polyline(
-            routeCoordinates ||
-              [
-                [
-                  currentPosition.latitude,
-                  currentPosition.longitude
-                ],
-                destinationCoordinates
-              ],
-            {
-              color: "#d9b978",
-              weight: 6,
-              opacity: 0.95,
-              dashArray: "12 8"
-            }
-          ).addTo(activeMap);
-
-        activeMap.fitBounds(
-          routeLine.getBounds(),
-          {
-            padding: [35, 35]
-          }
-        );
-
-        const distance =
-          best.distance
-            ? `${(
-                best.distance / 1000
-              ).toFixed(1)} km`
-            : "Ruta calculada";
-
-        document.getElementById(
-          "locationStatus"
-        ).textContent =
-          `Ruta por calles marcada dentro del mapa: ${distance}.`;
-      })
-      .catch(() => {
-        routeLine?.remove();
-
-        routeLine =
-          L.polyline(
-            [
-              [
-                currentPosition.latitude,
-                currentPosition.longitude
-              ],
-              destinationCoordinates
-            ],
-            {
-              color: "#d9b978",
-              weight: 6,
-              dashArray: "12 8"
-            }
-          ).addTo(activeMap);
-
-        activeMap.fitBounds(
-          routeLine.getBounds(),
-          {
-            padding: [35, 35]
-          }
-        );
-
-        document.getElementById(
-          "locationStatus"
-        ).textContent =
-          "Ruta directa marcada dentro del mapa.";
-      });
-
-    return;
-  }
-
-  mapElement.innerHTML = `
-    <div class="route-preview">
-      <div class="route-preview-header">
-        <strong>Ruta desde tu ubicación</strong>
-        <span>En coche</span>
-      </div>
-
-      <div class="route-preview-map">
-        <div class="route-path">
-          <i class="route-start"></i>
-          <b></b>
-          <i class="route-end"></i>
-        </div>
-
-        <span class="route-label route-start-label">
-          Tu ubicación actual
-        </span>
-
-        <span class="route-label route-end-label">
-          ${destination}
-        </span>
-      </div>
-
-      <small>
-        Conectando con el mapa interactivo...
-      </small>
-    </div>
-  `;
-
-  status.textContent =
-    "Ruta mostrada dentro del mapa.";
+  // Motor de rutas unificado: la geometría, el estilo y la lógica viven en
+  // mapas.openDirections (peatonal Valhalla en el complejo, OSRM en coche como
+  // respaldo). Nunca se dibuja una línea recta como si fuera una ruta real y,
+  // si el cálculo falla, se muestra un mensaje claro en su lugar.
+  return window.RevistaDigital?.mapas?.openDirections?.(destination, coordinates);
 }
 
 
@@ -5947,10 +5697,8 @@ function syncBookRoute() {
     }
   } else if (page.type === "country-menu") {
     nextPath = `/hoteles/${page.country}`;
-  } else if (page.type === "map") {
-    nextPath = "/mapa-general";
   } else if (page.type === "mapamundi") {
-    nextPath = "/mapa-mundi";
+    nextPath = "/mapa-hoteles";
   } else if (page.type === "workspace") {
     nextPath = "/workspace";
   } else if (page.type === "media360") {
@@ -6086,42 +5834,6 @@ function renderPage() {
       </div>
     `;
   }
-
-  else if (page.type === "map") {
-    bookShell.innerHTML = `
-      <div class="spread general-map-spread">
-        <div class="general-map-frame" id="generalMapFrame">
-          <div id="generalMap" class="google-map general-google-map"></div>
-          <button type="button" class="locate-me map-location-button">
-            📍 Mi ubicación
-          </button>
-        </div>
-
-        <div class="map-route-list">
-          <b>★ NAVEGAR A HOTEL</b>
-          ${pages
-            .filter((item) => item.type === "hotel")
-            .map(
-              (item, i) => `
-                <button type="button" data-hotel="${i + 1}" data-route="${item.location}" class="hotel-route-button">
-                  ● ${item.name.replace("Iberostar ", "")}
-                  <span>→</span>
-                </button>
-                <button class="mini-route" type="button" data-route="${item.location}">
-                  Cómo llegar
-                </button>
-              `
-            )
-            .join("")}
-        </div>
-
-        <a class="open-map general-map-link" href="https://www.openstreetmap.org/?mlat=20.7612389&mlon=-86.9640931#map=16/20.7612389/-86.9640931" target="_blank" rel="noopener">
-          Abrir mapa completo ↗
-        </a>
-      </div>
-    `;
-  }
-
 
   else if (
     page.type === "mapamundi"
