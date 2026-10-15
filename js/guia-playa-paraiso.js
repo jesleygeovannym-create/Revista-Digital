@@ -93,7 +93,7 @@
     // (su coordenada queda DENTRO del polígono de Vidanta y FUERA del complejo
     // Iberostar Playa Paraíso). Se conserva el registro pero se excluye del
     // explorador y del mapa (external: true).
-    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.7631,"lng":-86.9618,"description":"Resort vecino Vidanta Riviera Maya (fuera del complejo)","source":"osm","verified":true,"external":true},
+    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.7631,"lng":-86.9618,"description":"Coco Bar","source":"plano","verified":false},
     {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café","source":"osm","verified":true});
   POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Club premium del complejo","source":"plano","verified":false},
     {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea","source":"plano","verified":false});

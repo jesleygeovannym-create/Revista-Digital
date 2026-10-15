@@ -169,7 +169,7 @@
       description: "Hotel todo incluido en Playacar, Playa del Carmen, con cinco restaurantes de especialidad, tres buffets, spa, deportes acuáticos y actividades para toda la familia. Comparte complejo con Iberostar Waves Quetzal.",
       tabs: {
         habitaciones: { description: "Alojamiento para parejas y familias dentro del complejo Tucán & Quetzal.", keyPoints: ["Habitaciones y suites para familias", "Complejo compartido Tucán & Quetzal"] },
-        restaurante: { description: "La propuesta todo incluido reúne cinco restaurantes de especialidad y tres buffets, con opciones sin gluten.", keyPoints: ["Cinco restaurantes de especialidad", "Tres buffets y opciones sin gluten"] },
+        restaurante: { description: "Cinco restaurantes de especialidad —La Góndola (italiana), Bonsai (japonesa), Mare Nostrum (mediterránea), Uxmal (mexicana) y La Hacienda Smoke House (carnes)—, más el buffet Cozumel y opciones sin gluten.", keyPoints: ["Cinco restaurantes de especialidad", "Buffet Cozumel y opciones sin gluten"] },
         piscinas: { description: "El complejo cuenta con piscinas para adultos y niños, además del acceso a la playa.", keyPoints: ["Piscinas para adultos y niños", "Acceso a la playa"] },
         experiencias: { description: "Star Camp, animación profesional, deportes acuáticos, tenis y gym, con spa y campo de golf cercano.", keyPoints: ["Star Camp y animación", "Deportes acuáticos y spa"] }
       }
@@ -179,7 +179,7 @@
       description: "Hotel todo incluido frente al mar en Playacar, Playa del Carmen, con acceso directo a la playa, cuatro piscinas, cinco restaurantes de especialidad, spa y programas para familias. Comparte complejo con Iberostar Waves Tucán.",
       tabs: {
         habitaciones: { description: "Alojamiento para parejas y familias dentro del complejo Tucán & Quetzal.", keyPoints: ["Habitaciones y suites para familias", "Complejo compartido Tucán & Quetzal"] },
-        restaurante: { description: "El todo incluido incluye cinco restaurantes de especialidad y tres buffets, con opciones sin gluten y a base de plantas.", keyPoints: ["Cinco restaurantes de especialidad", "Tres buffets, opciones sin gluten"] },
+        restaurante: { description: "Cinco restaurantes de especialidad —La Góndola (italiana), Bonsai (japonesa), Mare Nostrum (mediterránea), Uxmal (mexicana) y La Hacienda Smoke House (carnes)—, más el buffet Cozumel y opciones sin gluten y a base de plantas.", keyPoints: ["Cinco restaurantes de especialidad", "Buffet Cozumel, opciones sin gluten"] },
         piscinas: { description: "Cuatro piscinas, incluida piscina infantil, además del acceso directo a la playa.", keyPoints: ["Cuatro piscinas", "Acceso directo a la playa"] },
         experiencias: { description: "Star Camp, animación, buceo PADI, tenis, gym y spa frente al mar dentro del complejo.", keyPoints: ["Star Camp y animación", "Buceo PADI y spa"] }
       }

@@ -235,6 +235,18 @@
                 "src/official-hotels/gallery/grand-amazon-expedition-66797.jpg",
                 "src/official-hotels/gallery/grand-amazon-expedition-66798.jpg"
             ]
+        },
+        "waves-quetzal": {
+            "restaurante": [
+                "src/official-hotels/gallery/waves-quetzal-77507.jpg",
+                "src/official-hotels/gallery/waves-quetzal-68795.jpg"
+            ]
+        },
+        "waves-tucan": {
+            "restaurante": [
+                "src/official-hotels/gallery/waves-tucan-58591.jpg",
+                "src/official-hotels/gallery/waves-tucan-89215.jpg"
+            ]
         }
     }
         ;

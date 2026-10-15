@@ -613,7 +613,7 @@
     ".portal-hero > img",
     ".portal-destination-hero > div > *",
     ".portal-destination-hero > img",
-    ".portal-breadcrumb",
+    ".portal-nav",
     ".portal-section > *",
     ".portal-section-heading > *",
     ".destination-card > *",

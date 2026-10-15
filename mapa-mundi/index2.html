@@ -46,8 +46,10 @@
   .panel .cap b{display:block;font-family:'Marcellus',serif;font-size:17px;font-weight:400;letter-spacing:.1em;text-transform:uppercase}
   .panel .cap span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   svg{display:block}
-  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .12s;background:#fff;border:1px solid var(--line);
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1);
+       transform:translateY(8px) scale(.97);background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);
        box-shadow:0 12px 34px rgba(60,50,30,.16);padding:14px 16px;min-width:220px;max-width:min(320px,calc(100vw - 32px));z-index:20}
+  .tip.show{opacity:1;transform:translateY(0) scale(1)}
   .tip h4{font-family:'Marcellus',serif;font-size:16px;margin:0 0 2px;font-weight:400}
   .tip .co{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
   .tip ul{margin:0;padding:0;list-style:none;font-size:12.5px;line-height:1.55}
@@ -74,6 +76,38 @@
   .back{display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
         color:var(--muted);text-decoration:none;margin-bottom:22px;padding:6px 2px;transition:color .15s}
   .back:hover{color:var(--gold)}
+
+  /* ===== Nodos y foco ===== */
+  .node{transition:opacity .28s ease}
+  .panel svg.has-active .node:not(.active){opacity:.26}
+  .node.active .node-art{filter:drop-shadow(0 6px 14px rgba(24,42,58,.3))}
+
+  /* Pulso alrededor del punto */
+  .fx{pointer-events:none}
+  .fx-ring{fill:none;stroke:currentColor;stroke-width:1.6;transform-box:fill-box;
+    transform-origin:center;animation:ringOut .95s ease-out both}
+  @keyframes ringOut{0%{transform:scale(.55);opacity:.9}100%{transform:scale(2.3);opacity:0}}
+
+  /* Polvo digital en el borde del recuadro, con deriva sutil (no gira) */
+  .particle-layer{position:fixed;inset:0;pointer-events:none;z-index:21;overflow:hidden}
+  .particle{position:absolute;border-radius:50%;background:var(--pc,#2fa898);
+    opacity:0;transition:opacity .6s ease;
+    animation:drift var(--fdur,6s) ease-in-out infinite;animation-delay:var(--fdel,0s)}
+  .particle.settled{opacity:.9}
+  .particle.gone{opacity:0}
+  @keyframes drift{
+    0%,100%{transform:translate3d(0,0,0) scale(.85)}
+    50%{transform:translate3d(var(--fx,0px),var(--fy,-5px),0) scale(1.35)}}
+
+  /* La ficha se "escribe" línea a línea */
+  .tip h4,.tip .co,.tip .grp,.tip li{animation:infoIn .4s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes infoIn{from{opacity:0;transform:translateX(-7px)}to{opacity:1;transform:none}}
+
+  @media (prefers-reduced-motion: reduce){
+    .fx-ring{animation:none !important}
+    .tip h4,.tip .co,.tip .grp,.tip li{animation:none !important}
+    .particle{animation:none !important;transition:none}
+  }
   *{font-family:'EB Garamond',Georgia,serif !important}
 </style>
 </head>
@@ -102,6 +136,7 @@
   </div>
 
   <div class="grid" id="grid"></div>
+  <div class="particle-layer" id="particles"></div>
   <div class="tip" id="tip"></div>
 
   <div class="lists" id="lists"></div>
@@ -196,8 +231,25 @@ d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').th
       .fitExtent([[p.pad,p.padTop||p.pad],[p.w-p.pad,p.h-p.pad]], {type:'MultiPoint', coordinates:items.map(d=>[d.lon,d.lat])});
     if(items.length===1 || proj.scale()>9000) proj.scale(Math.min(proj.scale(),9000));
     const path = d3.geoPath(proj);
+
+    // --- ondulación sutil de las costas (continentes) ---
+    const uid = 'p' + p.id;
+    const defs = svg.append('defs');
+    const flt = defs.append('filter').attr('id','ripple-'+uid)
+      .attr('x','-6%').attr('y','-6%').attr('width','112%').attr('height','112%');
+    const turb = flt.append('feTurbulence').attr('type','fractalNoise')
+      .attr('baseFrequency','0.009').attr('numOctaves',2)
+      .attr('seed', (p.id.length*3+7)%20).attr('result','noise');
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+      turb.append('animate').attr('attributeName','baseFrequency')
+        .attr('dur','11s').attr('values','0.009;0.02;0.009').attr('repeatCount','indefinite');
+    }
+    flt.append('feDisplacementMap').attr('in','SourceGraphic').attr('in2','noise')
+      .attr('scale',12).attr('xChannelSelector','R').attr('yChannelSelector','G');
+
     svg.append('path').datum(land).attr('d',path).attr('fill','var(--land)')
-       .attr('stroke','#f7f3ec').attr('stroke-width',1);
+       .attr('stroke','#f7f3ec').attr('stroke-width',1)
+       .attr('filter','url(#ripple-'+uid+')');
 
     // Separar burbujas que se empalman: se desplazan lo mínimo y una línea guía marca la ubicación real
     const ds = p.dotScale||1, GAP = p.dotScale ? 5 : 8;
@@ -221,17 +273,26 @@ d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').th
     });
 
     const nodes = svg.append('g').selectAll('g').data(items).join('g')
+      .attr('class','node')
       .attr('transform',d=>{const q=pos.get(d);return `translate(${q.x},${q.y})`}).style('cursor','pointer');
 
-    nodes.each(function(d){
+    nodes.each(function(d,i){
       const r = rScale(d.total)*(p.dotScale||1), arc = d3.arc().innerRadius(0).outerRadius(r);
-      d3.select(this).selectAll('path').data(pie(CATS.map(c=>d[c.key].length)).filter(a=>a.value>0)).join('path')
+      const art = d3.select(this).append('g').attr('class','node-art').attr('transform','scale(.2)');
+      art.selectAll('path').data(pie(CATS.map(c=>d[c.key].length)).filter(a=>a.value>0)).join('path')
         .attr('d',arc).attr('fill',a=>CATS[a.index].color).attr('stroke','#fff').attr('stroke-width',1.4);
-      if(d.total>2 && !(p.dotScale)) d3.select(this).append('text').text(d.total)
+      if(d.total>2 && !(p.dotScale)) art.append('text').text(d.total)
         .attr('text-anchor','middle').attr('dy','.35em').attr('font-size',Math.max(11,r*.8))
         .attr('font-family','Marcellus, serif').attr('fill','#fff').attr('pointer-events','none');
       d3.select(this).append('circle').attr('r',r+8).attr('fill','transparent');
+      const q = pos.get(d);
+      this.__geo = {r:r, x:q.x, y:q.y};
+      // entrada escalonada de cada destino
+      art.transition().delay(160 + i*50).duration(640).ease(d3.easeBackOut.overshoot(1.7))
+        .attr('transform','scale(1)');
     });
+
+    const fx = svg.append('g').attr('class','fx');
 
     if(p.labels === false) { hookTips(); return; }
     // labels with greedy collision avoidance
@@ -279,29 +340,115 @@ d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').th
 
     hookTips();
     function hookTips(){
-    function showTip(ev,d){
-        let html = `<h4>${d.n}</h4><div class="co">${d.c} · ${d.total} hotel${d.total>1?'es':''}</div>`;
-        CATS.forEach(c=>{ if(d[c.key].length){
-          html += `<div class="grp">${c.label}</div><ul>`+d[c.key].map(x=>`<li><i style="background:${c.color}"></i><span>${x}</span></li>`).join('')+`</ul>`;
-        }});
+      const particleLayer = document.getElementById('particles');
+      let current = null, frameParticles = [], touchLock = 0;
+      function positionTip(ev){
         const tw = Math.min(320, innerWidth-32);
-        tip.html(html).style('opacity',1)
-           .style('left',Math.max(8,Math.min(ev.clientX+18, innerWidth-tw-8))+'px')
+        tip.style('left',Math.max(8,Math.min(ev.clientX+18, innerWidth-tw-8))+'px')
            .style('top',Math.max(8,Math.min(ev.clientY-30, innerHeight-260))+'px');
-    }
-    nodes.on('mousemove',function(ev,d){ showTip(ev,d); })
-      .on('mouseleave',()=>tip.style('opacity',0))
-      .on('touchstart',function(ev,d){
-        ev.preventDefault();
-        const t = ev.touches[0];
-        showTip({clientX:t.clientX, clientY:t.clientY}, d);
-      });
+      }
+      function renderTip(d){
+        if(current === d){ tip.classed('show',true); return; }
+        current = d;
+        let delay = 0, html = `<h4 style="animation-delay:0ms">${d.n}</h4>`
+          + `<div class="co" style="animation-delay:40ms">${d.c} · ${d.total} hotel${d.total>1?'es':''}</div>`;
+        CATS.forEach(c=>{ if(d[c.key].length){
+          delay += 50;
+          html += `<div class="grp" style="animation-delay:${delay}ms">${c.label}</div><ul>`;
+          html += d[c.key].map(x=>{ delay += 45;
+            return `<li style="animation-delay:${delay}ms"><i style="background:${c.color}"></i><span>${x}</span></li>`; }).join('');
+          html += `</ul>`;
+        }});
+        const col = (CATS.find(c=>d[c.key].length)||CATS[0]).color;
+        tip.html(html).classed('show',true).style('border-top-color',col);
+      }
+      function setActive(node,d,on){
+        d3.select(node).classed('active',on);
+        svg.classed('has-active',on);
+        d3.select(node).select('.node-art').interrupt()
+          .transition().duration(260).ease(d3.easeCubicOut).attr('transform', on?'scale(1.22)':'scale(1)');
+        if(on){
+          const g0 = node.__geo, col = (CATS.find(c=>d[c.key].length)||CATS[0]).color;
+          if(g0){
+            const ring = fx.append('circle').attr('class','fx-ring')
+              .attr('cx',g0.x).attr('cy',g0.y).attr('r',g0.r).style('color',col);
+            setTimeout(()=>ring.remove(), 1000);
+          }
+        }
+      }
+      function clearParticles(){
+        frameParticles.splice(0).forEach(p=>{ p.classList.add('gone'); setTimeout(()=>p.remove(), 420); });
+      }
+      // punto sobre el perímetro del recuadro (t de 0 a 1)
+      function pointOnRect(t,w,h,pad){
+        const P = 2*(w+h); let d = t*P;
+        if(d < w) return [d, -pad];
+        d -= w; if(d < h) return [w+pad, d];
+        d -= h; if(d < w) return [w-d, h+pad];
+        d -= w; return [-pad, h-d];
+      }
+      // Polvo sobre el borde del recuadro (una sola fila) con deriva sutil
+      function particlesToFrame(colors){
+        const r = tip.node().getBoundingClientRect();
+        const per = 2*(r.width + r.height);
+        const count = Math.max(56, Math.min(220, Math.round(per/6)));
+        const small = innerWidth < 640;
+        for(let i=0;i<count;i++){
+          const pt = pointOnRect((i + 0.5)/count, r.width, r.height, 3);
+          const size = 2.4 + Math.random()*(small ? 2 : 3.2);
+          const p = document.createElement('div');
+          p.className = 'particle';
+          p.style.left = (r.left + pt[0])+'px';
+          p.style.top = (r.top + pt[1])+'px';
+          p.style.width = size.toFixed(1)+'px';
+          p.style.height = size.toFixed(1)+'px';
+          p.style.margin = (-size/2).toFixed(1)+'px 0 0 '+(-size/2).toFixed(1)+'px';
+          p.style.setProperty('--pc', colors[i%colors.length]||'#2fa898');
+          p.style.setProperty('--fx', (Math.random()*10-5).toFixed(1)+'px');
+          p.style.setProperty('--fy', (Math.random()*10-5).toFixed(1)+'px');
+          p.style.setProperty('--fdur', (2.4 + Math.random()*3.4).toFixed(2)+'s');
+          p.style.setProperty('--fdel', (Math.random()*2.5).toFixed(2)+'s');
+          p.style.transitionDelay = (i*4)+'ms';
+          particleLayer.appendChild(p);
+          frameParticles.push(p);
+          requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('settled')));
+        }
+      }
+      function spawnParticles(d){
+        clearParticles();
+        // color según las gráficas, pero todo país incluye siempre los 3 colores
+        let pal = CATS.map(c=>c.color);
+        CATS.forEach(c=>{ for(let k=0;k<d[c.key].length;k++) pal.push(c.color); });
+        particlesToFrame(pal);
+      }
+      nodes.on('mouseenter',function(ev,d){
+        if(Date.now() - touchLock < 900) return;
+        renderTip(d); positionTip(ev); setActive(this,d,true);
+        spawnParticles(d);
+      })
+        .on('mouseleave',function(ev,d){
+          if(Date.now() - touchLock < 900) return;
+          current=null; setActive(this,d,false); tip.classed('show',false); clearParticles();
+        })
+        .on('touchstart',function(ev,d){
+          ev.preventDefault();
+          touchLock = Date.now();
+          const t = ev.touches[0];
+          svg.selectAll('.node').classed('active',false);
+          current=null; renderTip(d); positionTip({clientX:t.clientX, clientY:t.clientY});
+          setActive(this,d,true);
+          spawnParticles(d);
+        });
     }
   });
 });
 
 document.addEventListener('touchstart',function(ev){
-  if(!ev.target.closest('.grid')) tip.style('opacity',0);
+  if(!ev.target.closest('.grid')){
+    tip.classed('show',false);
+    d3.selectAll('.grid .node').classed('active',false);
+    d3.selectAll('.grid svg').classed('has-active',false);
+  }
 }, {passive:true});
 
 const back = document.getElementById('back');

@@ -721,10 +721,38 @@
                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/81712/crops/16:9/955/image.jpeg"
                                                                       },
     "src/official-hotels/gallery/grand-amazon-expedition-66798.jpg":  {
-                                                                          "hotelSlug":  "grand-amazon-expedition",
-                                                                          "gallerySection":  "El Amazonas",
-                                                                          "imageId":  "66798",
-                                                                          "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
-                                                                          "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66798/crops/16:9/955/image.jpeg"
-                                                                      }
+                                                                           "hotelSlug":  "grand-amazon-expedition",
+                                                                           "gallerySection":  "El Amazonas",
+                                                                           "imageId":  "66798",
+                                                                           "sourcePage":  "https://www.iberostar.com/es/hoteles/manaos/iberostar-grand-amazon/",
+                                                                           "sourceImage":  "https://apiimg.iberostar.com/uploads/image/66798/crops/16:9/955/image.jpeg"
+                                                                       },
+    "src/official-hotels/gallery/waves-quetzal-77507.jpg":  {
+                                                                  "hotelSlug":  "waves-quetzal",
+                                                                  "gallerySection":  "Bares y restaurantes",
+                                                                  "imageId":  "77507",
+                                                                  "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-maya/iberostar-waves-quetzal/",
+                                                                  "sourceImage":  "https://apiimg.iberostar.com/uploads/image/77507/crops/2:3/500/image.jpeg"
+                                                              },
+    "src/official-hotels/gallery/waves-quetzal-68795.jpg":  {
+                                                                  "hotelSlug":  "waves-quetzal",
+                                                                  "gallerySection":  "Bares y restaurantes",
+                                                                  "imageId":  "68795",
+                                                                  "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-maya/iberostar-waves-quetzal/",
+                                                                  "sourceImage":  "https://apiimg.iberostar.com/uploads/image/68795/crops/2:3/500/image.jpeg"
+                                                              },
+    "src/official-hotels/gallery/waves-tucan-58591.jpg":  {
+                                                              "hotelSlug":  "waves-tucan",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "58591",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-maya/iberostar-waves-tucan/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/58591/crops/2:3/500/image.jpeg"
+                                                          },
+    "src/official-hotels/gallery/waves-tucan-89215.jpg":  {
+                                                              "hotelSlug":  "waves-tucan",
+                                                              "gallerySection":  "Bares y restaurantes",
+                                                              "imageId":  "89215",
+                                                              "sourcePage":  "https://www.iberostar.com/es/hoteles/riviera-maya/iberostar-waves-tucan/",
+                                                              "sourceImage":  "https://apiimg.iberostar.com/uploads/image/89215/crops/2:3/500/image.jpeg"
+                                                          }
 }

@@ -17,9 +17,13 @@ Portadas descargadas del CDN oficial de imágenes de Iberostar el 6 de octubre d
 | `selection-cancun.jpg` | Iberostar Selection Cancún | https://apiimg.iberostar.com/uploads/image/80497/crops/16%3A9/1920/image.jpeg |
 | `waves-cozumel.jpg` | Iberostar Waves Cozumel | https://apiimg.iberostar.com/uploads/image/84210/crops/16%3A9/1920/image.jpg |
 | `selection-playa-mita.jpg` | Iberostar Selection Playa Mita | https://apiimg.iberostar.com/uploads/image/73644/crops/16%3A9/1920/image.jpeg |
+| `waves-quetzal.jpg` | Iberostar Waves Quetzal | https://apiimg.iberostar.com/uploads/image/89293/crops/16%3A9/1920/image.jpeg |
+| `waves-tucan.jpg` | Iberostar Waves Tucán | https://apiimg.iberostar.com/uploads/image/89212/crops/16%3A9/1920/image.jpeg |
 
 ## Galerías por sección
 
 Las fichas reutilizables de México fuera de Riviera Maya, Jamaica, República Dominicana y Brasil cargan dos imágenes oficiales por sección: habitaciones, restaurantes, piscinas y experiencias. Las imágenes se sirven desde `gallery/`; las páginas de origen y los identificadores del CDN quedan registrados en `gallery/sources.json`. El módulo `js/hotel-gallery-data.js` conecta esas rutas locales con las fichas existentes. Los hoteles alias comparten la galería del hotel al que pertenecen.
 
 Las cinco fichas originales de Riviera Maya siguen usando sus imágenes y galerías actuales.
+
+Iberostar Waves Quetzal e Iberostar Waves Tucán (Riviera Maya) usan portada local y galería gastronómica propia, con recorte vertical `2:3` porque el CDN solo sirve esas fotos de restaurante en ese formato.

@@ -15,7 +15,6 @@
       
       menuWorldMap: "Mapamundi",
       menuWorldMapD3: "Planisferio Interactivo (D3)",
-      menuHotelsMap: "Mapa general de hoteles",
       menuComplexMap: "Mapa del complejo Playa Paraíso",
       menuWorkspace: "Workspace",
       menuVideos: "Videos",
@@ -60,7 +59,6 @@
 
       menuWorldMap: "World Map",
       menuWorldMapD3: "Interactive World Map (D3)",
-      menuHotelsMap: "General Hotels Map",
       menuComplexMap: "Playa Paraíso Complex Map",
       menuWorkspace: "Workspace",
       menuVideos: "Videos",

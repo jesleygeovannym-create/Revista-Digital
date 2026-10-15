@@ -499,11 +499,6 @@ const pages = [
   },
 
   {
-    type: "mapamundi",
-    title: "Mapa Mundi"
-  },
-
-  {
     type: "workspace",
     title: "Workspace",
     kicker: "EXPERIENCIAS DE LA COMUNIDAD"
@@ -3255,9 +3250,16 @@ function renderRestaurantMenu(pageIndex) {
    NUEVO - WORKSPACE
    ========================================================= */
 
+function sharedBackNav(route) {
+  const routes = window.RevistaDigital && window.RevistaDigital.routes;
+  if (!routes || typeof routes.portalNav !== "function" || typeof routes.getPortalNavModel !== "function") return "";
+  return routes.portalNav(routes.getPortalNavModel(route));
+}
+
 function renderWorkspace() {
   return `
     <div class="spread workspace-spread">
+      ${sharedBackNav("/workspace")}
 
       <div class="workspace-header">
 
@@ -3929,6 +3931,7 @@ console.log("ERROR INSERT:", error);
 function render360() {
   return `
     <div class="spread media-spread">
+      ${sharedBackNav("/360")}
 
       <div class="media-header">
         <div>
@@ -4369,6 +4372,7 @@ function wire360() {
 function renderVideos() {
   return `
     <div class="spread media-spread">
+      ${sharedBackNav("/videos")}
 
       <div class="media-header">
 
@@ -5697,8 +5701,6 @@ function syncBookRoute() {
     }
   } else if (page.type === "country-menu") {
     nextPath = `/hoteles/${page.country}`;
-  } else if (page.type === "mapamundi") {
-    nextPath = "/mapa-hoteles";
   } else if (page.type === "workspace") {
     nextPath = "/workspace";
   } else if (page.type === "media360") {
@@ -5707,6 +5709,8 @@ function syncBookRoute() {
     nextPath = "/videos";
   } else if (page.type === "complex") {
     nextPath = "/complejo-playa-paraiso";
+  } else if (page.type === "guia") {
+    nextPath = "/guia-playa-paraiso";
   }
 
   const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");
@@ -5719,9 +5723,6 @@ function syncBookRoute() {
 }
 
 function renderPage() {
-  // Al cambiar de página se desmonta el mapamundi animado (si estaba activo):
-  // cancela temporizadores, animaciones y elimina la instancia de mapa.
-  window.RevistaDigital.mapamundi?.unmount();
   if (!Number.isInteger(currentIndex) || !pages[currentIndex]) {
     currentIndex = 0;
   }
@@ -5761,6 +5762,7 @@ function renderPage() {
   else if (page.type === "guia") {
     bookShell.innerHTML = `
       <section class="spread guide-spread">
+        ${sharedBackNav("/guia-playa-paraiso")}
         <div id="guiaMount"></div>
       </section>
     `;
@@ -5833,21 +5835,6 @@ function renderPage() {
 
       </div>
     `;
-  }
-
-  else if (
-    page.type === "mapamundi"
-  ) {
-    // Sección animada del mapamundi (8 animaciones). El ciclo de vida lo
-    // gestiona js/mapamundi.js: mount() al entrar y unmount() al salir.
-    window.RevistaDigital.mapamundi?.unmount();
-    bookShell.innerHTML = `
-      <div class="spread">
-        <div id="mapamundiMount"></div>
-      </div>
-    `;
-    const mapamundiMount = document.getElementById("mapamundiMount");
-    if (mapamundiMount) window.RevistaDigital.mapamundi?.mount(mapamundiMount);
   }
 
   /* NUEVO */

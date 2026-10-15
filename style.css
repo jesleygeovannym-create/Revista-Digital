@@ -2669,7 +2669,7 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 .portal-destination-map.portal-complex-map { height:min(58vh,500px); min-height:420px; }
 .portal-section-heading { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:20px; }
 .portal-section-heading h2 { margin:6px 0 0; color:var(--green-deep); font:500 clamp(28px,3vw,40px) Georgia,serif; }
-.portal-section-heading > a,.portal-breadcrumb a { color:#8a7c6e; font:13px Arial,sans-serif; text-decoration:none; }
+.portal-section-heading > a,.portal-nav-trail-link { color:#8a7c6e; font:13px Arial,sans-serif; text-decoration:none; }
 .destination-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
 .destination-card { position:relative; display:flex; min-height:360px; overflow:hidden; flex-direction:column; border:1px solid rgba(64,54,46,.06); border-radius:14px; background:#ead9bf; color:white; text-decoration:none; box-shadow:0 14px 28px rgba(64,54,46,.08); }
 .destination-card > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s ease; }
@@ -2678,9 +2678,21 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 .destination-card-copy { position:relative; z-index:1; display:flex; min-height:330px; flex:1; flex-direction:column; justify-content:end; align-items:start; padding:24px; }
 .destination-card-copy small { color:#e8d5b4; font:600 9px Arial,sans-serif; letter-spacing:.2em; }
 .destination-card-copy strong { margin:8px 0; font:500 29px Georgia,serif; }
-.destination-card-copy span { max-width:360px; color:#fbf8f1; font:13px/1.5 Arial,sans-serif; }
+.destination-card-copy > span { max-width:360px; color:#fbf8f1; font:13px/1.5 Arial,sans-serif; }
 .destination-card-copy b { margin-top:16px; color:#f0d8ad; font:600 11px Arial,sans-serif; }
-.portal-breadcrumb { margin:0 0 18px; color:#8e7666; font:12px Arial,sans-serif; }
+/* Navegación compartida de las páginas del portal: botón de regreso + rastro de ubicación */
+.portal-nav { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px 18px; margin:0 0 20px; }
+.portal-nav-back { display:inline-flex; align-items:center; gap:9px; padding:11px 18px; border:1px solid #d9c9ae; border-radius:10px; background:#fff; color:#40362e; font:600 13px/1 Arial,sans-serif; letter-spacing:.02em; text-decoration:none; box-shadow:0 4px 12px rgba(64,54,46,.07); transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease,box-shadow .16s ease; }
+.portal-nav-back-icon { font:700 15px/1 Arial,sans-serif; transition:transform .16s ease; }
+.portal-nav-back:hover,.portal-nav-back:focus-visible { background:#090403; border-color:#090403; color:#f0d8ad; transform:translateY(-1px); box-shadow:0 8px 18px rgba(9,4,3,.18); }
+.portal-nav-back:hover .portal-nav-back-icon,.portal-nav-back:focus-visible .portal-nav-back-icon { transform:translateX(-2px); }
+.portal-nav-back:active { transform:translateY(0); box-shadow:0 3px 8px rgba(9,4,3,.14); }
+.portal-nav-trail { display:flex; flex-wrap:wrap; align-items:center; gap:7px; color:#8e7666; font:12px Arial,sans-serif; }
+.portal-nav-trail-link { color:#8a7c6e; text-decoration:none; }
+.portal-nav-trail-link:hover,.portal-nav-trail-link:focus-visible { color:#090403; text-decoration:underline; }
+.portal-nav-trail-sep { color:#b9a887; }
+.portal-nav-trail-current { color:#40362e; font-weight:600; }
+@media(max-width:620px) { .portal-nav { flex-direction:column; align-items:stretch; } .portal-nav-back { width:100%; justify-content:center; padding:13px 16px; } }
 .hotel-detail-map-section { max-width:1180px; margin:34px auto; padding:0 clamp(16px,4vw,42px); }
 .hotel-detail-map-heading { margin-bottom:14px; }
 .hotel-detail-map-heading small { color:#8f7332; font:600 10px Arial,sans-serif; letter-spacing:.18em; }
@@ -3597,60 +3609,4 @@ body.pano-360-open { overflow: hidden; }
 .location-welcome { animation:locationWelcomeIn .34s cubic-bezier(.2,.75,.25,1) both; }
 @media (max-width:599px){ .location-welcome { right:12px; left:12px; bottom:12px; width:auto; } }
 
-/* =========================================================
-   MAPAMUNDI · 8 ANIMACIONES (entrada y salida de la sección)
-   1 mapaMundiIn        10 mapaMundiSweep      20 mapaMundiRise
-   3 mapaMundiPulse     4 mapaMundiArc         5 mapaMundiDrift
-   6 mapaMundiCount     7 mapaMundiTip         8 mapaMundiOut
-   ========================================================= */
-.mapamundi-page { display:flex; flex-direction:column; gap:20px; padding:8px 4px 26px; }
-.mapamundi-head { display:flex; flex-wrap:wrap; gap:16px 26px; align-items:flex-end; justify-content:space-between; }
-.mapamundi-kicker { margin:0 0 6px; color:var(--gold-deep); font:600 10px/1.5 Arial,sans-serif; letter-spacing:.22em; text-transform:uppercase; }
-.mapamundi-title { margin:0; color:var(--green); font:400 clamp(26px,3.4vw,40px)/1.1 Marcellus,Georgia,serif; letter-spacing:.05em; text-transform:uppercase; }
-.mapamundi-totals { display:flex; flex-wrap:wrap; gap:18px 26px; }
-.mapamundi-tot { text-align:right; }
-.mapamundi-tot b { display:block; color:var(--green); font:400 clamp(22px,3vw,32px)/1 Marcellus,Georgia,serif; }
-.mapamundi-tot span { display:block; margin-top:5px; color:var(--muted); font:600 10px/1.4 Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase; }
-.mapamundi-legend { display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; color:var(--green-deep); font:600 11px/1.4 Arial,sans-serif; letter-spacing:.12em; text-transform:uppercase; }
-.mapamundi-legend i { display:inline-block; width:11px; height:11px; margin-right:7px; border-radius:50%; }
-.mapamundi-frame { position:relative; border:1px solid #d9c9ae; border-radius:16px; background:var(--panel); overflow:hidden; }
-.mapamundi-map { width:100%; height:clamp(340px,46vw,520px); }
-.mapamundi-note { margin:0; color:var(--muted); font:12px/1.6 Arial,sans-serif; }
-.mapamundi-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
-.mapamundi-btn { padding:10px 16px; border:1px solid #d9c9ae; border-radius:999px; background:var(--paper-alt); color:var(--green-deep); font:600 12px/1.4 Arial,sans-serif; letter-spacing:.06em; text-decoration:none; cursor:pointer; }
-.mapamundi-btn:hover,.mapamundi-btn:focus-visible { border-color:var(--gold-deep); color:var(--gold-deep); }
-.mapamundi-hotspot { display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--green); font:600 10px/1.3 Arial,sans-serif; letter-spacing:.06em; text-transform:uppercase; white-space:nowrap; text-shadow:0 1px 0 #fff,0 0 6px #fff; }
-.mapamundi-frame .leaflet-popup-content { animation:mapaMundiTip .18s ease-out both; }
-.mapamundi-hotspot i { display:block; width:11px; height:11px; border-radius:50%; box-shadow:0 0 0 3px rgba(255,255,255,.75); }
-@keyframes mapaMundiIn { from { opacity:0; transform:translateY(16px) scale(.985); } to { opacity:1; transform:none; } }
-@keyframes mapaMundiSweep { from { background-position:-140% 0; } to { background-position:240% 0; } }
-@keyframes mapaMundiRise { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
-@keyframes mapaMundiPulse { 0% { transform:scale(.55); opacity:.85; } 70% { opacity:0; } 100% { transform:scale(2.4); opacity:0; } }
-@keyframes mapaMundiArc { from { stroke-dashoffset: var(--arc-length, 900); } to { stroke-dashoffset: 0; } }
-@keyframes mapaMundiDrift { 0%,100% { transform:translate3d(0,0,0); } 50% { transform:translate3d(0,-8px,0); } }
-@keyframes mapaMundiCount { from { opacity:.25; transform:translateY(6px); } to { opacity:1; transform:none; } }
-@keyframes mapaMundiTip { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
-@keyframes mapaMundiOut { from { opacity:1; filter:blur(0); } to { opacity:0; filter:blur(6px); } }
-.mapamundi-page[data-anim="in"] .mapamundi-frame { animation:mapaMundiIn .55s cubic-bezier(.2,.75,.25,1) both; }
-.mapamundi-page[data-anim="in"] .mapamundi-frame::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.5) 50%,transparent 58%); background-size:220% 100%; animation:mapaMundiSweep 1.15s ease-out .12s both; }
-.mapamundi-page[data-anim="in"] .mapamundi-head > *,
-.mapamundi-page[data-anim="in"] .mapamundi-legend { animation:mapaMundiRise .5s cubic-bezier(.2,.75,.25,1) both; }
-.mapamundi-page[data-anim="in"] .mapamundi-head > *:nth-child(2) { animation-delay:.09s; }
-.mapamundi-page[data-anim="in"] .mapamundi-legend { animation-delay:.16s; }
-.mapamundi-pulse { position:absolute; width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:50%; background:rgba(199,169,94,.55); animation:mapaMundiPulse 2.6s ease-out infinite; pointer-events:none; }
-.mapamundi-arc { animation:mapaMundiArc 1.5s ease-out both; }
-.mapamundi-page[data-anim="in"] .mapamundi-map { animation:mapaMundiDrift 16s ease-in-out .6s 2 both; }
-.mapamundi-tot b { animation:mapaMundiCount .5s ease-out both; }
-.leaflet-popup-content .mapamundi-hotspot { text-shadow:none; }
-.mapamundi-page[data-anim="out"] .mapamundi-frame { animation:mapaMundiOut .3s ease-in both; }
-@media (prefers-reduced-motion: reduce) {
-  .mapamundi-page *,.mapamundi-pulse,.mapamundi-arc { animation:none !important; transition:none !important; }
-}
-/* Tipografía EB Garamond para la sección «Mapa general de hoteles».
-   El modo "tool" fuerza Arial con !important sobre .magazine-stage; se
-   reafirma EB Garamond (ya cargada en index.html) solo dentro de esta
-   sección, sin alterar el resto de la revista ni el Mapamundi Leaflet. */
-.mapamundi-page,
-.mapamundi-page * { font-family:"EB Garamond",Georgia,serif !important; }
-body[data-app-mode="tool"] .mapamundi-page,
-body[data-app-mode="tool"] .mapamundi-page * { font-family:"EB Garamond",Georgia,serif !important; }
+

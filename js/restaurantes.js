@@ -24,6 +24,16 @@
       ["Cozumel Buffet", "Buffet"], ["El Cedral Buffet", "Buffet"],
       ["El Cedral Smoke House", "Parrilla"], ["Las dos Marías", "Mexicana"]
     ],
+    "Iberostar Waves Quetzal": [
+      ["La Góndola", "Italiana"], ["Bonsai", "Japonesa"],
+      ["Mare Nostrum", "Mediterránea"], ["Uxmal", "Mexicana"],
+      ["La Hacienda · Smoke House", "Carnes / BBQ texano"], ["Cozumel", "Buffet internacional"]
+    ],
+    "Iberostar Waves Tucán": [
+      ["La Góndola", "Italiana"], ["Bonsai", "Japonesa"],
+      ["Mare Nostrum", "Mediterránea"], ["Uxmal", "Mexicana"],
+      ["La Hacienda · Smoke House", "Carnes / BBQ texano"], ["Cozumel", "Buffet internacional"]
+    ],
     "JOIA Rose Hall by Iberostar": [
       ["Chez Charlie", "Francesa"], ["Amari", "Italiana"], ["Oriole", "Jamaicana"],
       ["Marina", "Buffet mediterráneo"], ["Garden Pantry", "Opciones frescas"], ["Gaia", "Parrilla"]
@@ -83,6 +93,8 @@
     "Iberostar Selection Playa Mita": "https://www.iberostar.com/en/hotels/riviera-nayarit/iberostar-selection-playa-mita/",
     "Iberostar Selection Cancún": "https://www.iberostar.com/en/hotels/cancun/iberostar-selection-cancun/",
     "Iberostar Waves Cozumel": "https://www.iberostar.com/en/hotels/cozumel/iberostar-waves-cozumel/",
+    "Iberostar Waves Quetzal": "https://www.iberostar.com/en/hotels/riviera-maya/iberostar-waves-quetzal/",
+    "Iberostar Waves Tucán": "https://www.iberostar.com/en/hotels/riviera-maya/iberostar-waves-tucan/",
     "JOIA Rose Hall by Iberostar": "https://www.iberostar.com/en/hotels/montego-bay/joia-rose-hall-by-iberostar/",
     "Iberostar Selection Rose Hall Suites": "https://www.iberostar.com/en/hotels/montego-bay/iberostar-selection-rose-hall-suites/",
     "Iberostar Waves Rose Hall Beach": "https://www.iberostar.com/en/hotels/montego-bay/iberostar-waves-rose-hall-beach/",
